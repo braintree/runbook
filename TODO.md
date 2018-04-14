@@ -165,7 +165,7 @@ end
 
 Additional statements include:
 
- * `assert`: Run a command with a specified interval until no error is returned
+ * `assert`: Run a command with a specified interval until no error is returned. Could have timeout and execute behavior on timeout
  * `ask`: Collect user input for future conditions
  * `condition`: Takes three lambdas: predicate, if, else and executes
  * `wait`: Sleep for a specified period of time
@@ -266,3 +266,32 @@ $ ./my_runbook.rb
 ./lib/runbook/statements/wait.rb
 ./lib/runbook/extensions/copy_commands.rb
 ./lib/runbook/extensions/tmux.rb
+
+## Open Questions
+
+### Potential command frameworks
+
+* https://github.com/piotrmurach/tty-command
+* capistrano
+
+### Potential command line frameworks
+
+* Thor
+
+### How to integrate guard
+### How will the helpers work?
+### Is monitor to brittle of a context for a statement?
+### Is the set of statements minimalistic?
+
+## Additional TODO
+
+* Review Scaling runbooks: https://knowledge_repo/scaling/runbooks/
+* Review Runbook Best Practices
+    * https://victorops.com/how-to-build-runbooks?
+    * http://holyhandgrenade.org/blog/2011/08/runbooks-are-stupid-and-youre-doing-them-wrong/
+    * https://www.ansible.com/blog/migrating-the-runbook-a-journey-from-legacy-to-devops
+    * http://www.plutora.com/blog/deployment-runbook
+    * https://github.com/SkeltonThatcher/run-book-template/blob/master/run-book-template.md
+    * https://www.process.st/create-a-runbook/
+    * https://www.rundeck.com/open-source
+    * https://automatron.io/
