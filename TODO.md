@@ -59,6 +59,12 @@ Runbook.book "Drop Redis" do
 
     step "Wait for the dump to finish" do
       command "redis-cli -h #{host} -p 6379 INFO | grep rdb_bgsave_in_progress:0"
+      ask "How many messages are left", into: :num_messages_left
+      condition (
+        predicate: -> { num_messages_left.to_i > 5 },
+        if_stmt: -> { puts "There are more messages than we expect. Exiting"; exit },
+        else_stmt: nil
+      )
     end
 
     step "Stream snapshot and replication log into destination" do
@@ -97,7 +103,7 @@ Runbook.book "Drop Redis" do
 
     step "Ensure replication log is no longer being written to" do
       monitor (
-        command: "tail -f /tmp/source_redis_node_replication_log",
+        cmd: "tail -f /tmp/source_redis_node_replication_log",
         confirm: "The replication log is no longer being written to"
       )
     end
@@ -261,8 +267,6 @@ $ ./my_runbook.rb
 ./lib/runbook/statements/monitor.rb
 ./lib/runbook/statements/note.rb
 ./lib/runbook/statements/notice.rb
-./lib/runbook/statements/server.rb
-./lib/runbook/statements/servers.rb
 ./lib/runbook/statements/wait.rb
 ./lib/runbook/extensions/copy_commands.rb
 ./lib/runbook/extensions/tmux.rb
@@ -282,6 +286,7 @@ $ ./my_runbook.rb
 ### How will the helpers work?
 ### Is monitor to brittle of a context for a statement?
 ### Is the set of statements minimalistic?
+### If skip-prompts is set, a warning should be displayed if this may cause issues (e.x. ask statement)
 
 ## Additional TODO
 
