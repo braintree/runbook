@@ -1,3 +1,4 @@
+require "pry"
 require "bundler/setup"
 require "runbook"
 
