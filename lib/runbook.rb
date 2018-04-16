@@ -33,15 +33,8 @@ module Runbook
   end
 
   def self.statements
-    consts = Runbook::Statements.constants.map do |const|
+    Runbook::Statements.constants.map { |const|
       "Runbook::Statements::#{const}".constantize
-    end
-    consts.select { |const| const.is_a?(Class) }
-  end
-
-  def self.statement_methods
-    statements.map do |klass|
-      klass.to_s.split("::")[-1].underscore
-    end
+    }.select { |const| const.is_a?(Class) }
   end
 end

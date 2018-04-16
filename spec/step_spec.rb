@@ -9,7 +9,10 @@ RSpec.describe Runbook::Step do
   end
 
   complex_arg_statements = ["ask", "condition", "monitor"]
-  statements = Runbook.statement_methods
+  statements = Runbook.statements.map do |klass|
+    klass.to_s.split("::")[-1].underscore
+  end
+
   (statements - complex_arg_statements).each do |method|
     it "responds to the #{method} statement" do
       expect(step).to respond_to(method)
