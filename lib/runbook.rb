@@ -6,6 +6,7 @@ require "runbook/entities/section"
 require "runbook/entities/step"
 
 require "runbook/viewer"
+require "runbook/views/markdown"
 
 require "runbook/statement"
 require "runbook/statements/ask"
@@ -30,6 +31,10 @@ module Runbook
     Entities::Book.new(title).tap do |book|
       book.instance_eval(&block)
     end
+  end
+
+  def self.entities
+    _child_classes(Runbook::Entities)
   end
 
   def self.statements

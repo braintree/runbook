@@ -10,11 +10,12 @@ module Runbook
       @items ||= []
     end
 
-    def render(view, string)
-      view.render(self, string)
+    def render(view, output)
+      view.render_before(self, output)
       items.each do |item|
-        item.render(view, string)
+        item.render(view, output)
       end
+      view.render_after(self, output)
     end
   end
 end
