@@ -15,5 +15,5 @@ module Runbook::Extensions
     end
   end
 
-  Runbook::Step.prepend(ServerList)
+  Runbook::Entities::Step.prepend(ServerList)
 end

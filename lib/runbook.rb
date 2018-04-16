@@ -27,7 +27,7 @@ require "runbook/version"
 
 module Runbook
   def self.book(title, &block)
-    Book.new(title).tap do |book|
+    Entities::Book.new(title).tap do |book|
       book.instance_eval(&block)
     end
   end

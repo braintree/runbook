@@ -10,7 +10,7 @@ RSpec.describe Runbook do
     let(:book) { Runbook.book(title) {} }
 
     it "returns a book" do
-      expect(book).to be_a(Runbook::Book)
+      expect(book).to be_a(Runbook::Entities::Book)
     end
 
     it "sets the books title" do

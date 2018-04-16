@@ -1,5 +1,5 @@
-module Runbook
-  class Book < Entity
+module Runbook::Entities
+  class Book < Runbook::Entity
     def initialize(title)
       super(title)
     end

@@ -20,5 +20,5 @@ module Runbook::Extensions
     end
   end
 
-  Runbook::Step.prepend(Statements)
+  Runbook::Entities::Step.prepend(Statements)
 end

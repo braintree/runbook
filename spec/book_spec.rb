@@ -1,8 +1,8 @@
 require "spec_helper"
 
-RSpec.describe Runbook::Book do
+RSpec.describe Runbook::Entities::Book do
   let(:title) { "Some Title" }
-  let(:book) { Runbook::Book.new(title) }
+  let(:book) { Runbook::Entities::Book.new(title) }
 
   it "has a title" do
     expect(book.title).to eq(title)
