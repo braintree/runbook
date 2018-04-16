@@ -13,14 +13,10 @@ module Runbook
   end
 
   module Statements
-    def statements
-      @statements ||= []
-    end
-
     def method_missing(name, *args, &block)
       if (klass = Statements._statement_class(name))
         klass.new(*args, &block).tap do |statement|
-          statements << statement
+          items << statement
         end
       else
         super

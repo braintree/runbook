@@ -9,15 +9,15 @@ RSpec.describe Runbook::Section do
   end
 
   describe "#step" do
-    it "adds a step to the section" do
+    it "adds a step to the section's items" do
       step = section.step("My Step") {}
-      expect(section.steps).to include(step)
+      expect(section.items).to include(step)
     end
 
-    it "adds to the section's existing steps" do
+    it "adds to the section's existing items" do
       step1 = section.step("My step") {}
       step2 = section.step("My other step") {}
-      expect(section.steps).to eq([step1, step2])
+      expect(section.items).to eq([step1, step2])
     end
 
     it "evaluates the block in the context of the step" do

@@ -1,8 +1,9 @@
 require "active_support/inflector"
 
-require "runbook/book"
-require "runbook/section"
-require "runbook/step"
+require "runbook/entity"
+require "runbook/entities/book"
+require "runbook/entities/section"
+require "runbook/entities/step"
 
 require "runbook/viewer"
 

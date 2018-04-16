@@ -1,9 +1,7 @@
 module Runbook
-  class Book
-    attr_reader :title
-
+  class Book < Entity
     def initialize(title)
-      @title = title
+      super(title)
     end
   end
 end

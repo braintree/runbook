@@ -22,17 +22,17 @@ RSpec.describe Runbook::Step do
         expect(statement).to be_a(klass)
       end
 
-      it "adds a #{method} statement to the step" do
+      it "adds a #{method} statement to the step's items" do
         statement = step.send(method.to_sym, "some_arg")
-        expect(step.statements).to include(statement)
+        expect(step.items).to include(statement)
       end
     end
   end
 
-  it "adds new statements to the step's existing statements" do
+  it "adds new statements to the step's existing items" do
     stmt1 = step.command("echo 'hi'")
     stmt2 = step.command("echo 'hi'")
-    expect(step.statements).to eq([stmt1, stmt2])
+    expect(step.items).to eq([stmt1, stmt2])
   end
 
   it "does not break method_missing" do

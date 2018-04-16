@@ -9,15 +9,15 @@ RSpec.describe Runbook::Book do
   end
 
   describe "#section" do
-    it "adds a section to the book" do
+    it "adds a section to the book's items" do
       section = book.section("My Section") {}
-      expect(book.sections).to include(section)
+      expect(book.items).to include(section)
     end
 
-    it "adds to the book's existing sections" do
+    it "adds to the book's existing items" do
       section1 = book.section("My Section") {}
       section2 = book.section("My Other Section") {}
-      expect(book.sections).to eq([section1, section2])
+      expect(book.items).to eq([section1, section2])
     end
 
     it "evaluates the block in the context of the section" do
