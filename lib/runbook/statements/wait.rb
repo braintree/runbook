@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Wait
+  class Wait < Runbook::Statement
     attr_reader :time
 
     def initialize(time)

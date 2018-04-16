@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Command
+  class Command < Runbook::Statement
     attr_reader :cmd
 
     def initialize(cmd)

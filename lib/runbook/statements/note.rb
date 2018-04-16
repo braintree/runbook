@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Note
+  class Note < Runbook::Statement
     attr_reader :msg
 
     def initialize(msg)

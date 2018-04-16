@@ -7,6 +7,7 @@ require "runbook/entities/step"
 
 require "runbook/viewer"
 
+require "runbook/statement"
 require "runbook/statements/ask"
 require "runbook/statements/assert"
 require "runbook/statements/command"

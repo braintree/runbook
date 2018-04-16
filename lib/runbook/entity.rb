@@ -9,6 +9,13 @@ module Runbook
     def items
       @items ||= []
     end
+
+    def render(view, string)
+      view.render(self, string)
+      items.each do |item|
+        item.render(view, string)
+      end
+    end
   end
 end
 

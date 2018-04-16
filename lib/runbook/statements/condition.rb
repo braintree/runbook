@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Condition
+  class Condition < Runbook::Statement
     attr_reader :predicate, :if_stmt, :else_stmt
 
     def initialize(predicate: , if_stmt: , else_stmt: nil)

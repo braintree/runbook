@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Ask
+  class Ask < Runbook::Statement
     attr_reader :prompt, :into
 
     def initialize(prompt, into:)

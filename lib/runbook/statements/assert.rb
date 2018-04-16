@@ -1,5 +1,5 @@
 module Runbook::Statements
-  class Assert
+  class Assert < Runbook::Statement
     attr_reader :cmd, :interval, :timeout, :exec_on_timeout
 
     def initialize(cmd, interval: 1, timeout: 0, exec_on_timeout: nil)
