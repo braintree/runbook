@@ -33,8 +33,12 @@ module Runbook
   end
 
   def self.statements
-    Runbook::Statements.constants.map { |const|
-      "Runbook::Statements::#{const}".constantize
+    _child_classes(Runbook::Statements)
+  end
+
+  def self._child_classes(modgule)
+    modgule.constants.map { |const|
+      "#{modgule.to_s}::#{const}".constantize
     }.select { |const| const.is_a?(Class) }
   end
 end
