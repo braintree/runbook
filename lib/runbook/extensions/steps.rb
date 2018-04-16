@@ -1,7 +1,7 @@
-module Runbook
+module Runbook::Extensions
   module Steps
     def step(title=nil, &block)
-      Step.new(title).tap do |step|
+      Runbook::Step.new(title).tap do |step|
         items << step
         step.instance_eval(&block) if block
       end

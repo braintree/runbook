@@ -1,17 +1,4 @@
-module Runbook
-  def self.statements
-    consts = Runbook::Statements.constants.map do |const|
-      "Runbook::Statements::#{const}".constantize
-    end
-    consts.select { |const| const.is_a?(Class) }
-  end
-
-  def self.statement_methods
-    statements.map do |klass|
-      klass.to_s.split("::")[-1].underscore
-    end
-  end
-
+module Runbook::Extensions
   module Statements
     def method_missing(name, *args, &block)
       if (klass = Statements._statement_class(name))

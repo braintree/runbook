@@ -31,4 +31,17 @@ module Runbook
       book.instance_eval(&block)
     end
   end
+
+  def self.statements
+    consts = Runbook::Statements.constants.map do |const|
+      "Runbook::Statements::#{const}".constantize
+    end
+    consts.select { |const| const.is_a?(Class) }
+  end
+
+  def self.statement_methods
+    statements.map do |klass|
+      klass.to_s.split("::")[-1].underscore
+    end
+  end
 end

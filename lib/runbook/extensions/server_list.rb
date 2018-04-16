@@ -1,4 +1,4 @@
-module Runbook
+module Runbook::Extensions
   module ServerList
     def server_list
       @server_list ||= []
