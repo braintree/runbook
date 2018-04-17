@@ -1,5 +1,6 @@
-require "pry"
+require "aruba/rspec"
 require "bundler/setup"
+require "pry"
 require "runbook"
 require "./spec/support/factory"
 
