@@ -244,6 +244,14 @@ $ ./my_runbook.rb
 * Compile-time validations?
 * Handles ctrl-c gracefully
 * Will need some sort of configuration for the runbook
+* Be able to serve up markdown docs for easy viewing
+* Allow sections to inherit from sections
+* Add way to track depth of a current object in the tree
+* Add a way to introspect on your neighbors or place in the tree
+* Allow some sort of notes statement at the section level
+* Should provide an option to suppress warnings
+* Can specify input-format, output-format, input (file), and output (file)
+
 
 ## Architecture
 
