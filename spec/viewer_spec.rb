@@ -30,11 +30,13 @@ RSpec.describe Runbook::Viewer do
 ## 1. First Section
 
 1. [] Step 1
-   note: I like cheese
+
+   I like cheese
 
 ## 1. Second Section
 
 1. [] Step 1
+
    confirm: Did you eat cheese today?
 
 MARKDOWN

@@ -1,6 +1,6 @@
 module Runbook::Views
   module Markdown
-    def self.render_before(object, output)
+    def self.render(object, output)
       case object
       when Runbook::Entities::Book
         output << "# #{object.title}\n\n"
@@ -40,26 +40,6 @@ module Runbook::Views
       else
         # TODO: How do we handle error output?
         puts "WARNING! No _before_ render rule for #{object.class} for Runbook::Views::Markdown"
-      end
-    end
-
-    def self.render_after(object, output)
-      case object
-      when Runbook::Entities::Book
-      when Runbook::Entities::Section
-      when Runbook::Entities::Step
-      when Runbook::Statements::Ask
-      when Runbook::Statements::Assert
-      when Runbook::Statements::Command
-      when Runbook::Statements::Condition
-      when Runbook::Statements::Confirm
-      when Runbook::Statements::Monitor
-      when Runbook::Statements::Note
-      when Runbook::Statements::Notice
-      when Runbook::Statements::Wait
-      else
-        # TODO: How do we handle error output?
-        puts "WARNING! No _after_ render rule for #{object.class} for Runbook::Views::Markdown"
       end
     end
   end

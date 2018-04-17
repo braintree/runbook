@@ -11,11 +11,10 @@ module Runbook
     end
 
     def render(view, output)
-      view.render_before(self, output)
+      view.render(self, output)
       items.each do |item|
         item.render(view, output)
       end
-      view.render_after(self, output)
     end
   end
 end
