@@ -18,12 +18,6 @@ RSpec.describe "runbook view", type: :aruba do
   before(:each) { run(command) }
 
   describe "input specification" do
-    context "runbook is written to standard in" do
-      let(:command) { "sh -c 'cat #{runbook_file} | runbook view'" }
-
-      it "prints a markdown representation of the runbook"
-    end
-
     context "runbook is passed as an argument" do
       let(:command) { "runbook view #{runbook_file}" }
 
@@ -32,15 +26,17 @@ RSpec.describe "runbook view", type: :aruba do
       end
     end
 
-    context "when a non-existant file is passed in as an argument" do
-      it "prints a markdown representation of the runbook"
+    context "when an unknown file is passed in as an argument" do
+      let(:command) { "runbook view unknown" }
+      let(:unknown_file_output) {
+        "view: cannot access unknown: No such file or directory"
+      }
+      it "prints an unknown file message" do
+        expect(last_command_started).to have_output(unknown_file_output)
+      end
     end
 
-    context "when a file option is passed in" do
-      it "prints a markdown representation of the runbook"
-    end
-
-    context "when a non-existant file is passed in as an option" do
+    context "runbook is written to standard in" do
       it "prints a markdown representation of the runbook"
     end
 
