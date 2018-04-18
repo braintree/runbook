@@ -33,7 +33,7 @@ RSpec.describe Runbook::Viewer do
 
    I like cheese
 
-## 1. Second Section
+## 2. Second Section
 
 1. [] Step 1
 
