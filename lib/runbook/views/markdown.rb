@@ -1,46 +1,64 @@
 module Runbook::Views
   module Markdown
-    def self.render(object, output)
-      case object
-      when Runbook::Entities::Book
-        output << "# #{object.title}\n\n"
-      when Runbook::Entities::Section
-        output << "## 1. #{object.title}\n\n"
-      when Runbook::Entities::Step
-        output << "1. [] #{object.title}\n\n"
-      when Runbook::Statements::Ask
-        output << "   #{object.prompt}\n\n"
-      when Runbook::Statements::Assert
-        output << "   run: `#{object.cmd}` every #{object.interval} seconds until it returns 0\n\n"
-        if object.timeout > 0
-          exec_on_timeout_msg = object.exec_on_timeout ? " and run `#{object.exec_on_timeout}`" : ""
-          output << "   after #{object.timeout} seconds, time out#{exec_on_timeout_msg}\n\n"
-        end
-      when Runbook::Statements::Command
-        output << "   run: `#{object.cmd}`\n\n"
-      when Runbook::Statements::Condition
-        begin
-          output << "   if (#{object.predicate.source})\n\n"
-          output << "   then (#{object.if_stmt.source})\n\n"
-          output << "   else (#{object.else_stmt.source})\n\n" if object.else_stmt
-        rescue MethodSource::SourceNotFoundError => e
-          output << "   Unable to retrieve source code\n\n"
-        end
-      when Runbook::Statements::Confirm
-        output << "   confirm: #{object.prompt}\n\n"
-      when Runbook::Statements::Monitor
-        output << "   run: `#{object.cmd}`\n\n"
-        output << "   confirm: #{object.prompt}\n\n"
-      when Runbook::Statements::Note
-        output << "   #{object.msg}\n\n"
-      when Runbook::Statements::Notice
-        output << "   **#{object.msg}**\n\n"
-      when Runbook::Statements::Wait
-        output << "   wait: #{object.time} seconds\n\n"
-      else
-        # TODO: How do we handle error output?
-        puts "WARNING! No _before_ render rule for #{object.class} for Runbook::Views::Markdown"
+    include Runbook::View
+
+    def self.runbook__entities__book(object, output)
+      output << "# #{object.title}\n\n"
+    end
+
+    def self.runbook__entities__section(object, output)
+      output << "## 1. #{object.title}\n\n"
+    end
+
+    def self.runbook__entities__step(object, output)
+      output << "1. [] #{object.title}\n\n"
+    end
+
+    def self.runbook__statements__ask(object, output)
+      output << "   #{object.prompt}\n\n"
+    end
+
+    def self.runbook__statements__assert(object, output)
+      output << "   run: `#{object.cmd}` every #{object.interval} seconds until it returns 0\n\n"
+      if object.timeout > 0
+        exec_on_timeout_msg = object.exec_on_timeout ? " and run `#{object.exec_on_timeout}`" : ""
+        output << "   after #{object.timeout} seconds, time out#{exec_on_timeout_msg}\n\n"
       end
+    end
+
+    def self.runbook__statements__command(object, output)
+      output << "   run: `#{object.cmd}`\n\n"
+    end
+
+    def self.runbook__statements__condition(object, output)
+      begin
+        output << "   if (#{object.predicate.source})\n\n"
+        output << "   then (#{object.if_stmt.source})\n\n"
+        output << "   else (#{object.else_stmt.source})\n\n" if object.else_stmt
+      rescue MethodSource::SourceNotFoundError => e
+        output << "   Unable to retrieve source code\n\n"
+      end
+    end
+
+    def self.runbook__statements__confirm(object, output)
+      output << "   confirm: #{object.prompt}\n\n"
+    end
+
+    def self.runbook__statements__monitor(object, output)
+      output << "   run: `#{object.cmd}`\n\n"
+      output << "   confirm: #{object.prompt}\n\n"
+    end
+
+    def self.runbook__statements__note(object, output)
+      output << "   #{object.msg}\n\n"
+    end
+
+    def self.runbook__statements__notice(object, output)
+      output << "   **#{object.msg}**\n\n"
+    end
+
+    def self.runbook__statements__wait(object, output)
+      output << "   wait: #{object.time} seconds\n\n"
     end
   end
 end

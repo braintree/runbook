@@ -6,6 +6,7 @@ require "runbook/entities/section"
 require "runbook/entities/step"
 
 require "runbook/viewer"
+require "runbook/view"
 require "runbook/views/markdown"
 
 require "runbook/statement"
