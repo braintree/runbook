@@ -220,38 +220,43 @@ $ ./my_runbook.rb
 
 ## Feature list
 
-* Yaml specification format
-  * Will not contain as much flexibility as Ruby format
-  * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
-* Generate markdown
-  * Different generators can be used for different types of markdown
+* [x] Allow sections to inherit from sections
+* [x] Add way to track depth of a current object in the tree
+* [x] Add a way to introspect on your neighbors or place in the tree
+* [x] Allow some sort of description statement at the section level
 * Generation plugins
   * Can specify additional generators for output of the runbook
-* Runbook lifecycle hooks
-  * Can hook into various points of the execution of a runbook to add functionality
-  * Example includes adding an option to take notes at each step or logging the run
 * Pluggable runbook functionality
   * You can augment the runbook's default keywords with additional keywords to suite your needs and add extra functionality
   * You can for example create a layout declaration that is executed for your runbooks
   * You can hook in to existing keywords to add additional functionality (such as copying all commands to the clipboard)
-* Command line interface (without prompts, noop, resume at specific step)
+* Runbook lifecycle hooks
+  * Can hook into various points of the execution of a runbook to add functionality
+  * Example includes adding an option to take notes at each step or logging the run
+* Handles ctrl-c gracefully
+* Should provide an option to suppress warnings
+* Will need some sort of configuration for the runbook
+* Create a generator for a runbook? Allow for custom generators?
+* Guard for view updates (How to handle arguments?)
+* Could provide a rake task for compiling and nooping runbooks?
+* Be able to serve up markdown docs (web server) for easy viewing
+* Compile-time validations?
+* Can specify input-format, output-format, input (file), and output (file)
+* Yaml specification format (subset of Ruby)
+  * Will not contain as much flexibility as Ruby format
+  * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
+
+Document:
+
+* [x] Command line interface (without prompts, noop, resume/continue/start at specific step)
   * Reads from standard in, writes to standard out
 * Ruby interface
   * You can integrate and execute runbooks from within your existing projects
 * Runbooks can be self-contained/runnable files
-* Seamlessly integrates with other Ruby libraries
-* Guard for view updates (How to handle arguments?)
-* Compile-time validations?
-* Handles ctrl-c gracefully
-* Will need some sort of configuration for the runbook
-* Be able to serve up markdown docs for easy viewing
-* Allow sections to inherit from sections
-* Add way to track depth of a current object in the tree
-* Add a way to introspect on your neighbors or place in the tree
-* Allow some sort of notes statement at the section level
-* Should provide an option to suppress warnings
-* Can specify input-format, output-format, input (file), and output (file)
-* Create a generator for a runbook? Allow for custom generators?
+* Generate markdown
+  * Different generators can be used for different types of markdown or generally for different formatting
+* Seamlessly integrates with other Ruby libraries (for augmenting functionality)
+* Demonstrate how to add aliases for keywords
 
 
 ## Architecture
