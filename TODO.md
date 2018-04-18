@@ -251,6 +251,7 @@ $ ./my_runbook.rb
 * Allow some sort of notes statement at the section level
 * Should provide an option to suppress warnings
 * Can specify input-format, output-format, input (file), and output (file)
+* Create a generator for a runbook? Allow for custom generators?
 
 
 ## Architecture
