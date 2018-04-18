@@ -65,6 +65,13 @@ module Factory
       return Runbook::Statements::Confirm.new(
         attrs[:prompt],
       )
+    when :description
+      attrs = {
+        msg: "This is a loooong description",
+      }.merge!(overrides)
+      return Runbook::Statements::Description.new(
+        attrs[:msg],
+      )
     when :monitor
       attrs = {
         cmd: "ps aux | grep redis",

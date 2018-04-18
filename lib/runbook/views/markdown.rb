@@ -44,6 +44,10 @@ module Runbook::Views
       output << "   confirm: #{object.prompt}\n\n"
     end
 
+    def self.runbook__statements__description(object, output)
+      output << "#{object.msg}\n\n"
+    end
+
     def self.runbook__statements__monitor(object, output)
       output << "   run: `#{object.cmd}`\n\n"
       output << "   confirm: #{object.prompt}\n\n"
