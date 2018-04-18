@@ -8,6 +8,27 @@ RSpec.describe Runbook::Entities::Section do
     expect(section.title).to eq(title)
   end
 
+  describe "#section" do
+    it "adds a section to the section's items" do
+      section2 = section.section("My Nested Section") {}
+      expect(section.items).to include(section2)
+    end
+
+    it "adds to the section's existing items" do
+      sec1 = section.section("My nested section 1") {}
+      sec2 = section.section("My nested section 2") {}
+      expect(section.items).to eq([sec1, sec2])
+    end
+
+    it "evaluates the block in the context of the section" do
+      in_section = nil
+      out_section = section.section("My inner section") {
+        in_section = self
+      }
+      expect(in_section).to eq(out_section)
+    end
+  end
+
   describe "#step" do
     it "adds a step to the section's items" do
       step = section.step("My Step") {}

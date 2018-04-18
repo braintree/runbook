@@ -7,7 +7,8 @@ module Runbook::Views
     end
 
     def self.runbook__entities__section(object, output, metadata)
-      output << "## #{metadata[:index]+1}. #{object.title}\n\n"
+      heading = "#"*metadata[:depth]
+      output << "#{heading} #{metadata[:index]+1}. #{object.title}\n\n"
     end
 
     def self.runbook__entities__step(object, output, metadata)

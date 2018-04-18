@@ -9,4 +9,5 @@ module Runbook::Extensions
   end
 
   Runbook::Entities::Book.prepend(Sections)
+  Runbook::Entities::Section.prepend(Sections)
 end

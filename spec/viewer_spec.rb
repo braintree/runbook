@@ -3,15 +3,17 @@ require "spec_helper"
 RSpec.describe Runbook::Viewer do
   let(:book) do
     Runbook.book "My Book" do
-      section "First Section" do
-        step "Step 1" do
-          note "I like cheese"
+      section "Parent Section" do
+        section "First Section" do
+          step "Step 1" do
+            note "I like cheese"
+          end
         end
-      end
 
-      section "Second Section" do
-        step "Step 1" do
-          confirm "Did you eat cheese today?"
+        section "Second Section" do
+          step "Step 1" do
+            confirm "Did you eat cheese today?"
+          end
         end
       end
     end
@@ -27,13 +29,15 @@ RSpec.describe Runbook::Viewer do
       expect(markdown).to eq(<<-MARKDOWN)
 # My Book
 
-## 1. First Section
+## 1. Parent Section
+
+### 1. First Section
 
 1. [] Step 1
 
    I like cheese
 
-## 2. Second Section
+### 2. Second Section
 
 1. [] Step 1
 
