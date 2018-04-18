@@ -21,6 +21,7 @@ require "runbook/statements/note"
 require "runbook/statements/notice"
 require "runbook/statements/wait"
 
+require "runbook/extensions/description"
 require "runbook/extensions/sections"
 require "runbook/extensions/server_list"
 require "runbook/extensions/statements"

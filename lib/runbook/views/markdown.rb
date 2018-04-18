@@ -45,7 +45,7 @@ module Runbook::Views
     end
 
     def self.runbook__statements__description(object, output)
-      output << "#{object.msg}\n\n"
+      output << "#{object.msg}\n"
     end
 
     def self.runbook__statements__monitor(object, output)

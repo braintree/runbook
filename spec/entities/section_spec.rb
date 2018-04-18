@@ -34,4 +34,17 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.step("Some step")).to_not be_nil
     end
   end
+
+  describe "#description" do
+    it "adds a description to the section's items" do
+      desc = section.description("My Description") {}
+      expect(section.items).to include(desc)
+    end
+
+    it "adds to the section's existing items" do
+      desc1 = section.description("My description") {}
+      desc2 = section.description("My other description") {}
+      expect(section.items).to eq([desc1, desc2])
+    end
+  end
 end
