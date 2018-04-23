@@ -19,6 +19,7 @@ require "runbook/statements/description"
 require "runbook/statements/monitor"
 require "runbook/statements/note"
 require "runbook/statements/notice"
+require "runbook/statements/ruby_command"
 require "runbook/statements/wait"
 
 require "runbook/extensions/description"

@@ -62,6 +62,12 @@ module Runbook::Views
       output << "   **#{object.msg}**\n\n"
     end
 
+    def self.runbook__statements__ruby_command(object, output, metadata)
+      output << "   run: `#{object.cmd.source}`\n\n"
+    rescue MethodSource::SourceNotFoundError => e
+      output << "   Unable to retrieve source code\n\n"
+    end
+
     def self.runbook__statements__wait(object, output, metadata)
       output << "   wait: #{object.time} seconds\n\n"
     end

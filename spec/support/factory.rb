@@ -95,6 +95,14 @@ module Factory
       return Runbook::Statements::Notice.new(
         attrs[:msg],
       )
+    when :ruby_command
+      cmd = -> { }
+      attrs = {
+        cmd: cmd,
+      }.merge!(overrides)
+      return Runbook::Statements::RubyCommand.new(
+        attrs[:cmd],
+      )
     when :wait
       attrs = {
         time: 120,
