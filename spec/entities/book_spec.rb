@@ -26,4 +26,17 @@ RSpec.describe Runbook::Entities::Book do
       expect(in_section).to eq(out_section)
     end
   end
+
+  describe "#description" do
+    it "adds a description to the book's items" do
+      desc = book.description("My Description") {}
+      expect(book.items).to include(desc)
+    end
+
+    it "adds to the book's existing items" do
+      desc1 = book.description("My description") {}
+      desc2 = book.description("My other description") {}
+      expect(book.items).to eq([desc1, desc2])
+    end
+  end
 end

@@ -7,5 +7,6 @@ module Runbook::Extensions
     end
   end
 
+  Runbook::Entities::Book.prepend(Description)
   Runbook::Entities::Section.prepend(Description)
 end
