@@ -225,6 +225,13 @@ $ ./my_runbook.rb
 * [x] Add way to track depth of a current object in the tree
 * [x] Add a way to introspect on your neighbors or place in the tree
 * [x] Allow some sort of description statement at the section level
+* [] Allow step-level configuration for the following:
+  * parallelization [:parallel, :groups, :sequence], :limit, :wait
+  * path
+  * user
+  * group
+  * env
+  * umask
 * Generation plugins
   * Can specify additional generators for output of the runbook
 * Pluggable runbook functionality

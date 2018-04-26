@@ -23,7 +23,7 @@ require "runbook/statements/wait"
 
 require "runbook/extensions/description"
 require "runbook/extensions/sections"
-require "runbook/extensions/server_list"
+require "runbook/extensions/ssh_config"
 require "runbook/extensions/statements"
 require "runbook/extensions/steps"
 
