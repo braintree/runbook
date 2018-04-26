@@ -2,7 +2,8 @@ module Runbook::Extensions
   module SSHConfig
     def ssh_config
       @ssh_config ||= {
-        servers: []
+        servers: [],
+        parallelization: {},
       }
     end
 
