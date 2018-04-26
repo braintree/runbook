@@ -63,9 +63,14 @@ module Runbook::Views
     end
 
     def self.runbook__statements__ruby_command(object, output, metadata)
-      output << "   run: `#{object.cmd.source}`\n\n"
-    rescue MethodSource::SourceNotFoundError => e
-      output << "   Unable to retrieve source code\n\n"
+      output << "   run:\n"
+      output << "   ```ruby\n"
+      begin
+        output << "   #{object.block.source}"
+      rescue MethodSource::SourceNotFoundError => e
+        output << "   Unable to retrieve source code\n"
+      end
+      output << "   ```\n\n"
     end
 
     def self.runbook__statements__wait(object, output, metadata)

@@ -1,9 +1,9 @@
 module Runbook::Statements
   class RubyCommand < Runbook::Statement
-    attr_reader :cmd
+    attr_reader :block
 
-    def initialize(cmd)
-      @cmd = cmd
+    def initialize(block)
+      @block = block
     end
   end
 end
