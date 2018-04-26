@@ -8,7 +8,7 @@ RSpec.describe Runbook::Entities::Step do
     expect(step.title).to eq(title)
   end
 
-  complex_arg_statements = ["ask", "condition", "monitor"]
+  complex_arg_statements = ["ask", "monitor"]
   statements = Runbook.statements.map do |klass|
     klass.to_s.split("::")[-1].underscore
   end

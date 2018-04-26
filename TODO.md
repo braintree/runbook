@@ -60,11 +60,12 @@ Runbook.book "Drop Redis" do
     step "Wait for the dump to finish" do
       command "redis-cli -h #{host} -p 6379 INFO | grep rdb_bgsave_in_progress:0"
       ask "How many messages are left", into: :num_messages_left
-      condition (
-        predicate: -> { num_messages_left.to_i > 5 },
-        if_stmt: -> { puts "There are more messages than we expect. Exiting"; exit },
-        else_stmt: nil
-      )
+      ruby_command do |statement, metadata|
+        if metadata[:parent].num_messages_left.to_i > 5
+          puts "There are more messages than we expect. Exiting..."
+          exit(1)
+        end
+      end
     end
 
     step "Stream snapshot and replication log into destination" do
@@ -172,8 +173,8 @@ end
 Additional statements include:
 
  * `assert`: Run a command with a specified interval until no error is returned. Could have timeout and execute behavior on timeout
- * `ask`: Collect user input for future conditions
- * `condition`: Takes three lambdas: predicate, if, else and executes
+ * `ask`: Collect user input for future ruby command blocks
+ * `ruby_command`: A block of arbitrary ruby code to be executed in the context of the step at runtime
  * `wait`: Sleep for a specified period of time
 
 CLI interface examples:
@@ -275,12 +276,13 @@ Document:
 ./lib/runbook/helpers/link.rb # Helper objects used within books, sections, steps, and statements
 ./lib/runbook/statements/ask.rb
 ./lib/runbook/statements/assert.rb
+./lib/runbook/statements/capture.rb
 ./lib/runbook/statements/command.rb
-./lib/runbook/statements/condition.rb
 ./lib/runbook/statements/confirm.rb
 ./lib/runbook/statements/monitor.rb
 ./lib/runbook/statements/note.rb
 ./lib/runbook/statements/notice.rb
+./lib/runbook/statements/ruby_command.rb
 ./lib/runbook/statements/wait.rb
 ./lib/runbook/extensions/copy_commands.rb
 ./lib/runbook/extensions/tmux.rb

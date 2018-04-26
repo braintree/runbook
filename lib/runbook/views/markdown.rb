@@ -31,16 +31,6 @@ module Runbook::Views
       output << "   run: `#{object.cmd}`\n\n"
     end
 
-    def self.runbook__statements__condition(object, output, metadata)
-      begin
-        output << "   if (#{object.predicate.source})\n\n"
-        output << "   then (#{object.if_stmt.source})\n\n"
-        output << "   else (#{object.else_stmt.source})\n\n" if object.else_stmt
-      rescue MethodSource::SourceNotFoundError => e
-        output << "   Unable to retrieve source code\n\n"
-      end
-    end
-
     def self.runbook__statements__confirm(object, output, metadata)
       output << "   confirm: #{object.prompt}\n\n"
     end
