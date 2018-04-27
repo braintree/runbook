@@ -100,6 +100,11 @@ RSpec.describe Runbook::Entities::Step do
       expect(step.ssh_config[:servers]).to eq(servers)
     end
 
+    it "takes an array as a list of servers" do
+      step.servers(servers)
+      expect(step.ssh_config[:servers]).to eq(servers)
+    end
+
     it "explicitly sets the list of servers" do
       step.server(old_server)
       step.servers(*servers)

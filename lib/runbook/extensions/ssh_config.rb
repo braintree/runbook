@@ -22,7 +22,9 @@ module Runbook::Extensions
 
     def servers(*servers)
       ssh_config[:servers].clear
-      servers.each { |server| ssh_config[:servers] << server }
+      servers.flatten.each do |server|
+        ssh_config[:servers] << server
+      end
     end
 
     def path(path)
