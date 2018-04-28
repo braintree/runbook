@@ -8,6 +8,18 @@ module Runbook::Extensions
     end
 
     module DSL
+      def ssh_config(&block)
+        config = Class.new do
+          attr_reader :dsl
+          prepend Runbook::Extensions::SSHConfig
+        end.new
+        dsl_class = Runbook::DSL.class(
+          Runbook::Extensions::SSHConfig::DSL,
+        )
+        config.instance_variable_set(:@dsl, dsl_class.new(config))
+        config.dsl.instance_eval(&block)
+        config.ssh_config
+      end
 
       def parallelization(strategy: , limit: 2, wait: 2)
         parent.ssh_config[:parallelization] = {

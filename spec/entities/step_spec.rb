@@ -156,4 +156,32 @@ RSpec.describe Runbook::Entities::Step do
       expect(step.ssh_config[:umask]).to eq(umask)
     end
   end
+
+  describe "#ssh_config" do
+    let(:umask) { "077" }
+
+    it "returns a configured ssh_config object" do
+      ssh_config = step.dsl.ssh_config do
+        parallelization strategy: :sequence, wait: 5
+        server "s1.prod"
+        path "/home"
+        user "root"
+        group "root"
+        env({path: "/usr/bin"})
+        umask "077"
+      end
+
+      expect(ssh_config).to eq(
+        {
+          parallelization: {strategy: :sequence, limit: 2, wait: 5},
+          servers: ["s1.prod"],
+          path: "/home",
+          user: "root",
+          group: "root",
+          env: {path: "/usr/bin"},
+          umask: "077",
+        }
+      )
+    end
+  end
 end

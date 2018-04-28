@@ -30,13 +30,13 @@ module Factory
         cmd: "echo 'hi'",
         interval: 1,
         timeout: 0,
-        exec_on_timeout: nil,
+        timeout_cmd: nil,
       }.merge!(overrides)
       return Runbook::Statements::Assert.new(
         attrs[:cmd],
         interval: attrs[:interval],
         timeout: attrs[:timeout],
-        exec_on_timeout: attrs[:exec_on_timeout],
+        timeout_cmd: attrs[:timeout_cmd],
       )
     when :command
       attrs = {
