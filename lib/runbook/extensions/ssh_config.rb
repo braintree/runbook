@@ -7,46 +7,50 @@ module Runbook::Extensions
       }
     end
 
-    def parallelization(strategy: , limit: 2, wait: 2)
-      ssh_config[:parallelization] = {
-        strategy: strategy,
-        limit: limit,
-        wait: wait,
-      }
-    end
+    module DSL
 
-    def server(server)
-      ssh_config[:servers].clear
-      ssh_config[:servers] << server
-    end
-
-    def servers(*servers)
-      ssh_config[:servers].clear
-      servers.flatten.each do |server|
-        ssh_config[:servers] << server
+      def parallelization(strategy: , limit: 2, wait: 2)
+        parent.ssh_config[:parallelization] = {
+          strategy: strategy,
+          limit: limit,
+          wait: wait,
+        }
       end
-    end
 
-    def path(path)
-      ssh_config[:path] = path
-    end
+      def server(server)
+        parent.ssh_config[:servers].clear
+        parent.ssh_config[:servers] << server
+      end
 
-    def user(user)
-      ssh_config[:user] = user
-    end
+      def servers(*servers)
+        parent.ssh_config[:servers].clear
+        servers.flatten.each do |server|
+          parent.ssh_config[:servers] << server
+        end
+      end
 
-    def group(group)
-      ssh_config[:group] = group
-    end
+      def path(path)
+        parent.ssh_config[:path] = path
+      end
 
-    def env(env)
-      ssh_config[:env] = env
-    end
+      def user(user)
+        parent.ssh_config[:user] = user
+      end
 
-    def umask(umask)
-      ssh_config[:umask] = umask
+      def group(group)
+        parent.ssh_config[:group] = group
+      end
+
+      def env(env)
+        parent.ssh_config[:env] = env
+      end
+
+      def umask(umask)
+        parent.ssh_config[:umask] = umask
+      end
     end
   end
 
   Runbook::Entities::Step.prepend(SSHConfig)
+  Runbook::Entities::Step::DSL.prepend(SSHConfig::DSL)
 end

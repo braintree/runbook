@@ -20,10 +20,10 @@ RSpec.describe Runbook::Entities::Book do
       expect(book.items).to eq([section1, section2])
     end
 
-    it "evaluates the block in the context of the section" do
+    it "evaluates the block in the context of the section's dsl" do
       in_section = nil
-      out_section = book.section("My Section") { in_section = self }
-      expect(in_section).to eq(out_section)
+      section = book.section("My Section") { in_section = self }
+      expect(in_section).to eq(section.dsl)
     end
   end
 

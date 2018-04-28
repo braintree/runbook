@@ -1,13 +1,15 @@
 module Runbook::Extensions
   module Sections
-    def section(title, &block)
-      Runbook::Entities::Section.new(title).tap do |section|
-        items << section
-        section.instance_eval(&block)
+    module DSL
+      def section(title, &block)
+        Runbook::Entities::Section.new(title).tap do |section|
+          parent.items << section
+          section.dsl.instance_eval(&block)
+        end
       end
     end
   end
 
-  Runbook::Entities::Book.prepend(Sections)
-  Runbook::Entities::Section.prepend(Sections)
+  Runbook::Entities::Book::DSL.prepend(Sections::DSL)
+  Runbook::Entities::Section::DSL.prepend(Sections::DSL)
 end

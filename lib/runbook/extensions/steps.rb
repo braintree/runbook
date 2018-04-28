@@ -1,12 +1,14 @@
 module Runbook::Extensions
   module Steps
-    def step(title=nil, &block)
-      Runbook::Entities::Step.new(title).tap do |step|
-        items << step
-        step.instance_eval(&block) if block
+    module DSL
+      def step(title=nil, &block)
+        Runbook::Entities::Step.new(title).tap do |step|
+          parent.items << step
+          step.dsl.instance_eval(&block) if block
+        end
       end
     end
   end
 
-  Runbook::Entities::Section.prepend(Steps)
+  Runbook::Entities::Section::DSL.prepend(Steps::DSL)
 end

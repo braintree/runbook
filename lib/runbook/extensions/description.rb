@@ -1,12 +1,14 @@
 module Runbook::Extensions
   module Description
-    def description(msg)
-      Runbook::Statements::Description.new(msg).tap do |desc|
-        items << desc
+    module DSL
+      def description(msg)
+        Runbook::Statements::Description.new(msg).tap do |desc|
+          parent.items << desc
+        end
       end
     end
   end
 
-  Runbook::Entities::Book.prepend(Description)
-  Runbook::Entities::Section.prepend(Description)
+  Runbook::Entities::Book::DSL.prepend(Description::DSL)
+  Runbook::Entities::Section::DSL.prepend(Description::DSL)
 end

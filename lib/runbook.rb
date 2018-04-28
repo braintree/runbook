@@ -1,5 +1,7 @@
 require "active_support/inflector"
 
+require "runbook/dsl"
+
 require "runbook/entity"
 require "runbook/entities/book"
 require "runbook/entities/section"

@@ -20,12 +20,12 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.items).to eq([sec1, sec2])
     end
 
-    it "evaluates the block in the context of the section" do
+    it "evaluates the block in the context of the section's dsl" do
       in_section = nil
       out_section = section.section("My inner section") {
         in_section = self
       }
-      expect(in_section).to eq(out_section)
+      expect(in_section).to eq(out_section.dsl)
     end
   end
 
@@ -41,10 +41,10 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.items).to eq([step1, step2])
     end
 
-    it "evaluates the block in the context of the step" do
+    it "evaluates the block in the context of the step's dsl" do
       in_step = nil
-      out_step = section.step("My step") { in_step = self }
-      expect(in_step).to eq(out_step)
+      step = section.step("My step") { in_step = self }
+      expect(in_step).to eq(step.dsl)
     end
 
     it "does not require a title" do
