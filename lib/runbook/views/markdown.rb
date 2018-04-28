@@ -25,8 +25,8 @@ module Runbook::Views
     def self.runbook__statements__assert(object, output, metadata)
       output << "   run: `#{object.cmd}` every #{object.interval} seconds until it returns 0\n\n"
       if object.timeout > 0
-        exec_on_timeout_msg = object.exec_on_timeout ? " and run `#{object.exec_on_timeout}`" : ""
-        output << "   after #{object.timeout} seconds, time out#{exec_on_timeout_msg}\n\n"
+        exec_on_timeout_msg = object.exec_on_timeout ? " run `#{object.exec_on_timeout}` and" : ""
+        output << "   after #{object.timeout} seconds, #{exec_on_timeout_msg} exit\n\n"
       end
     end
 
