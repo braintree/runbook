@@ -49,9 +49,9 @@ module Runbook
     _child_classes(Runbook::Statements)
   end
 
-  def self._child_classes(modgule)
-    modgule.constants.map { |const|
-      "#{modgule.to_s}::#{const}".constantize
+  def self._child_classes(mod)
+    mod.constants.map { |const|
+      "#{mod.to_s}::#{const}".constantize
     }.select { |const| const.is_a?(Class) }
   end
 end
