@@ -1,4 +1,5 @@
 require "active_support/inflector"
+require "sshkit"
 
 require "runbook/dsl"
 
@@ -6,6 +7,8 @@ require "runbook/entity"
 require "runbook/entities/book"
 require "runbook/entities/section"
 require "runbook/entities/step"
+
+require "runbook/helpers/ssh_kit_helper"
 
 require "runbook/viewer"
 require "runbook/view"
