@@ -8,6 +8,10 @@ RSpec.describe Runbook::Entities::Step do
     expect(step.title).to eq(title)
   end
 
+  it "does not require arguments" do
+    expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
+  end
+
   complex_arg_statements = ["ask", "monitor"]
   statements = Runbook.statements.map do |klass|
     klass.to_s.split("::")[-1].underscore
