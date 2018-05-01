@@ -17,7 +17,9 @@ module Runbook
       Executes the runbook.
 
       With --noop (-n), Runs the runbook in no-op mode, preventing commands from executing.
+
       With --auto (-a), Runs the runbook in auto mode. This will prevent the execution from asking for any user input (such as confirmations). Not all runbooks are compatible with auto mode (if they use the ask statement for example).
+
       With --start-at (-s), Runs the runbooks starting at the specified section or step.
     LONGDESC
     option :noop, aliases: :n, type: :boolean
