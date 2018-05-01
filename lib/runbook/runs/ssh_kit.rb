@@ -69,7 +69,7 @@ module Runbook::Runs
           indentation = lines[0].size - lines[0].gsub(/^\s+/, "").size
           lines.map! { |line| line[indentation..-1] }
           _output("```ruby\n#{lines.join("\n")}\n```\n")
-        rescue MethodSource::SourceNotFoundError => e
+        rescue ::MethodSource::SourceNotFoundError => e
           _output("Unable to retrieve source code")
         end
         return

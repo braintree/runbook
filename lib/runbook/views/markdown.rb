@@ -60,7 +60,7 @@ module Runbook::Views
       output << "   ```ruby\n"
       begin
         output << "   #{object.block.source}"
-      rescue MethodSource::SourceNotFoundError => e
+      rescue ::MethodSource::SourceNotFoundError => e
         output << "   Unable to retrieve source code\n"
       end
       output << "   ```\n\n"

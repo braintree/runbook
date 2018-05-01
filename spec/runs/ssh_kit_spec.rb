@@ -275,6 +275,20 @@ RSpec.describe "Runbook::Runs::SSHKit" do
 
         subject.execute(object, metadata)
       end
+
+      context "when ::MethodSource::SourceNotFoundError is raised" do
+        it "prints 'Unable to retrieve source code'" do
+          expect(block).to receive(:source) do
+            raise ::MethodSource::SourceNotFoundError
+          end
+          msg1 = "\n[NOOP] Run the following Ruby block:\n"
+          expect(subject).to receive(:_output).with(msg1)
+          msg2 = "Unable to retrieve source code"
+          expect(subject).to receive(:_output).with(msg2)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 end
