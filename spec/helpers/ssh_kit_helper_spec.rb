@@ -103,6 +103,17 @@ RSpec.describe Runbook::Helpers::SSHKitHelper do
           subject.with_ssh_config(ssh_config) {}
         end
       end
+
+      context "when no strategy is passed" do
+        let(:parallelization) { {} }
+
+        it "does not pass an :in option" do
+          expect_any_instance_of(
+            SSHKit::Coordinator
+          ).to receive(:each).with({}).and_call_original
+          subject.with_ssh_config(ssh_config) {}
+        end
+      end
     end
 
     context "with users and groups" do

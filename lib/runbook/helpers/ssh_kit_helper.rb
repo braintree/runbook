@@ -30,7 +30,9 @@ module Runbook::Helpers
 
     def _coordinator_options(ssh_config_parallelization)
       ssh_config_parallelization.clone.tap do |options|
-        options[:in] = options.delete(:strategy)
+        if options[:strategy]
+          options[:in] = options.delete(:strategy)
+        end
       end
     end
 
