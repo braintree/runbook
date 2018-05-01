@@ -6,7 +6,7 @@ module Runbook
       @book = book
     end
 
-    def run(run: , noop: false, auto: false, start_at: 0)
+    def run(run: :ssh_kit, noop: false, auto: false, start_at: 0)
       run = "Runbook::Runs::#{run.to_s.camelize}".constantize
       metadata = {
         noop: noop,

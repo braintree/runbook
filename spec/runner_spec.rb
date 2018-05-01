@@ -28,6 +28,11 @@ This is a very elaborate runbook that does stuff
   end
   let(:runner) { Runbook::Runner.new(book) }
 
+  it "defaults to run using ssh_kit" do
+    expect(book).to receive(:run).with(Runbook::Runs::SSHKit, Hash)
+    runner.run
+  end
+
   context "with ssh_kit run" do
     let(:run) { :ssh_kit }
     let(:output) { StringIO.new }
