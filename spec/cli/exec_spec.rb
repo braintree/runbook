@@ -54,7 +54,7 @@ RSpec.describe "runbook run", type: :aruba do
           /Executing My Runbook\.\.\./,
           /Section 1: First Section/,
           /Step 1\.1: Print stuff/,
-          /.*\[NOOP\] Run: echo 'hi'.*/,
+          /.*\[NOOP\] Run: `echo 'hi'`.*/,
         ]
       }
 

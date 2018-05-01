@@ -46,9 +46,11 @@ module Runbook::Runs
 
     def runbook__statements__command(object, metadata)
       if metadata[:noop]
-        _output("[NOOP] Run: #{object.cmd}")
+        _output("[NOOP] Run: `#{object.cmd}`")
         return
       end
+
+      _output("\n") # for formatting
 
       ssh_config = object.ssh_config || metadata[:parent].ssh_config
       execute_args = ssh_kit_command(object.cmd)

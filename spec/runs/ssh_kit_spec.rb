@@ -244,7 +244,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
       let(:metadata_override) { {noop: true} }
 
       it "outputs the noop text for the command statement" do
-        msg = "[NOOP] Run: #{cmd}"
+        msg = "[NOOP] Run: `#{cmd}`"
         expect(subject).to receive(:_output).with(msg)
         expect(subject).to_not receive(:with_ssh_config)
 
