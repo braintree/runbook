@@ -257,6 +257,7 @@ $ ./my_runbook.rb
   * env
   * umask
 * password sudo
+* Allow runs and views to be specified via CLI
 * logging solution for alternate output
 * Should provide an option to suppress warnings
 * Global configuration (including sshkit config and server configs)
