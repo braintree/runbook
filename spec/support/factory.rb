@@ -100,9 +100,7 @@ module Factory
       attrs = {
         cmd: cmd,
       }.merge!(overrides)
-      return Runbook::Statements::RubyCommand.new(
-        attrs[:cmd],
-      )
+      return Runbook::Statements::RubyCommand.new(&attrs[:cmd])
     when :wait
       attrs = {
         time: 120,
