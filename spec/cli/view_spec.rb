@@ -31,6 +31,7 @@ RSpec.describe "runbook view", type: :aruba do
       let(:unknown_file_output) {
         "view: cannot access unknown: No such file or directory"
       }
+
       it "prints an unknown file message" do
         expect(last_command_started).to have_output(unknown_file_output)
       end
