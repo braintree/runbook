@@ -30,7 +30,27 @@ Runbook.book "Drop Redis" do
 
     step "Install rdbtools" do
       server host
+      path "~"
+      user "root"
+      env {rails_env: "production"}
+
       command "sudo pip install rdbtools"
+
+      timeout_cmd_ssh_config = ssh_config do
+        server host
+        path "~"
+        user "root"
+        env {rails_env: "production"}
+      end
+
+      assert_cmd = "sudo pip list | grep 'rdbtools'"
+      timeout_cmd = "echo 'error' | mail -s 'error' me@me.com"
+      assert(
+        assert_cmd,
+        timeout: 60,
+        timeout_cmd: timeout_cmd,
+        timeout_cmd_ssh_config: timeout_cmd_ssh_config,
+      )
     end
 
     step "Run ~/flip_redis_feature_switches.rb" do
@@ -164,7 +184,7 @@ runbook = Runbook.book "Say hello to world" do
 end
 
 if __FILE__ == $0
-  Runbook::Runner.run(runbook)
+  Runbook::Runner.new(runbook).run
 else
   runbook
 end
@@ -172,10 +192,14 @@ end
 
 Additional statements include:
 
- * `assert`: Run a command with a specified interval until no error is returned. Could have timeout and execute behavior on timeout
- * `ask`: Collect user input for future ruby command blocks
- * `ruby_command`: A block of arbitrary ruby code to be executed in the context of the step at runtime
- * `wait`: Sleep for a specified period of time
+ * [x] `assert`: Run a command with a specified interval until no error is returned. Could have timeout and execute behavior on timeout
+ * [x] `ask`: Collect user input for future ruby command blocks
+ * [] `capture`: Capture data from a host into a variable
+ * [] `download`: Download a file from a host
+ * [x] `ruby_command`: A block of arbitrary ruby code to be executed in the context of the step at runtime
+ * [] `set`: Set arbitrary data at the step level
+ * [] `upload`: Upload a file to a host
+ * [x] `wait`: Sleep for a specified period of time
 
 CLI interface examples:
 
@@ -196,19 +220,19 @@ $ cat my_runbook.rb | runbook view --input ruby --output yaml --file my_runbook.
 ```
 
 ```
-$ runbook run my_runbook.rb
+$ runbook exec my_runbook.rb
 ```
 
 ```
-$ runbook run --noop my_runbook.rb
+$ runbook exec --noop my_runbook.rb
 ```
 
 ```
-$ runbook run --noop --skip-prompts my_runbook.rb
+$ runbook exec --noop --auto my_runbook.rb
 ```
 
 ```
-$ runbook run --noop --start-at 1.2.1 my_runbook.rb
+$ runbook exec --noop --start-at 1.2.1 my_runbook.rb
 ```
 
 ```
@@ -225,15 +249,24 @@ $ ./my_runbook.rb
 * [x] Add way to track depth of a current object in the tree
 * [x] Add a way to introspect on your neighbors or place in the tree
 * [x] Allow some sort of description statement at the section level
-* [] Allow step-level configuration for the following:
+* [x] Allow step-level configuration for the following:
   * parallelization [:parallel, :groups, :sequence], :limit, :wait
   * path
   * user
   * group
   * env
   * umask
+* password sudo
+* logging solution for alternate output
+* Should provide an option to suppress warnings
+* Global configuration (including sshkit config and server configs)
+* Will need some sort of configuration for the runbook
+  * Look for runbookrc in /etc/runbookrc, Runbookfile, $HOME/.runbookrc, command line arg, runbook file
+  * load configurations in this order
+  * Overrides or load only a single file?
+* Add a revert section that does not get executed, but can be executed by passing a revert flag
 * Generation plugins
-  * Can specify additional generators for output of the runbook
+  * Can specify additional generators for output of the runbook (markdown, ssh_kit, etc.)
 * Pluggable runbook functionality
   * You can augment the runbook's default keywords with additional keywords to suite your needs and add extra functionality
   * You can for example create a layout declaration that is executed for your runbooks
@@ -241,18 +274,22 @@ $ ./my_runbook.rb
 * Runbook lifecycle hooks
   * Can hook into various points of the execution of a runbook to add functionality
   * Example includes adding an option to take notes at each step or logging the run
+* various control mechanisms throughout the runbook such as skip, exit, jump to step, etc
 * Handles ctrl-c gracefully
-* Should provide an option to suppress warnings
-* Will need some sort of configuration for the runbook
 * Create a generator for a runbook? Allow for custom generators?
+  * Generate runbook projects with Runbookfile, Gemfile, etc.
+  * Generate plugins
+  * Generate runbooks templates
 * Guard for view updates (How to handle arguments?)
 * Could provide a rake task for compiling and nooping runbooks?
 * Be able to serve up markdown docs (web server) for easy viewing
 * Compile-time validations?
+* Add a tree traversal that detects errors such as ask statements in auto-mode
 * Can specify input-format, output-format, input (file), and output (file)
 * Yaml specification format (subset of Ruby)
   * Will not contain as much flexibility as Ruby format
   * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
+* raw flag for cmd statements (prevents Cap environment wrapping)
 
 Document:
 
@@ -265,6 +302,7 @@ Document:
   * Different generators can be used for different types of markdown or generally for different formatting
 * Seamlessly integrates with other Ruby libraries (for augmenting functionality)
 * Demonstrate how to add aliases for keywords
+* Other ways to extend the functionality
 
 
 ## Architecture
@@ -301,15 +339,17 @@ Document:
 * https://github.com/piotrmurach/tty-command
 * capistrano
 
+[Conclusion] Will use SSHKit
+
 ### Potential command line frameworks
 
 * Thor
 
 ### How to integrate guard
-### How will the helpers work?
+### How will the helpers work (link helper)?
 ### Is monitor to brittle of a context for a statement?
 ### Is the set of statements minimalistic?
-### If skip-prompts is set, a warning should be displayed if this may cause issues (e.x. ask statement)
+### If skip-prompts is set, a warning should be displayed if this may cause issues (e.g. ask statement)
 
 ## Additional TODO
 
