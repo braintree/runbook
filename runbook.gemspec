@@ -33,6 +33,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'activesupport', '~> 5.0', '>= 5.0.0.1'
   spec.add_runtime_dependency "sshkit", "~> 1.16"
   spec.add_runtime_dependency "thor", "~> 0.20.0"
+  spec.add_runtime_dependency "tty-progressbar", "~> 0.14.0"
+  spec.add_runtime_dependency "tty-prompt", "~> 0.16.0"
 
   spec.add_development_dependency "aruba", "~> 0.14.5"
   spec.add_development_dependency "bundler", "~> 1.15"

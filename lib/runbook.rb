@@ -1,5 +1,10 @@
 require "active_support/inflector"
+require "pastel"
 require "sshkit"
+require "tty-progressbar"
+require "tty-prompt"
+
+require "runbook/errors"
 
 require "runbook/dsl"
 
@@ -9,6 +14,10 @@ require "runbook/entities/section"
 require "runbook/entities/step"
 
 require "runbook/helpers/ssh_kit_helper"
+
+require "runbook/runner"
+require "runbook/run"
+require "runbook/runs/ssh_kit"
 
 require "runbook/viewer"
 require "runbook/view"
@@ -33,6 +42,10 @@ require "runbook/extensions/statements"
 require "runbook/extensions/steps"
 
 require "runbook/version"
+
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.acronym 'SSH'
+end
 
 module Runbook
   def self.book(title, &block)

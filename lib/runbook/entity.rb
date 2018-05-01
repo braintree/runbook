@@ -36,11 +36,44 @@ module Runbook
       end
     end
 
+    def run(run, metadata)
+      run.execute(self, metadata)
+      items.each_with_index do |item, index|
+        item.run(run, _run_metadata(items, item, metadata, index))
+      end
+    end
+
     def _render_metadata(metadata, index)
       {
         depth: metadata[:depth] + 1,
         index: index,
         parent: self,
+      }
+    end
+
+    def _run_metadata(items, item, metadata, index)
+      pos_index = items.select do |item|
+        item.is_a?(Entity)
+      end.index(item)
+
+      if pos_index
+        if metadata[:position].empty?
+          pos = "#{pos_index + 1}"
+        else
+          pos = "#{metadata[:position]}.#{pos_index + 1}"
+        end
+      else
+        pos = metadata[:position]
+      end
+
+      {
+        depth: metadata[:depth] + 1,
+        index: index,
+        parent: self,
+        position: pos,
+        noop: metadata[:noop],
+        auto: metadata[:auto],
+        start_at: metadata[:start_at],
       }
     end
   end
