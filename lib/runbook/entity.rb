@@ -78,4 +78,3 @@ module Runbook
     end
   end
 end
-

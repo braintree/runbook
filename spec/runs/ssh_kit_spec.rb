@@ -160,7 +160,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
       let(:metadata_override) { {noop: true} }
 
       it "outputs the noop text for the assert statement" do
-        msg = "[NOOP] Assert: #{cmd} returns 0"
+        msg = "[NOOP] Assert: `#{cmd}` returns 0"
         msg += " (running every #{interval} second(s))"
         expect(subject).to receive(:_output).with(msg)
         expect(subject).to_not receive(:with_ssh_config)

@@ -5,7 +5,7 @@ module Runbook::Runs
     def runbook__statements__assert(object, metadata)
       if metadata[:noop]
         interval_msg = "(running every #{object.interval} second(s))"
-        _output("[NOOP] Assert: #{object.cmd} returns 0 #{interval_msg}")
+        _output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
         if object.timeout > 0
           timeout_msg = object.timeout_cmd ? " run `#{object.timeout_cmd}` and" : ""
           timeout_msg = "after #{object.timeout} seconds,#{timeout_msg} exit"
