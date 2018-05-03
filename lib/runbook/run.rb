@@ -95,6 +95,24 @@ module Runbook
       _warn("Notice: #{object.msg}")
     end
 
+    def runbook__statements__ruby_command(object, metadata)
+      if metadata[:noop]
+        _output("\n[NOOP] Run the following Ruby block:\n")
+        begin
+          source = object.block.source
+          lines = source.split("\n")
+          indentation = lines[0].size - lines[0].gsub(/^\s+/, "").size
+          lines.map! { |line| line[indentation..-1] }
+          _output("```ruby\n#{lines.join("\n")}\n```\n")
+        rescue ::MethodSource::SourceNotFoundError => e
+          _output("Unable to retrieve source code")
+        end
+        return
+      end
+
+      self.instance_exec(object, metadata, &object.block)
+    end
+
     def runbook__statements__wait(object, metadata)
       if metadata[:noop]
         _output("[NOOP] Sleep #{object.time} seconds")
