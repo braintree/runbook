@@ -8,7 +8,7 @@ module Runbook
       unless File.exist?(runbook)
         raise Thor::UnknownArgumentError, "view: cannot access #{runbook}: No such file or directory"
       end
-      runbook = eval(File.read(runbook))
+      runbook = _retrieve_runbook(runbook)
       puts Runbook::Viewer.new(runbook).generate(:markdown)
     end
 
@@ -29,13 +29,21 @@ module Runbook
       unless File.exist?(runbook)
         raise Thor::UnknownArgumentError, "exec: cannot access #{runbook}: No such file or directory"
       end
-      runbook = eval(File.read(runbook))
+      runbook = _retrieve_runbook(runbook)
       Runbook::Runner.new(runbook).run(
         run: :ssh_kit,
         noop: options[:noop],
         auto: options[:auto],
         start_at: options[:start_at],
       )
+    end
+
+    private
+
+    def _retrieve_runbook(runbook)
+      load(runbook)
+      runbook_key = File.basename(runbook, ".rb").to_sym
+      Runbook.books[runbook_key] || eval(File.read(runbook))
     end
   end
 end

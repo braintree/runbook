@@ -55,6 +55,10 @@ module Runbook
     end
   end
 
+  def self.books
+    @books ||= {}
+  end
+
   def self.entities
     _child_classes(Runbook::Entities)
   end
