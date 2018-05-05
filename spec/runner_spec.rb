@@ -18,8 +18,8 @@ This is a very elaborate runbook that does stuff
         section "Second Section" do
           step "Step 1" do
             notice "Some cheese is actually yellow plastic"
-            ruby_command do
-              _output("I like cheese whiz!")
+            ruby_command do |rb_cmd, metadata|
+              metadata[:toolbox].output("I like cheese whiz!")
             end
           end
         end
@@ -38,10 +38,10 @@ This is a very elaborate runbook that does stuff
     let(:output) { StringIO.new }
 
     before(:each) do
-      allow_any_instance_of(Runbook::Runs::SSHKit).to receive(:_output) do |instance, msg|
+      allow_any_instance_of(Runbook::Toolbox).to receive(:output) do |instance, msg|
         output.puts(msg)
       end
-      allow_any_instance_of(Runbook::Runs::SSHKit).to receive(:_warn) do |instance, msg|
+      allow_any_instance_of(Runbook::Toolbox).to receive(:warn) do |instance, msg|
         output.puts(msg)
       end
     end
@@ -101,8 +101,8 @@ Notice: Some cheese is actually yellow plastic
 
 [NOOP] Run the following Ruby block:
 ```ruby
-ruby_command do
-  _output("I like cheese whiz!")
+ruby_command do |rb_cmd, metadata|
+  metadata[:toolbox].output("I like cheese whiz!")
 end
 ```
 

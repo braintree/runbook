@@ -1,27 +1,22 @@
 require "spec_helper"
 
 RSpec.describe "Runbook::Run" do
-  subject { Runbook::Run.new }
+  subject { Class.new { include Runbook::Run } }
   let (:object) { Runbook::Entities::Book.new("title") }
   let (:metadata_override) { {} }
+  let (:toolbox) { instance_double("Runbook::Toolbox") }
   let (:metadata) {
     {
       noop: false,
       auto: false,
       start_at: 0,
+      toolbox: toolbox,
       depth: 1,
       index: 0,
       parent: nil,
       position: "",
     }.merge(metadata_override)
   }
-
-  before(:each) do
-    allow(subject).to receive(:_output)
-    allow(subject).to receive(:_warn)
-    allow(subject).to receive(:_error)
-    allow(subject).to receive(:_exit)
-  end
 
   describe "execute" do
     it "executes on an object" do
@@ -32,7 +27,7 @@ RSpec.describe "Runbook::Run" do
 
     it "sends an error if an unknown object is executed on" do
       err_msg = /ERROR! No execution rule for Object \(object\)/
-      expect(subject).to receive(:_error).with(err_msg)
+      expect(toolbox).to receive(:error).with(err_msg)
 
       subject.execute(Object.new, metadata)
     end
@@ -67,7 +62,7 @@ RSpec.describe "Runbook::Run" do
 
     it "outputs the title of the book" do
       msg = "Executing title...\n\n"
-      expect(subject).to receive(:_output).with(msg)
+      expect(toolbox).to receive(:output).with(msg)
 
       subject.execute(object, metadata)
     end
@@ -79,7 +74,7 @@ RSpec.describe "Runbook::Run" do
 
     it "outputs the section and position" do
       msg = "Section 5: My Section\n\n"
-      expect(subject).to receive(:_output).with(msg)
+      expect(toolbox).to receive(:output).with(msg)
 
       subject.execute(object, metadata)
     end
@@ -91,7 +86,7 @@ RSpec.describe "Runbook::Run" do
 
     it "outputs the step and position" do
       msg = "Step 1.1: My Step\n\n"
-      expect(subject).to receive(:_output).with(msg)
+      expect(toolbox).to receive(:output).with(msg)
 
       subject.execute(object, metadata)
     end
@@ -112,7 +107,7 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs the noop text for the ask statement" do
         msg = "[NOOP] Ask: #{prompt} (store in: #{into})"
-        expect(subject).to receive(:_output).with(msg)
+        expect(toolbox).to receive(:output).with(msg)
 
         subject.execute(object, metadata)
       end
@@ -123,7 +118,7 @@ RSpec.describe "Runbook::Run" do
 
       it "raises an ExecutionError" do
         error_msg = "ERROR! Can't execute ask statement in automatic mode!"
-        expect(subject).to receive(:_error).with(error_msg)
+        expect(toolbox).to receive(:error).with(error_msg)
 
         expect do
           subject.execute(object, metadata)
@@ -133,7 +128,7 @@ RSpec.describe "Runbook::Run" do
 
     it "prompts the user and stores the result on the parent object" do
       result = "result"
-      expect(subject.prompt).to receive(:ask).with(prompt).and_return(result)
+      expect(toolbox).to receive(:ask).with(prompt).and_return(result)
 
       subject.execute(object, metadata)
 
@@ -150,8 +145,8 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs the noop text for the confirm statement" do
         msg = "[NOOP] Prompt: #{prompt}"
-        expect(subject).to receive(:_output).with(msg)
-        expect(subject.prompt).to_not receive(:yes?)
+        expect(toolbox).to receive(:output).with(msg)
+        expect(toolbox).to_not receive(:yes?)
 
         subject.execute(object, metadata)
       end
@@ -162,8 +157,8 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs auto text for the confirm statement" do
         skip_msg = "Skipping confirmation (auto): #{prompt}"
-        expect(subject).to receive(:_output).with(skip_msg)
-        expect(subject.prompt).to_not receive(:yes?)
+        expect(toolbox).to receive(:output).with(skip_msg)
+        expect(toolbox).to_not receive(:yes?)
 
         subject.execute(object, metadata)
       end
@@ -174,9 +169,9 @@ RSpec.describe "Runbook::Run" do
 
       it "does not exit" do
         expect(
-          subject.prompt
+          toolbox
         ).to receive(:yes?).with(prompt).and_return(prompt_result)
-        expect(subject).to_not receive(:_exit)
+        expect(toolbox).to_not receive(:exit)
 
         subject.execute(object, metadata)
       end
@@ -187,9 +182,9 @@ RSpec.describe "Runbook::Run" do
 
       it "exits" do
         expect(
-          subject.prompt
+          toolbox
         ).to receive(:yes?).with(prompt).and_return(prompt_result)
-        expect(subject).to receive(:_exit).with(1)
+        expect(toolbox).to receive(:exit).with(1)
 
         subject.execute(object, metadata)
       end
@@ -201,7 +196,8 @@ RSpec.describe "Runbook::Run" do
     let (:object) { Runbook::Statements::Description.new(description) }
 
     it "outputs the description" do
-      expect(subject).to receive(:_output).with("#{description}\n")
+      allow(toolbox).to receive(:output)
+      expect(toolbox).to receive(:output).with("#{description}\n")
 
       subject.execute(object, metadata)
     end
@@ -217,9 +213,9 @@ RSpec.describe "Runbook::Run" do
     it "outputs the command with instructions" do
       msg1 = "Run the following in a separate pane:"
       msg2 = "`#{cmd}`"
-      expect(subject).to receive(:_output).with(msg1).ordered
-      expect(subject).to receive(:_output).with(msg2).ordered
-      expect(subject.prompt).to receive(:yes?).and_return(true)
+      expect(toolbox).to receive(:output).with(msg1).ordered
+      expect(toolbox).to receive(:output).with(msg2).ordered
+      expect(toolbox).to receive(:yes?).and_return(true)
 
       subject.execute(object, metadata)
     end
@@ -229,8 +225,9 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs the noop text for the monitor statement" do
         msg = "[NOOP] Prompt: #{prompt}"
-        expect(subject).to receive(:_output).with(msg)
-        expect(subject.prompt).to_not receive(:yes?)
+        allow(toolbox).to receive(:output)
+        expect(toolbox).to receive(:output).with(msg)
+        expect(toolbox).to_not receive(:yes?)
 
         subject.execute(object, metadata)
       end
@@ -241,8 +238,9 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs auto text for the monitor statement" do
         skip_msg = "Skipping confirmation (auto): #{prompt}"
-        expect(subject).to receive(:_output).with(skip_msg)
-        expect(subject.prompt).to_not receive(:yes?)
+        allow(toolbox).to receive(:output)
+        expect(toolbox).to receive(:output).with(skip_msg)
+        expect(toolbox).to_not receive(:yes?)
 
         subject.execute(object, metadata)
       end
@@ -252,10 +250,11 @@ RSpec.describe "Runbook::Run" do
       let (:prompt_result) { true }
 
       it "does not exit" do
+        allow(toolbox).to receive(:output)
         expect(
-          subject.prompt
+          toolbox
         ).to receive(:yes?).with(prompt).and_return(prompt_result)
-        expect(subject).to_not receive(:_exit)
+        expect(toolbox).to_not receive(:exit)
 
         subject.execute(object, metadata)
       end
@@ -265,10 +264,11 @@ RSpec.describe "Runbook::Run" do
       let (:prompt_result) { false }
 
       it "exits" do
+        allow(toolbox).to receive(:output)
         expect(
-          subject.prompt
+          toolbox
         ).to receive(:yes?).with(prompt).and_return(prompt_result)
-        expect(subject).to receive(:_exit).with(1)
+        expect(toolbox).to receive(:exit).with(1)
 
         subject.execute(object, metadata)
       end
@@ -280,7 +280,7 @@ RSpec.describe "Runbook::Run" do
     let (:object) { Runbook::Statements::Note.new(note) }
 
     it "outputs the note" do
-      expect(subject).to receive(:_output).with("Note: #{note}")
+      expect(toolbox).to receive(:output).with("Note: #{note}")
 
       subject.execute(object, metadata)
     end
@@ -291,9 +291,48 @@ RSpec.describe "Runbook::Run" do
     let (:object) { Runbook::Statements::Notice.new(notice) }
 
     it "outputs the notice" do
-      expect(subject).to receive(:_warn).with("Notice: #{notice}")
+      expect(toolbox).to receive(:warn).with("Notice: #{notice}")
 
       subject.execute(object, metadata)
+    end
+  end
+
+  describe "runbook__entities__ruby_command" do
+    let (:block) { ->(object, metadata) { raise "This happened" } }
+    let (:object) { Runbook::Statements::RubyCommand.new(&block) }
+
+    it "runs the block" do
+      expect do
+        subject.execute(object, metadata)
+      end.to raise_error("This happened")
+    end
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the ruby command statement" do
+        msg1 = "\n[NOOP] Run the following Ruby block:\n"
+        expect(toolbox).to receive(:output).with(msg1)
+        msg2 = "```ruby\nlet (:block) { ->(object, metadata) { raise \"This happened\" } }\n```\n"
+        expect(toolbox).to receive(:output).with(msg2)
+        expect(subject).to_not receive(:instance_exec)
+
+        subject.execute(object, metadata)
+      end
+
+      context "when ::MethodSource::SourceNotFoundError is raised" do
+        it "prints 'Unable to retrieve source code'" do
+          expect(block).to receive(:source) do
+            raise ::MethodSource::SourceNotFoundError
+          end
+          msg1 = "\n[NOOP] Run the following Ruby block:\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "Unable to retrieve source code"
+          expect(toolbox).to receive(:output).with(msg2)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 
@@ -306,7 +345,7 @@ RSpec.describe "Runbook::Run" do
 
       it "outputs the noop text for the wait statement" do
         msg = "[NOOP] Sleep #{time} seconds"
-        expect(subject).to receive(:_output).with(msg)
+        expect(toolbox).to receive(:output).with(msg)
         expect(subject).to_not receive(:sleep)
 
         subject.execute(object, metadata)

@@ -1,15 +1,16 @@
 module Runbook::Runs
-  class SSHKit < Runbook::Run
-    include Runbook::Helpers::SSHKitHelper
+  module SSHKit
+    include Runbook::Run
+    extend Runbook::Helpers::SSHKitHelper
 
-    def runbook__statements__assert(object, metadata)
+    def self.runbook__statements__assert(object, metadata)
       if metadata[:noop]
         interval_msg = "(running every #{object.interval} second(s))"
-        _output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
+        metadata[:toolbox].output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
         if object.timeout > 0
           timeout_msg = object.timeout_cmd ? " run `#{object.timeout_cmd}` and" : ""
           timeout_msg = "after #{object.timeout} seconds,#{timeout_msg} exit"
-          _output(timeout_msg)
+          metadata[:toolbox].output(timeout_msg)
         end
         return
       end
@@ -31,7 +32,7 @@ module Runbook::Runs
 
       if timed_out
         error_msg = "Error! Assertion `#{object.cmd}` failed"
-        _error(error_msg)
+        metadata[:toolbox].error(error_msg)
         if (timeout_cmd = object.timeout_cmd)
           ssh_config = object.timeout_cmd_ssh_config ||
             metadata[:parent].ssh_config
@@ -44,13 +45,13 @@ module Runbook::Runs
       end
     end
 
-    def runbook__statements__command(object, metadata)
+    def self.runbook__statements__command(object, metadata)
       if metadata[:noop]
-        _output("[NOOP] Run: `#{object.cmd}`")
+        metadata[:toolbox].output("[NOOP] Run: `#{object.cmd}`")
         return
       end
 
-      _output("\n") # for formatting
+      metadata[:toolbox].output("\n") # for formatting
 
       ssh_config = object.ssh_config || metadata[:parent].ssh_config
       execute_args = ssh_kit_command(object.cmd)

@@ -74,6 +74,7 @@ module Runbook
         noop: metadata[:noop],
         auto: metadata[:auto],
         start_at: metadata[:start_at],
+        toolbox: metadata[:toolbox],
       }
     end
   end

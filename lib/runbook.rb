@@ -5,9 +5,8 @@ require "sshkit"
 require "tty-progressbar"
 require "tty-prompt"
 
-require "runbook/errors"
-
 require "runbook/dsl"
+require "runbook/errors"
 
 require "runbook/entity"
 require "runbook/entities/book"
@@ -19,6 +18,8 @@ require "runbook/helpers/ssh_kit_helper"
 require "runbook/runner"
 require "runbook/run"
 require "runbook/runs/ssh_kit"
+
+require "runbook/toolbox"
 
 require "runbook/viewer"
 require "runbook/view"
@@ -51,7 +52,19 @@ end
 module Runbook
   def self.book(title, &block)
     Entities::Book.new(title).tap do |book|
-      book.instance_eval(&block)
+      book.dsl.instance_eval(&block)
+    end
+  end
+
+  def self.section(title, &block)
+    Entities::Section.new(title).tap do |section|
+      section.dsl.instance_eval(&block)
+    end
+  end
+
+  def self.step(title=nil, &block)
+    Entities::Step.new(title).tap do |step|
+      step.dsl.instance_eval(&block) if block
     end
   end
 

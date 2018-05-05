@@ -1,27 +1,22 @@
 require "spec_helper"
 
-RSpec.describe "Runbook::Runs::SSHKit" do
-  subject { Runbook::Runs::SSHKit.new }
+RSpec.describe Runbook::Runs::SSHKit do
+  subject { Runbook::Runs::SSHKit }
   let (:metadata_override) { {} }
   let (:parent) { Runbook::Entities::Step.new }
+  let (:toolbox) { instance_double("Runbook::Toolbox") }
   let (:metadata) {
     {
       noop: false,
       auto: false,
       start_at: 0,
+      toolbox: toolbox,
       depth: 1,
       index: 2,
       parent: parent,
       position: "3.3",
     }.merge(metadata_override)
   }
-
-  before(:each) do
-    allow(subject).to receive(:_output)
-    allow(subject).to receive(:_warn)
-    allow(subject).to receive(:_error)
-    allow(subject).to receive(:_exit)
-  end
 
   describe "runbook__entities__assert" do
     let (:cmd) { "echo 'hi'" }
@@ -87,7 +82,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
         expect(subject).to_not receive(:sleep)
 
         error_msg = "Error! Assertion `#{cmd}` failed"
-        expect(subject).to receive(:_error).with(error_msg)
+        expect(toolbox).to receive(:error).with(error_msg)
         expect do
           subject.execute(object, metadata)
         end.to raise_error Runbook::Runner::ExecutionError, error_msg
@@ -114,6 +109,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
         it "calls the timeout_cmd" do
           timeout_cmd_args = [:echo, "'timed out!'"]
           ssh_config = metadata[:parent].ssh_config
+          expect(toolbox).to receive(:error)
           expect(
             subject
           ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -141,6 +137,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
 
           it "calls the timeout_cmd with timeout_cmd_ssh_config" do
             timeout_cmd_args = [:echo, "'timed out!'"]
+            expect(toolbox).to receive(:error)
             expect(subject).to receive(:with_ssh_config).
               with(timeout_cmd_ssh_config).
               and_call_original
@@ -162,7 +159,7 @@ RSpec.describe "Runbook::Runs::SSHKit" do
       it "outputs the noop text for the assert statement" do
         msg = "[NOOP] Assert: `#{cmd}` returns 0"
         msg += " (running every #{interval} second(s))"
-        expect(subject).to receive(:_output).with(msg)
+        expect(toolbox).to receive(:output).with(msg)
         expect(subject).to_not receive(:with_ssh_config)
 
         subject.execute(object, metadata)
@@ -176,7 +173,8 @@ RSpec.describe "Runbook::Runs::SSHKit" do
 
         it "outputs the noop text for the timeout" do
           msg = "after #{timeout} seconds, exit"
-          expect(subject).to receive(:_output).with(msg)
+          allow(toolbox).to receive(:output)
+          expect(toolbox).to receive(:output).with(msg)
 
           subject.execute(object, metadata)
         end
@@ -193,7 +191,8 @@ RSpec.describe "Runbook::Runs::SSHKit" do
 
           it "outputs the noop text for the timeout_cmd" do
             msg = "after #{timeout} seconds, run `#{timeout_cmd}` and exit"
-            expect(subject).to receive(:_output).with(msg)
+            allow(toolbox).to receive(:output)
+            expect(toolbox).to receive(:output).with(msg)
 
             subject.execute(object, metadata)
           end
@@ -205,6 +204,10 @@ RSpec.describe "Runbook::Runs::SSHKit" do
   describe "runbook__entities__command" do
     let (:cmd) { "echo 'hi'" }
     let (:object) { Runbook::Statements::Command.new(cmd) }
+
+    before(:each) do
+      allow(toolbox).to receive(:output)
+    end
 
     it "runs cmd" do
       execute_args = [:echo, "'hi'"]
@@ -245,49 +248,10 @@ RSpec.describe "Runbook::Runs::SSHKit" do
 
       it "outputs the noop text for the command statement" do
         msg = "[NOOP] Run: `#{cmd}`"
-        expect(subject).to receive(:_output).with(msg)
+        expect(toolbox).to receive(:output).with(msg)
         expect(subject).to_not receive(:with_ssh_config)
 
         subject.execute(object, metadata)
-      end
-    end
-  end
-
-  describe "runbook__entities__ruby_command" do
-    let (:block) { ->(object, metadata) { raise "This happened" } }
-    let (:object) { Runbook::Statements::RubyCommand.new(&block) }
-
-    it "runs the block" do
-      expect do
-        subject.execute(object, metadata)
-      end.to raise_error("This happened")
-    end
-
-    context "noop" do
-      let(:metadata_override) { {noop: true} }
-
-      it "outputs the noop text for the ruby command statement" do
-        msg1 = "\n[NOOP] Run the following Ruby block:\n"
-        expect(subject).to receive(:_output).with(msg1)
-        msg2 = "```ruby\nlet (:block) { ->(object, metadata) { raise \"This happened\" } }\n```\n"
-        expect(subject).to receive(:_output).with(msg2)
-        expect(subject).to_not receive(:instance_exec)
-
-        subject.execute(object, metadata)
-      end
-
-      context "when ::MethodSource::SourceNotFoundError is raised" do
-        it "prints 'Unable to retrieve source code'" do
-          expect(block).to receive(:source) do
-            raise ::MethodSource::SourceNotFoundError
-          end
-          msg1 = "\n[NOOP] Run the following Ruby block:\n"
-          expect(subject).to receive(:_output).with(msg1)
-          msg2 = "Unable to retrieve source code"
-          expect(subject).to receive(:_output).with(msg2)
-
-          subject.execute(object, metadata)
-        end
       end
     end
   end
