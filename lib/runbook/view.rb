@@ -6,9 +6,12 @@ module Runbook
 
     module ClassMethods
       def render(object, output, metadata)
-        send(_method_name(object), object, output, metadata)
-      rescue NoMethodError
-        $stderr.puts("WARNING! No render rule for #{object.class} (#{_method_name(object)}) in #{self.to_s}")
+        method = _method_name(object)
+        if respond_to?(method)
+          send(_method_name(object), object, output, metadata)
+        else
+          $stderr.puts("WARNING! No render rule for #{object.class} (#{_method_name(object)}) in #{self.to_s}")
+        end
       end
 
       def _method_name(object)
