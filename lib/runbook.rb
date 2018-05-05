@@ -13,6 +13,7 @@ require "runbook/entities/book"
 require "runbook/entities/section"
 require "runbook/entities/step"
 
+require "runbook/helpers/format_helper"
 require "runbook/helpers/ssh_kit_helper"
 
 require "runbook/runner"

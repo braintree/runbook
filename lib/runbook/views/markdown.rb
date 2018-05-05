@@ -1,6 +1,7 @@
 module Runbook::Views
   module Markdown
     include Runbook::View
+    extend Runbook::Helpers::FormatHelper
 
     def self.runbook__entities__book(object, output, metadata)
       output << "# #{object.title}\n\n"
@@ -59,7 +60,7 @@ module Runbook::Views
       output << "   run:\n"
       output << "   ```ruby\n"
       begin
-        output << "   #{object.block.source}"
+        output << "   #{deindent(object.block.source)}"
       rescue ::MethodSource::SourceNotFoundError => e
         output << "   Unable to retrieve source code\n"
       end

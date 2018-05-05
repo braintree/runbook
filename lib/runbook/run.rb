@@ -5,6 +5,8 @@ module Runbook
     end
 
     module ClassMethods
+      include Runbook::Helpers::FormatHelper
+
       def execute(object,  metadata)
         position = Gem::Version.new(metadata[:position])
         start_at = Gem::Version.new(metadata[:start_at])
