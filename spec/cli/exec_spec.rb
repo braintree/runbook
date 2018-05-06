@@ -195,5 +195,33 @@ RSpec.describe "runbook run", type: :aruba do
         end
       end
     end
+
+    context "when run is passed" do
+      let(:command) { "runbook exec --run ssh_kit #{runbook_file}" }
+      let(:output_lines) {
+        [
+          /Executing My Runbook\.\.\./,
+          /Section 1: First Section/,
+          /Step 1\.1: Print stuff/,
+          /.*echo 'hi'.*/,
+        ]
+      }
+
+      it "runs the runbook" do
+        output_lines.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
+      end
+
+      context "(when r is passed)" do
+        let(:command) { "runbook exec -r ssh_kit #{runbook_file}" }
+
+        it "runs the runbook" do
+          output_lines.each do |line|
+            expect(last_command_started).to have_output(line)
+          end
+        end
+      end
+    end
   end
 end
