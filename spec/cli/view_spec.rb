@@ -58,6 +58,22 @@ RSpec.describe "runbook view", type: :aruba do
       end
     end
 
+    context "when view is passed" do
+      let(:command) { "runbook view --view markdown #{runbook_file}" }
+
+      it "prints a markdown representation of the runbook" do
+        expect(last_command_started).to have_output(/echo 'hi'/)
+      end
+
+      context "(when v is passed)" do
+        let(:command) { "runbook view -v markdown #{runbook_file}" }
+
+        it "prints a markdown representation of the runbook" do
+          expect(last_command_started).to have_output(/echo 'hi'/)
+        end
+      end
+    end
+
     context "runbook is written to standard in" do
       it "prints a markdown representation of the runbook"
     end

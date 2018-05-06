@@ -4,12 +4,18 @@ require "runbook"
 module Runbook
   class CLI < Thor
     desc "view RUNBOOK", "Generates a formatted version of the runbook"
+    long_desc <<-LONGDESC
+      Executes the runbook.
+
+      With --view (-v), Generates the view with the specified view type
+    LONGDESC
+    option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
       unless File.exist?(runbook)
         raise Thor::UnknownArgumentError, "view: cannot access #{runbook}: No such file or directory"
       end
       runbook = _retrieve_runbook(runbook)
-      puts Runbook::Viewer.new(runbook).generate(:markdown)
+      puts Runbook::Viewer.new(runbook).generate(options[:view])
     end
 
     desc "exec RUNBOOK", "Executes the runbook"
