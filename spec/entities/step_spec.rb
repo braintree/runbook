@@ -188,4 +188,12 @@ RSpec.describe Runbook::Entities::Step do
       )
     end
   end
+
+  describe "#add" do
+    it "adds a statement to the step" do
+      note = Runbook::Statements::Note.new("Read me")
+      step.dsl.add(note)
+      expect(step.items).to include(note)
+    end
+  end
 end

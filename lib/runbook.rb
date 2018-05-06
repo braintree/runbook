@@ -38,6 +38,7 @@ require "runbook/statements/notice"
 require "runbook/statements/ruby_command"
 require "runbook/statements/wait"
 
+require "runbook/extensions/add"
 require "runbook/extensions/description"
 require "runbook/extensions/sections"
 require "runbook/extensions/ssh_config"

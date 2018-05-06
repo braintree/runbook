@@ -39,4 +39,12 @@ RSpec.describe Runbook::Entities::Book do
       expect(book.items).to eq([desc1, desc2])
     end
   end
+
+  describe "#add" do
+    it "adds a section to the book" do
+      section = Runbook.section("My Section") {}
+      book.dsl.add(section)
+      expect(book.items).to include(section)
+    end
+  end
 end

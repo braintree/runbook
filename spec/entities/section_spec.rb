@@ -68,4 +68,12 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.items).to eq([desc1, desc2])
     end
   end
+
+  describe "#add" do
+    it "adds a step to the section" do
+      step = Runbook.step("New step") {}
+      section.dsl.add(step)
+      expect(section.items).to include(step)
+    end
+  end
 end
