@@ -15,6 +15,10 @@ RSpec.describe Runbook::Helpers::SSHKitHelper do
     it "works when no command arguments are given" do
       expect(subject.ssh_kit_command("ls")).to eq([:ls, nil])
     end
+
+    it "returns and array with cmd when raw is true" do
+      expect(subject.ssh_kit_command(cmd, raw: true)).to eq([cmd])
+    end
   end
 
   describe "with_ssh_config" do

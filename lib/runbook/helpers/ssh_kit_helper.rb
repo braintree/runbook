@@ -1,6 +1,7 @@
 module Runbook::Helpers
   module SSHKitHelper
-    def ssh_kit_command(cmd)
+    def ssh_kit_command(cmd, raw: false)
+      return [cmd] if raw
       cmd, args = cmd.split(" ", 2)
       [cmd.to_sym, args]
     end

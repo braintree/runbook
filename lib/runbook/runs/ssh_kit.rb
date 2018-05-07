@@ -23,7 +23,7 @@ module Runbook::Runs
         time = Time.now
         cmd_ssh_config = object.cmd_ssh_config || metadata[:parent].ssh_config
         timed_out = false
-        test_args = ssh_kit_command(object.cmd)
+        test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
 
         with_ssh_config(cmd_ssh_config) do
           while !(test(*test_args))
@@ -41,7 +41,10 @@ module Runbook::Runs
           if (timeout_cmd = object.timeout_cmd)
             ssh_config = object.timeout_cmd_ssh_config ||
               metadata[:parent].ssh_config
-            timeout_cmd_args = ssh_kit_command(timeout_cmd)
+            timeout_cmd_args = ssh_kit_command(
+              timeout_cmd,
+              raw: object.timeout_cmd_raw,
+            )
             with_ssh_config(ssh_config) do
               execute(*timeout_cmd_args)
             end
@@ -59,7 +62,7 @@ module Runbook::Runs
         metadata[:toolbox].output("\n") # for formatting
 
         ssh_config = object.ssh_config || metadata[:parent].ssh_config
-        execute_args = ssh_kit_command(object.cmd)
+        execute_args = ssh_kit_command(object.cmd, raw: object.raw)
 
         with_ssh_config(ssh_config) do
           execute(*execute_args)

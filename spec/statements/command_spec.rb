@@ -17,8 +17,13 @@ RSpec.describe Runbook::Statements::Command do
       umask: "077",
     }
   }
+  let(:raw) { true }
   let(:command) {
-    Runbook::Statements::Command.new(cmd, ssh_config: ssh_config)
+    Runbook::Statements::Command.new(
+      cmd,
+      ssh_config: ssh_config,
+      raw: raw,
+    )
   }
 
   it "has a command" do
@@ -29,10 +34,18 @@ RSpec.describe Runbook::Statements::Command do
     expect(command.ssh_config).to eq(ssh_config)
   end
 
+  it "has a raw param" do
+    expect(command.raw).to eq(raw)
+  end
+
   describe "default_values" do
     let(:command) { Runbook::Statements::Command.new(cmd) }
     it "sets defaults for ssh_config" do
       expect(command.ssh_config).to be_nil
+    end
+
+    it "sets defaults for raw" do
+      expect(command.raw).to be_falsey
     end
   end
 end

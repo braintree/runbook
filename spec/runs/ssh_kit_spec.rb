@@ -64,6 +64,22 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
     end
 
+    context "with raw true" do
+      let(:raw) { true }
+      let (:object) do
+        Runbook::Statements::Assert.new(cmd, cmd_raw: raw)
+      end
+
+      it "runs runs test with the raw commmand string" do
+        test_args = ["echo 'hi'"]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:test).with(*test_args).and_return(true)
+
+        subject.execute(object, metadata)
+      end
+    end
+
     context "when assertion times out" do
       let!(:time) { Time.now }
       let (:timeout) { 1 }
@@ -103,7 +119,7 @@ RSpec.describe Runbook::Runs::SSHKit do
           expect_any_instance_of(
             SSHKit::Backend::Abstract
           ).to receive(:test).with(*test_args).and_return(false)
-          expect(subject).to receive(:with_ssh_config).and_call_original
+          allow(subject).to receive(:with_ssh_config).and_call_original
         end
 
         it "calls the timeout_cmd" do
@@ -141,6 +157,31 @@ RSpec.describe Runbook::Runs::SSHKit do
             expect(subject).to receive(:with_ssh_config).
               with(timeout_cmd_ssh_config).
               and_call_original
+            expect_any_instance_of(
+              SSHKit::Backend::Abstract
+            ).to receive(:execute).with(*timeout_cmd_args)
+
+            expect do
+              subject.execute(object, metadata)
+            end.to raise_error Runbook::Runner::ExecutionError
+          end
+        end
+
+        context "when timeout_cmd_raw is set to true" do
+          let(:raw) { true }
+          let (:object) do
+            Runbook::Statements::Assert.new(
+              cmd,
+              timeout: timeout,
+              timeout_cmd: timeout_cmd,
+              timeout_cmd_raw: raw,
+            )
+          end
+
+
+          it "calls the timeout_cmd with raw command string" do
+            timeout_cmd_args = ["echo 'timed out!'"]
+            expect(toolbox).to receive(:error)
             expect_any_instance_of(
               SSHKit::Backend::Abstract
             ).to receive(:execute).with(*timeout_cmd_args)
@@ -235,6 +276,22 @@ RSpec.describe Runbook::Runs::SSHKit do
         expect(
           subject
         ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:execute).with(*execute_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with raw true" do
+      let(:raw) { true }
+      let (:object) do
+        Runbook::Statements::Command.new(cmd, raw: raw)
+      end
+
+      it "executes the raw command string" do
+        execute_args = ["echo 'hi'"]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:execute).with(*execute_args)
