@@ -37,7 +37,11 @@ module Runbook
       end
 
       def runbook__entities__step(object, metadata)
-        metadata[:toolbox].output("Step #{metadata[:position]}: #{object.title}\n\n")
+        toolbox = metadata[:toolbox]
+        toolbox.output("Step #{metadata[:position]}: #{object.title}\n\n")
+        return if metadata[:auto] || metadata[:noop] || !metadata[:paranoid]
+        continue_result = toolbox.expand("Continue?", _step_choices)
+        _handle_continue_result(continue_result, object, metadata)
       end
 
       def runbook__statements__ask(object, metadata)
@@ -144,6 +148,34 @@ module Runbook
 
       def _method_name(object)
         object.class.to_s.underscore.gsub("/", "__")
+      end
+
+      def _step_choices
+        [
+          {key: "c", name: "Continue to execute this step", value: :continue},
+          {key: "s", name: "Skip this step", value: :skip},
+          {key: "j", name: "Jump to the specified position", value: :jump},
+          {key: "e", name: "Exit the runbook", value: :exit},
+        ]
+      end
+
+      def _handle_continue_result(result, object, metadata)
+        toolbox = metadata[:toolbox]
+        case result
+        when :continue
+          return
+        when :skip
+          position = metadata[:position]
+          current_step = position.split(".")[-1].to_i
+          new_step = current_step + 1
+          start_at = position.gsub(/\.#{current_step}$/, ".#{new_step}")
+          metadata[:start_at] = start_at
+        when :jump
+          result = toolbox.ask("What position would you like to jump to?")
+          metadata[:start_at] = result
+        when :exit
+          toolbox.exit(0)
+        end
       end
     end
   end

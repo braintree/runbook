@@ -33,6 +33,14 @@ This is a very elaborate runbook that does stuff
     runner.run
   end
 
+  it "defaults to run in paranoid mode" do
+    expect(book).to receive(:run).with(
+      Runbook::Runs::SSHKit,
+      hash_including(paranoid: true),
+    )
+    runner.run
+  end
+
   context "with ssh_kit run" do
     let(:run) { :ssh_kit }
     let(:output) { StringIO.new }
@@ -47,7 +55,7 @@ This is a very elaborate runbook that does stuff
     end
 
     it "runs the book using the ssk_kit run" do
-      runner.run(run: run)
+      runner.run(run: run, paranoid: false)
 
       expect(output.string).to eq(<<-OUTPUT)
 Executing My Book...
@@ -159,9 +167,34 @@ NOOP
       end
     end
 
+    context "with paranoid: true" do
+      let(:book) do
+        Runbook.book "My Book" do
+          section "Parent Section" do
+            step "Cheese inspection"
+          end
+        end
+      end
+
+      it "prompts to continue" do
+        expect_any_instance_of(Runbook::Toolbox).to receive(:expand).with("Continue?", Array)
+
+        runner.run(run: run, paranoid: true)
+
+        expect(output.string).to eq(<<-NOOP)
+Executing My Book...
+
+Section 1: Parent Section
+
+Step 1.1: Cheese inspection
+
+NOOP
+      end
+    end
+
     context "with start_at > 0" do
       it "skips parts less than start_at" do
-        runner.run(run: run, start_at: "1.2.1")
+        runner.run(run: run, paranoid: false, start_at: "1.2.1")
 
         expect(output.string).to eq(<<-OUTPUT)
 Executing My Book...

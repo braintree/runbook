@@ -66,16 +66,14 @@ module Runbook
         pos = metadata[:position]
       end
 
-      {
-        depth: metadata[:depth] + 1,
-        index: index,
-        parent: self,
-        position: pos,
-        noop: metadata[:noop],
-        auto: metadata[:auto],
-        start_at: metadata[:start_at],
-        toolbox: metadata[:toolbox],
-      }
+      metadata.merge(
+        {
+          depth: metadata[:depth] + 1,
+          index: index,
+          parent: self,
+          position: pos,
+        }
+      )
     end
   end
 end

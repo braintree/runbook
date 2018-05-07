@@ -28,11 +28,14 @@ module Runbook
 
       With --run (-r), Runs the runbook with the specified run type
 
+      With --no-paranoid (-P), Runs the runbook without prompting to continue at every step
+
       With --start-at (-s), Runs the runbook starting at the specified section or step.
     LONGDESC
     option :run, aliases: :r, type: :string, default: :ssh_kit
     option :noop, aliases: :n, type: :boolean
     option :auto, aliases: :a, type: :boolean
+    option :"no-paranoid", aliases: :P, type: :boolean
     option :start_at, aliases: :s, type: :string
     def exec(runbook)
       unless File.exist?(runbook)
@@ -43,6 +46,7 @@ module Runbook
         run: options[:run],
         noop: options[:noop],
         auto: options[:auto],
+        paranoid: options[:paranoid],
         start_at: options[:start_at],
       )
     end

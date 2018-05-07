@@ -9,6 +9,7 @@ RSpec.describe "Runbook::Run" do
     {
       noop: false,
       auto: false,
+      paranoid: true,
       start_at: 0,
       toolbox: toolbox,
       depth: 1,
@@ -84,11 +85,86 @@ RSpec.describe "Runbook::Run" do
     let (:object) { Runbook::Entities::Step.new("My Step") }
     let(:metadata_override) { {position: "1.1"} }
 
+    before(:each) do
+      allow(toolbox).to receive(:expand).and_return(:continue)
+    end
+
     it "outputs the step and position" do
       msg = "Step 1.1: My Step\n\n"
       expect(toolbox).to receive(:output).with(msg)
 
       subject.execute(object, metadata)
+    end
+
+    context "when paranoid mode is true" do
+      let(:metadata_override) { {position: "1.1", paranoid: true} }
+
+      before(:each) do
+        allow(toolbox).to receive(:output)
+      end
+
+      context "when :continue" do
+        it "goes to the next step" do
+          expect(toolbox).to receive(:expand).and_return(:continue)
+          start_at = metadata[:start_at]
+          subject.execute(object, metadata)
+          expect(metadata[:start_at]).to eq(start_at)
+        end
+      end
+
+      context "when :skip" do
+        it "skips the step" do
+          expect(toolbox).to receive(:expand).and_return(:skip)
+          subject.execute(object, metadata)
+          expect(metadata[:start_at]).to eq("1.2")
+        end
+      end
+
+      context "when :jump" do
+        let (:ask_msg) { "What position would you like to jump to?" }
+
+        it "jumps to the specified step" do
+          expect(toolbox).to receive(:expand).and_return(:jump)
+          expect(toolbox).to receive(:ask).with(ask_msg).and_return("1.13")
+          subject.execute(object, metadata)
+          expect(metadata[:start_at]).to eq("1.13")
+        end
+      end
+
+      context "when :exit" do
+        it "exits the process" do
+          expect(toolbox).to receive(:expand).and_return(:exit)
+          expect(toolbox).to receive(:exit).with(0)
+          subject.execute(object, metadata)
+        end
+      end
+
+      context "when in noop mode" do
+        let(:metadata_override) { {noop: true} }
+
+        it "does not prompt" do
+          expect(toolbox).to_not receive(:expand)
+          subject.execute(object, metadata)
+        end
+      end
+
+      context "when in auto mode" do
+        let(:metadata_override) { {auto: true} }
+
+        it "does not prompt" do
+          expect(toolbox).to_not receive(:expand)
+          subject.execute(object, metadata)
+        end
+      end
+
+      context "when paranoid mode is disabled" do
+        let(:metadata_override) { {paranoid: false} }
+
+        it "does not prompt" do
+          expect(toolbox).to_not receive(:expand)
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 

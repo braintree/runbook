@@ -135,6 +135,44 @@ RSpec.describe "runbook run", type: :aruba do
       end
     end
 
+    context "when no-paranoid is passed" do
+      let(:command) { "runbook exec --no-paranoid #{runbook_file}" }
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "My Runbook" do
+          section "First Section" do
+            step "Do not ask for continue"
+          end
+        end
+        RUNBOOK
+      end
+      let(:output_lines) {
+        [
+          /Executing My Runbook\.\.\./,
+          /Section 1: First Section/,
+          /Step 1\.1: Do not ask for continue/,
+        ]
+      }
+
+      it "does not prompt" do
+        output_lines.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
+        expect(last_command_started).to_not have_output(/Continue\?/)
+      end
+
+      context "(when P is passed)" do
+        let(:command) { "runbook exec -P #{runbook_file}" }
+
+        it "does not prompt" do
+          output_lines.each do |line|
+            expect(last_command_started).to have_output(line)
+          end
+          expect(last_command_started).to_not have_output(/Continue\?/)
+        end
+      end
+    end
+
     context "when start_at is passed" do
       let(:command) { "runbook exec --start-at 1.2 #{runbook_file}" }
       let(:content) do

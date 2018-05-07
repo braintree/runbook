@@ -10,6 +10,10 @@ module Runbook
       prompt.ask(msg)
     end
 
+    def expand(msg, choices)
+      prompt.expand(msg, choices)
+    end
+
     def yes?(msg)
       prompt.yes?(msg)
     end
