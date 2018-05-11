@@ -2,6 +2,7 @@ require "active_support/inflector"
 require "method_source"
 require "pastel"
 require "sshkit"
+require "airbrussh"
 require "tty-progressbar"
 require "tty-prompt"
 

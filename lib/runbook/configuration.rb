@@ -17,6 +17,13 @@ module Runbook
 
     def initialize
       self.ssh_kit = SSHKit.config
+      ssh_kit.output = Airbrussh::Formatter.new(
+        $stdout,
+        banner: nil,
+        command_output: true,
+      )
     end
   end
+
+  configure
 end

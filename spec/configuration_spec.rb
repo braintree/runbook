@@ -18,6 +18,10 @@ RSpec.describe "Runbook Configuration" do
     it "sets ssh_kit to SSHKit's config" do
       expect(config.ssh_kit).to be_a(SSHKit::Configuration)
     end
+
+    it "sets ssh_kit.output to an Airbrussh::Formatter" do
+      expect(config.ssh_kit.output).to be_a(Airbrussh::Formatter)
+    end
   end
 
   describe "self.configure" do
