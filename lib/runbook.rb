@@ -5,6 +5,7 @@ require "sshkit"
 require "tty-progressbar"
 require "tty-prompt"
 
+require "runbook/configuration"
 require "runbook/dsl"
 require "runbook/errors"
 
