@@ -469,4 +469,67 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
     end
   end
+
+  describe "runbook__entities__upload" do
+    let (:from) { "customer_list.txt" }
+    let (:to) { "/home/bozo/customer_list.txt" }
+    let(:options) { {log_percent: 25} }
+    let(:upload_args) { [from, to, options] }
+    let (:object) {
+      Runbook::Statements::Upload.new(from, to: to, options: options)
+    }
+
+    before(:each) do
+      allow(toolbox).to receive(:output)
+    end
+
+    it "uploads the file" do
+      ssh_config = metadata[:parent].ssh_config
+      expect(
+        subject
+      ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+      expect_any_instance_of(
+        SSHKit::Backend::Local
+      ).to receive(:upload!).with(*upload_args)
+
+      subject.execute(object, metadata)
+    end
+
+    context "with ssh_config set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}}
+      end
+      let (:object) do
+        Runbook::Statements::Upload.new(
+          from,
+          to: to,
+          options: options,
+          ssh_config: ssh_config,
+        )
+      end
+
+      it "uses the ssh_config" do
+        expect(
+          subject
+        ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+        expect_any_instance_of(
+          SSHKit::Backend::Netssh
+        ).to receive(:upload!).with(*upload_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the upload statement" do
+        msg = "[NOOP] Upload: #{from} to #{to} with options #{options}"
+        expect(toolbox).to receive(:output).with(msg)
+        expect(subject).to_not receive(:with_ssh_config)
+
+        subject.execute(object, metadata)
+      end
+    end
+  end
 end

@@ -108,6 +108,25 @@ module Runbook::Runs
           download!(object.from, object.to, object.options)
         end
       end
+
+      def runbook__statements__upload(object, metadata)
+        if metadata[:noop]
+          options = object.options
+          to = " to #{object.to}" if object.to
+          opts = " with options #{options}" unless options == {}
+          noop_msg = "[NOOP] Upload: #{object.from}#{to}#{opts}"
+          metadata[:toolbox].output(noop_msg)
+          return
+        end
+
+        metadata[:toolbox].output("\n") # for formatting
+
+        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+
+        with_ssh_config(ssh_config) do
+          upload!(object.from, object.to, object.options)
+        end
+      end
     end
 
     extend ClassMethods

@@ -117,6 +117,15 @@ module Factory
         cmd: cmd,
       }.merge!(overrides)
       return Runbook::Statements::RubyCommand.new(&attrs[:cmd])
+    when :upload
+      attrs = {
+        from: "my_file.txt",
+        to: "/root/my_file.txt",
+      }.merge!(overrides)
+      return Runbook::Statements::Upload.new(
+        attrs[:from],
+        to: attrs[:to],
+      )
     when :wait
       attrs = {
         time: 120,

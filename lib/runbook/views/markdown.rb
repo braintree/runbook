@@ -78,6 +78,13 @@ module Runbook::Views
       output << "   ```\n\n"
     end
 
+    def self.runbook__statements__upload(object, output, metadata)
+      options = object.options
+      to = " to #{object.to}" if object.to
+      opts = " with options #{options}" unless options == {}
+      output << "   upload: #{object.from}#{to}#{opts}\n\n"
+    end
+
     def self.runbook__statements__wait(object, output, metadata)
       output << "   wait: #{object.time} seconds\n\n"
     end
