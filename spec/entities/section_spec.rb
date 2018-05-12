@@ -96,4 +96,143 @@ RSpec.describe Runbook::Entities::Section do
       expect(step.parent).to eq(section)
     end
   end
+
+  describe "#parallelization" do
+    let(:strategy) { :parallel }
+    let(:limit) { 5 }
+    let(:wait) { 2 }
+
+    it "sets the parallelization strategy for the section" do
+      section.parallelization(strategy: strategy)
+      expect(section.ssh_config[:parallelization]).to include(
+        strategy: strategy,
+      )
+    end
+
+    it "takes an optional limit in servers per group" do
+      section.parallelization(strategy: :groups, limit: limit)
+      expect(section.ssh_config[:parallelization]).to include(
+        strategy: :groups,
+        limit: limit,
+      )
+    end
+
+    it "takes an optional wait time between runs in seconds" do
+      section.parallelization(strategy: :sequence, wait: wait)
+      expect(section.ssh_config[:parallelization]).to include(
+        strategy: :sequence,
+        wait: wait,
+      )
+    end
+  end
+
+  describe "#server" do
+    let(:server) { "some_host.stg" }
+    let(:old_server) { "some_host.stg" }
+
+    it "sets the servers on the section" do
+      section.server(server)
+      expect(section.ssh_config[:servers]).to eq([server])
+    end
+
+    it "explicitly sets the list of servers" do
+      section.server(old_server)
+      section.server(server)
+      expect(section.ssh_config[:servers]).to eq([server])
+    end
+  end
+
+  describe "#servers" do
+    let(:old_server) { "some_host.stg" }
+    let(:servers) { ["some_host.stg", "other_server.stg"] }
+
+    it "sets the servers on the section" do
+      section.servers(*servers)
+      expect(section.ssh_config[:servers]).to eq(servers)
+    end
+
+    it "takes an array as a list of servers" do
+      section.servers(servers)
+      expect(section.ssh_config[:servers]).to eq(servers)
+    end
+
+    it "explicitly sets the list of servers" do
+      section.server(old_server)
+      section.servers(*servers)
+      expect(section.ssh_config[:servers]).to eq(servers)
+    end
+  end
+
+  describe "#path" do
+    let(:path) { "/some/path" }
+
+    it "sets the remote path for the section" do
+      section.path(path)
+      expect(section.ssh_config[:path]).to eq(path)
+    end
+  end
+
+  describe "#user" do
+    let(:user) { "root" }
+
+    it "sets the remote user for the section" do
+      section.user(user)
+      expect(section.ssh_config[:user]).to eq(user)
+    end
+  end
+
+  describe "#group" do
+    let(:group) { "root" }
+
+    it "sets the remote group for the section" do
+      section.group(group)
+      expect(section.ssh_config[:group]).to eq(group)
+    end
+  end
+
+  describe "#env" do
+    let(:env) { {rails_env: "production"} }
+
+    it "sets the remote environment for the section" do
+      section.env(env)
+      expect(section.ssh_config[:env]).to eq(env)
+    end
+  end
+
+  describe "#umask" do
+    let(:umask) { "077" }
+
+    it "sets the remote umask for the section" do
+      section.umask(umask)
+      expect(section.ssh_config[:umask]).to eq(umask)
+    end
+  end
+
+  describe "#ssh_config" do
+    let(:umask) { "077" }
+
+    it "returns a configured ssh_config object" do
+      ssh_config = section.dsl.ssh_config do
+        parallelization strategy: :sequence, wait: 5
+        server "s1.prod"
+        path "/home"
+        user "root"
+        group "root"
+        env({path: "/usr/bin"})
+        umask "077"
+      end
+
+      expect(ssh_config).to eq(
+        {
+          parallelization: {strategy: :sequence, limit: 2, wait: 5},
+          servers: ["s1.prod"],
+          path: "/home",
+          user: "root",
+          group: "root",
+          env: {path: "/usr/bin"},
+          umask: "077",
+        }
+      )
+    end
+  end
 end

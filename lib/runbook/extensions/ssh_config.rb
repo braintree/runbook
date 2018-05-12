@@ -1,10 +1,14 @@
 module Runbook::Extensions
   module SSHConfig
-    def ssh_config
-      @ssh_config ||= {
+    def self.blank_ssh_config
+      {
         servers: [],
         parallelization: {},
       }
+    end
+
+    def ssh_config
+      @ssh_config ||= Runbook::Extensions::SSHConfig.blank_ssh_config
     end
 
     module DSL
@@ -65,4 +69,8 @@ module Runbook::Extensions
 
   Runbook::Entities::Step.prepend(SSHConfig)
   Runbook::Entities::Step::DSL.prepend(SSHConfig::DSL)
+  Runbook::Entities::Section.prepend(SSHConfig)
+  Runbook::Entities::Section::DSL.prepend(SSHConfig::DSL)
+  Runbook::Entities::Book.prepend(SSHConfig)
+  Runbook::Entities::Book::DSL.prepend(SSHConfig::DSL)
 end

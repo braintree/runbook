@@ -6,6 +6,22 @@ module Runbook::Helpers
       [cmd.to_sym, args]
     end
 
+    def find_ssh_config(object, ssh_config_method=:ssh_config)
+      blank_config = Runbook::Extensions::SSHConfig.blank_ssh_config
+      nil_or_blank = ->(config) { config.nil? || config == blank_config }
+      ssh_config = object.send(ssh_config_method)
+      return ssh_config unless nil_or_blank.call(ssh_config)
+      object = object.parent
+
+      while object
+        ssh_config = object.ssh_config
+        return ssh_config unless nil_or_blank.call(ssh_config)
+        object = object.parent
+      end
+
+      return blank_config
+    end
+
     def with_ssh_config(ssh_config, &exec_block)
       user = ssh_config[:user]
       group = ssh_config[:group]

@@ -21,7 +21,7 @@ module Runbook::Runs
         end
 
         time = Time.now
-        cmd_ssh_config = object.cmd_ssh_config || object.parent.ssh_config
+        cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
         timed_out = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
 
@@ -39,8 +39,7 @@ module Runbook::Runs
           error_msg = "Error! Assertion `#{object.cmd}` failed"
           metadata[:toolbox].error(error_msg)
           if (timeout_cmd = object.timeout_cmd)
-            ssh_config = object.timeout_cmd_ssh_config ||
-              object.parent.ssh_config
+            ssh_config = find_ssh_config(object, :timeout_cmd_ssh_config)
             timeout_cmd_args = ssh_kit_command(
               timeout_cmd,
               raw: object.timeout_cmd_raw,
@@ -61,7 +60,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || object.parent.ssh_config
+        ssh_config = find_ssh_config(object)
         capture_args = ssh_kit_command(object.cmd, raw: object.raw)
 
         result = ""
@@ -82,7 +81,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || object.parent.ssh_config
+        ssh_config = find_ssh_config(object)
         execute_args = ssh_kit_command(object.cmd, raw: object.raw)
 
         with_ssh_config(ssh_config) do
@@ -102,7 +101,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || object.parent.ssh_config
+        ssh_config = find_ssh_config(object)
 
         with_ssh_config(ssh_config) do
           download!(object.from, object.to, object.options)
@@ -121,7 +120,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || object.parent.ssh_config
+        ssh_config = find_ssh_config(object)
 
         with_ssh_config(ssh_config) do
           upload!(object.from, object.to, object.options)

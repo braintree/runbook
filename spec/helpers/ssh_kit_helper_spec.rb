@@ -21,6 +21,81 @@ RSpec.describe Runbook::Helpers::SSHKitHelper do
     end
   end
 
+  describe "find_ssh_config" do
+    let(:metadata) { {} }
+    let(:blank_ssh_config) {
+      Runbook::Extensions::SSHConfig.blank_ssh_config
+    }
+    let(:stmt_ssh_config) {
+      blank_ssh_config[:servers] << "stmt_server.prod"
+    }
+    let(:object) {
+      Runbook::Statements::Command.new("ls")
+    }
+    let(:step_server) { "step_server.prod" }
+    let(:step) {
+      Runbook::Entities::Step.new("Step 1")
+    }
+    let(:section_server) { "section_server.prod" }
+    let(:section) {
+      Runbook::Entities::Section.new("Section 1")
+    }
+
+    before(:each) { section.add(step); step.add(object) }
+
+    context "when no ssh_configs are set" do
+      it "uses a blank config" do
+        expect(
+          subject.find_ssh_config(object)
+        ).to eq(blank_ssh_config)
+      end
+    end
+
+    context "when section ssh_config is set" do
+      before(:each) { section.dsl.server section_server }
+
+      it "uses the section config" do
+        expect(
+          subject.find_ssh_config(object)[:servers]
+        ).to eq([section_server])
+      end
+
+      context "when step ssh_config is set" do
+        before(:each) { step.dsl.server step_server }
+
+        it "uses the step config" do
+          expect(
+            subject.find_ssh_config(object)[:servers]
+          ).to eq([step_server])
+        end
+
+        context "when statement ssh_config is set" do
+          let(:object) do
+            Runbook::Statements::Command.new("ls", ssh_config: stmt_ssh_config)
+          end
+
+          it "uses the statement config" do
+            expect(
+              subject.find_ssh_config(object)
+            ).to eq(stmt_ssh_config)
+          end
+        end
+
+        context "when statement is an assert statement" do
+          let(:object) do
+            Runbook::Statements::Assert.new("ls", cmd_ssh_config: stmt_ssh_config)
+          end
+
+          it "uses the statement cmd_ssh_config" do
+            expect(
+              subject.find_ssh_config(object, :cmd_ssh_config)
+            ).to eq(stmt_ssh_config)
+          end
+        end
+      end
+    end
+  end
+
   describe "with_ssh_config" do
     let(:servers) { [] }
     let(:parallelization) { {strategy: :parallel} }
