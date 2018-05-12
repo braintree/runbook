@@ -47,6 +47,13 @@ module Runbook::Views
       output << "#{object.msg}\n"
     end
 
+    def self.runbook__statements__download(object, output, metadata)
+      options = object.options
+      to = " to #{object.to}" if object.to
+      opts = " with options #{options}" unless options == {}
+      output << "   download: #{object.from}#{to}#{opts}\n\n"
+    end
+
     def self.runbook__statements__monitor(object, output, metadata)
       output << "   run: `#{object.cmd}`\n\n"
       output << "   confirm: #{object.prompt}\n\n"

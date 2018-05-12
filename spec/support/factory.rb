@@ -81,6 +81,13 @@ module Factory
       return Runbook::Statements::Description.new(
         attrs[:msg],
       )
+    when :download
+      attrs = {
+        from: "/root/my_file.txt",
+      }.merge!(overrides)
+      return Runbook::Statements::Download.new(
+        attrs[:from],
+      )
     when :monitor
       attrs = {
         cmd: "ps aux | grep redis",
