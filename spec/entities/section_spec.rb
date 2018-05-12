@@ -14,6 +14,11 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.items).to include(section2)
     end
 
+    it "adds itself as the new section's parent" do
+      section2 = section.section("My Nested Section") {}
+      expect(section2.parent).to eq(section)
+    end
+
     it "adds to the section's existing items" do
       sec1 = section.section("My nested section 1") {}
       sec2 = section.section("My nested section 2") {}
@@ -33,6 +38,11 @@ RSpec.describe Runbook::Entities::Section do
     it "adds a step to the section's items" do
       step = section.step("My Step") {}
       expect(section.items).to include(step)
+    end
+
+    it "adds itself as the new step's parent" do
+      step = section.step("My Step") {}
+      expect(step.parent).to eq(section)
     end
 
     it "adds to the section's existing items" do
@@ -62,6 +72,11 @@ RSpec.describe Runbook::Entities::Section do
       expect(section.items).to include(desc)
     end
 
+    it "adds itself as the new description's parent" do
+      desc = section.description("My Description") {}
+      expect(desc.parent).to eq(section)
+    end
+
     it "adds to the section's existing items" do
       desc1 = section.description("My description") {}
       desc2 = section.description("My other description") {}
@@ -70,10 +85,15 @@ RSpec.describe Runbook::Entities::Section do
   end
 
   describe "#add" do
+    let(:step) { Runbook.step("New step") {} }
     it "adds a step to the section" do
-      step = Runbook.step("New step") {}
       section.dsl.add(step)
       expect(section.items).to include(step)
+    end
+
+    it "adds itself as the step's parent" do
+      section.dsl.add(step)
+      expect(step.parent).to eq(section)
     end
   end
 end

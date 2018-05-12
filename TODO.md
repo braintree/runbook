@@ -81,7 +81,7 @@ Runbook.book "Drop Redis" do
       command "redis-cli -h #{host} -p 6379 INFO | grep rdb_bgsave_in_progress:0"
       ask "How many messages are left", into: :num_messages_left
       ruby_command do |statement, metadata|
-        if metadata[:parent].num_messages_left.to_i > 5
+        if statement.parent.num_messages_left.to_i > 5
           puts "There are more messages than we expect. Exiting..."
           exit(1)
         end

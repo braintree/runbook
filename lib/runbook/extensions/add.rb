@@ -2,7 +2,7 @@ module Runbook::Extensions
   module Add
     module DSL
       def add(entity)
-        parent.items << entity
+        parent.add(entity)
       end
     end
   end

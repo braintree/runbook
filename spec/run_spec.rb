@@ -172,10 +172,9 @@ RSpec.describe "Runbook::Run" do
     let (:prompt) { "Sky blue?" }
     let (:into) { :sky_color }
     let (:object) { Runbook::Statements::Ask.new(prompt, into: into) }
-    let(:metadata_override) do
-      {
-        parent: Runbook::Entities::Step.new("step")
-      }
+
+    before(:each) do
+      object.parent = Runbook::Entities::Step.new("step")
     end
 
     context "noop" do
@@ -208,7 +207,7 @@ RSpec.describe "Runbook::Run" do
 
       subject.execute(object, metadata)
 
-      expect(metadata[:parent].sky_color).to eq(result)
+      expect(object.parent.sky_color).to eq(result)
     end
   end
 

@@ -6,7 +6,7 @@ module Runbook::Entities
 
     # Seed data for 'run' tree traversal method
     def self.initial_run_metadata
-      {depth: 1, index: 0, parent: nil, position: ""}
+      {depth: 1, index: 0, position: ""}
     end
   end
 end

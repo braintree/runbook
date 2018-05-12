@@ -13,10 +13,11 @@ RSpec.describe Runbook::Runs::SSHKit do
       toolbox: toolbox,
       depth: 1,
       index: 2,
-      parent: parent,
       position: "3.3",
     }.merge(metadata_override)
   }
+
+  before(:each) { object.parent = parent }
 
   describe "runbook__entities__assert" do
     let (:cmd) { "echo 'hi'" }
@@ -27,7 +28,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
     it "runs cmd until it returns true" do
       test_args = [:echo, "'hi'"]
-      ssh_config = metadata[:parent].ssh_config
+      ssh_config = object.parent.ssh_config
       expect(
         subject
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -124,7 +125,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         it "calls the timeout_cmd" do
           timeout_cmd_args = [:echo, "'timed out!'"]
-          ssh_config = metadata[:parent].ssh_config
+          ssh_config = object.parent.ssh_config
           expect(toolbox).to receive(:error)
           expect(
             subject
@@ -252,7 +253,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
     it "runs cmd" do
       execute_args = [:echo, "'hi'"]
-      ssh_config = metadata[:parent].ssh_config
+      ssh_config = object.parent.ssh_config
       expect(
         subject
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -325,7 +326,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
     it "captures cmd" do
       capture_args = [:echo, "'hi'", {:strip => true}]
-      ssh_config = metadata[:parent].ssh_config
+      ssh_config = object.parent.ssh_config
       expect(
         subject
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -334,7 +335,7 @@ RSpec.describe Runbook::Runs::SSHKit do
       ).to receive(:capture).with(*capture_args).and_return(result)
 
       subject.execute(object, metadata)
-      expect(metadata[:parent].send(into)).to eq(result)
+      expect(object.parent.send(into)).to eq(result)
     end
 
     context "with ssh_config set" do
@@ -421,7 +422,7 @@ RSpec.describe Runbook::Runs::SSHKit do
     end
 
     it "downloads the file" do
-      ssh_config = metadata[:parent].ssh_config
+      ssh_config = object.parent.ssh_config
       expect(
         subject
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -484,7 +485,7 @@ RSpec.describe Runbook::Runs::SSHKit do
     end
 
     it "uploads the file" do
-      ssh_config = metadata[:parent].ssh_config
+      ssh_config = object.parent.ssh_config
       expect(
         subject
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original

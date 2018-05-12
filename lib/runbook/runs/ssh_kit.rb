@@ -21,7 +21,7 @@ module Runbook::Runs
         end
 
         time = Time.now
-        cmd_ssh_config = object.cmd_ssh_config || metadata[:parent].ssh_config
+        cmd_ssh_config = object.cmd_ssh_config || object.parent.ssh_config
         timed_out = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
 
@@ -40,7 +40,7 @@ module Runbook::Runs
           metadata[:toolbox].error(error_msg)
           if (timeout_cmd = object.timeout_cmd)
             ssh_config = object.timeout_cmd_ssh_config ||
-              metadata[:parent].ssh_config
+              object.parent.ssh_config
             timeout_cmd_args = ssh_kit_command(
               timeout_cmd,
               raw: object.timeout_cmd_raw,
@@ -61,7 +61,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+        ssh_config = object.ssh_config || object.parent.ssh_config
         capture_args = ssh_kit_command(object.cmd, raw: object.raw)
 
         result = ""
@@ -69,7 +69,7 @@ module Runbook::Runs
           result = capture(*capture_args, strip: object.strip)
         end
 
-        metadata[:parent].define_singleton_method(object.into.to_sym) do
+        object.parent.define_singleton_method(object.into.to_sym) do
           result
         end
       end
@@ -82,7 +82,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+        ssh_config = object.ssh_config || object.parent.ssh_config
         execute_args = ssh_kit_command(object.cmd, raw: object.raw)
 
         with_ssh_config(ssh_config) do
@@ -102,7 +102,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+        ssh_config = object.ssh_config || object.parent.ssh_config
 
         with_ssh_config(ssh_config) do
           download!(object.from, object.to, object.options)
@@ -121,7 +121,7 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+        ssh_config = object.ssh_config || object.parent.ssh_config
 
         with_ssh_config(ssh_config) do
           upload!(object.from, object.to, object.options)

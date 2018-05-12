@@ -3,7 +3,7 @@ module Runbook::Extensions
     module DSL
       def step(title=nil, &block)
         Runbook::Entities::Step.new(title).tap do |step|
-          parent.items << step
+          parent.add(step)
           step.dsl.instance_eval(&block) if block
         end
       end

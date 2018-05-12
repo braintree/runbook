@@ -3,7 +3,7 @@ module Runbook::Extensions
     module DSL
       def section(title, &block)
         Runbook::Entities::Section.new(title).tap do |section|
-          parent.items << section
+          parent.add(section)
           section.dsl.instance_eval(&block)
         end
       end

@@ -3,7 +3,7 @@ module Runbook::Extensions
     module DSL
       def description(msg)
         Runbook::Statements::Description.new(msg).tap do |desc|
-          parent.items << desc
+          parent.add(desc)
         end
       end
     end

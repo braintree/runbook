@@ -36,6 +36,11 @@ RSpec.describe Runbook::Entities::Step do
     end
   end
 
+  it "adds itself as the new statement's parent" do
+    stmt = step.command("echo 'hi'")
+    expect(stmt.parent).to eq(step)
+  end
+
   it "adds new statements to the step's existing items" do
     stmt1 = step.command("echo 'hi'")
     stmt2 = step.command("echo 'hi'")
@@ -200,10 +205,16 @@ RSpec.describe Runbook::Entities::Step do
   end
 
   describe "#add" do
+    let(:note) { Runbook::Statements::Note.new("Read me") }
+
     it "adds a statement to the step" do
-      note = Runbook::Statements::Note.new("Read me")
       step.dsl.add(note)
       expect(step.items).to include(note)
+    end
+
+    it "adds itself as the statement's parent" do
+      step.dsl.add(note)
+      expect(note.parent).to eq(step)
     end
   end
 end

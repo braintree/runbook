@@ -21,8 +21,8 @@ module Runbook
           return
         end
 
-        if metadata[:parent].is_a?(Runbook::Entities::Step)
-          if metadata[:parent].items.last == object
+        if object.parent.is_a?(Runbook::Entities::Step)
+          if object.parent.items.last == object
             metadata[:toolbox].output("\n")
           end
         end
@@ -57,7 +57,7 @@ module Runbook
         end
 
         result = metadata[:toolbox].ask(object.prompt)
-        metadata[:parent].define_singleton_method(object.into.to_sym) do
+        object.parent.define_singleton_method(object.into.to_sym) do
           result
         end
       end

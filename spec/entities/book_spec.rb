@@ -14,6 +14,11 @@ RSpec.describe Runbook::Entities::Book do
       expect(book.items).to include(section)
     end
 
+    it "adds itself as the new section's parent" do
+      section = book.section("My Section") {}
+      expect(section.parent).to eq(book)
+    end
+
     it "adds to the book's existing items" do
       section1 = book.section("My Section") {}
       section2 = book.section("My Other Section") {}
@@ -33,6 +38,11 @@ RSpec.describe Runbook::Entities::Book do
       expect(book.items).to include(desc)
     end
 
+    it "adds itself as the new description's parent" do
+      desc = book.description("My Description") {}
+      expect(desc.parent).to eq(book)
+    end
+
     it "adds to the book's existing items" do
       desc1 = book.description("My description") {}
       desc2 = book.description("My other description") {}
@@ -41,10 +51,16 @@ RSpec.describe Runbook::Entities::Book do
   end
 
   describe "#add" do
+    let(:section) { Runbook.section("My Section") {} }
+
     it "adds a section to the book" do
-      section = Runbook.section("My Section") {}
       book.dsl.add(section)
       expect(book.items).to include(section)
+    end
+
+    it "adds itself as the section's parent" do
+      book.dsl.add(section)
+      expect(section.parent).to eq(book)
     end
   end
 end

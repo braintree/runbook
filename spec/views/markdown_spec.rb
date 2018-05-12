@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe Runbook::Views::Markdown do
   let(:my_output) { StringIO.new }
   let(:view) { Runbook::Views::Markdown }
-  let(:metadata) { {depth: 1, index: 0, parent: nil} }
+  let(:metadata) { {depth: 1, index: 0} }
 
   describe "self.render" do
     let(:title) { "This is my title" }

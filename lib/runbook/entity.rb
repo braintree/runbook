@@ -6,11 +6,18 @@ module Runbook
       child_class.const_set(:DSL, Runbook::DSL.class)
     end
 
+    attr_accessor :parent
     attr_reader :title, :dsl
 
-    def initialize(title)
+    def initialize(title, parent: nil)
       @title = title
+      @parent = parent
       @dsl = "#{self.class}::DSL".constantize.new(self)
+    end
+
+    def add(item)
+      items << item
+      item.parent = self
     end
 
     def items
@@ -29,7 +36,7 @@ module Runbook
       !!(dsl.respond_to?(name) || super)
     end
 
-    def render(view, output, metadata={depth: 1, index: 0, parent: nil})
+    def render(view, output, metadata={depth: 1, index: 0})
       view.render(self, output, metadata)
       items.each_with_index do |item, index|
         item.render(view, output, _render_metadata(metadata, index))
@@ -47,7 +54,6 @@ module Runbook
       {
         depth: metadata[:depth] + 1,
         index: index,
-        parent: self,
       }
     end
 
@@ -70,7 +76,6 @@ module Runbook
         {
           depth: metadata[:depth] + 1,
           index: index,
-          parent: self,
           position: pos,
         }
       )
