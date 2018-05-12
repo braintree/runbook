@@ -14,6 +14,8 @@ module Runbook
 
   class Configuration
     attr_accessor :ssh_kit
+    attr_accessor :enable_sudo_prompt
+    attr_reader :use_same_sudo_password
 
     def initialize
       self.ssh_kit = SSHKit.config
@@ -22,6 +24,21 @@ module Runbook
         banner: nil,
         command_output: true,
       )
+      self.enable_sudo_prompt = true
+      self.use_same_sudo_password = true
+    end
+
+    def use_same_sudo_password=(use_same_pwd)
+      @use_same_sudo_password = use_same_pwd
+      SSHKit::Sudo::InteractionHandler.class_eval do
+        if use_same_pwd
+          use_same_password!
+        else
+          def password_cache_key(host)
+            "#{host.user}@#{host.hostname}"
+          end
+        end
+      end
     end
   end
 

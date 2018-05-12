@@ -2,11 +2,15 @@ require "active_support/inflector"
 require "method_source"
 require "pastel"
 require "sshkit"
+require "sshkit/sudo"
 require "airbrussh"
 require "tty-progressbar"
 require "tty-prompt"
 
 require "runbook/configuration"
+
+require "hacks/ssh_kit"
+
 require "runbook/dsl"
 require "runbook/errors"
 

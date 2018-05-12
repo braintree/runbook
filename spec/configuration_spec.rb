@@ -3,6 +3,9 @@ require "spec_helper"
 RSpec.describe "Runbook Configuration" do
   let(:config) { Runbook::Configuration.new }
 
+  before(:all) { Runbook.reset_configuration }
+  after(:each) { Runbook.reset_configuration }
+
   describe "configuration" do
     it "returns a Runbook::Configuration object" do
       expect(Runbook.configuration).to be_a(Runbook::Configuration)
@@ -21,6 +24,36 @@ RSpec.describe "Runbook Configuration" do
 
     it "sets ssh_kit.output to an Airbrussh::Formatter" do
       expect(config.ssh_kit.output).to be_a(Airbrussh::Formatter)
+    end
+
+    it "sets enable_sudo_prompt to true" do
+      expect(config.enable_sudo_prompt).to eq(true)
+    end
+
+    it "sets use_same_sudo_password to true" do
+      expect(config.use_same_sudo_password).to eq(true)
+    end
+  end
+
+  describe "config.use_same_sudo_password=" do
+    let (:host) { SSHKit::Host.new("user@host") }
+
+    context "when set to true" do
+      it "sets SSHKit::Sudo::InteractionHandler.password_cache_key to 0" do
+        config.use_same_sudo_password = true
+        expect(
+          SSHKit::Sudo::InteractionHandler.new.password_cache_key(host)
+        ).to eq("0")
+      end
+    end
+
+    context "when set to false" do
+      it "sets SSHKit::Sudo::InteractionHandler.password_cache_key to the unique user and host" do
+        config.use_same_sudo_password = false
+        expect(
+          SSHKit::Sudo::InteractionHandler.new.password_cache_key(host)
+        ).to eq("user@host")
+      end
     end
   end
 
