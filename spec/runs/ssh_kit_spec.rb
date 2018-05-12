@@ -312,4 +312,98 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
     end
   end
+
+  describe "runbook__entities__capture" do
+    let (:cmd) { "echo 'hi'" }
+    let (:into) { :result }
+    let(:result) { "hi" }
+    let (:object) { Runbook::Statements::Capture.new(cmd, into: into) }
+
+    before(:each) do
+      allow(toolbox).to receive(:output)
+    end
+
+    it "captures cmd" do
+      capture_args = [:echo, "'hi'", {:strip => true}]
+      ssh_config = metadata[:parent].ssh_config
+      expect(
+        subject
+      ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+      expect_any_instance_of(
+        SSHKit::Backend::Abstract
+      ).to receive(:capture).with(*capture_args).and_return(result)
+
+      subject.execute(object, metadata)
+      expect(metadata[:parent].send(into)).to eq(result)
+    end
+
+    context "with ssh_config set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}}
+      end
+      let (:object) do
+        Runbook::Statements::Capture.new(
+          cmd,
+          into: into,
+          ssh_config: ssh_config,
+        )
+      end
+
+      it "uses the ssh_config" do
+        capture_args = [:echo, "'hi'", {:strip => true}]
+        expect(
+          subject
+        ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with raw true" do
+      let(:raw) { true }
+      let (:object) do
+        Runbook::Statements::Capture.new(cmd, into: into, raw: raw)
+      end
+
+      it "executes the raw command string" do
+        capture_args = ["echo 'hi'", {:strip => true}]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with strip false" do
+      let(:strip) { false }
+      let (:object) do
+        Runbook::Statements::Capture.new(cmd, into: into, strip: strip)
+      end
+
+      it "executes the raw command string" do
+        capture_args = [:echo, "'hi'", {:strip => false}]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the capture statement" do
+        msg = "[NOOP] Capture: `#{cmd}` into #{into}"
+        expect(toolbox).to receive(:output).with(msg)
+        expect(subject).to_not receive(:with_ssh_config)
+
+        subject.execute(object, metadata)
+      end
+    end
+  end
 end

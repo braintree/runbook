@@ -53,6 +53,27 @@ module Runbook::Runs
         end
       end
 
+      def runbook__statements__capture(object, metadata)
+        if metadata[:noop]
+          metadata[:toolbox].output("[NOOP] Capture: `#{object.cmd}` into #{object.into}")
+          return
+        end
+
+        metadata[:toolbox].output("\n") # for formatting
+
+        ssh_config = object.ssh_config || metadata[:parent].ssh_config
+        capture_args = ssh_kit_command(object.cmd, raw: object.raw)
+
+        result = ""
+        with_ssh_config(ssh_config) do
+          result = capture(*capture_args, strip: object.strip)
+        end
+
+        metadata[:parent].define_singleton_method(object.into.to_sym) do
+          result
+        end
+      end
+
       def runbook__statements__command(object, metadata)
         if metadata[:noop]
           metadata[:toolbox].output("[NOOP] Run: `#{object.cmd}`")

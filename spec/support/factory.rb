@@ -38,6 +38,15 @@ module Factory
         timeout: attrs[:timeout],
         timeout_cmd: attrs[:timeout_cmd],
       )
+    when :capture
+      attrs = {
+        cmd: "echo 'hi'",
+        into: :result,
+      }.merge!(overrides)
+      return Runbook::Statements::Capture.new(
+        attrs[:cmd],
+        into: attrs[:into],
+      )
     when :command
       attrs = {
         cmd: "echo 'hi'",
