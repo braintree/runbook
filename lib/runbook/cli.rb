@@ -11,10 +11,7 @@ module Runbook
     LONGDESC
     option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
-      unless File.exist?(runbook)
-        raise Thor::UnknownArgumentError, "view: cannot access #{runbook}: No such file or directory"
-      end
-      runbook = _retrieve_runbook(runbook)
+      runbook = _retrieve_runbook(runbook, :view)
       puts Runbook::Viewer.new(runbook).generate(options[:view])
     end
 
@@ -38,10 +35,7 @@ module Runbook
     option :"no-paranoid", aliases: :P, type: :boolean
     option :start_at, aliases: :s, type: :string
     def exec(runbook)
-      unless File.exist?(runbook)
-        raise Thor::UnknownArgumentError, "exec: cannot access #{runbook}: No such file or directory"
-      end
-      runbook = _retrieve_runbook(runbook)
+      runbook = _retrieve_runbook(runbook, :exec)
       Runbook::Runner.new(runbook).run(
         run: options[:run],
         noop: options[:noop],
@@ -53,7 +47,10 @@ module Runbook
 
     private
 
-    def _retrieve_runbook(runbook)
+    def _retrieve_runbook(runbook, cmd)
+      unless File.exist?(runbook)
+        raise Thor::UnknownArgumentError, "#{cmd}: cannot access #{runbook}: No such file or directory"
+      end
       load(runbook)
       runbook_key = File.basename(runbook, ".rb").to_sym
       Runbook.books[runbook_key] || eval(File.read(runbook))
