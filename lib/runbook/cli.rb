@@ -3,6 +3,8 @@ require "runbook"
 
 module Runbook
   class CLI < Thor
+    class_option :config, aliases: :c, type: :string
+
     desc "view RUNBOOK", "Generates a formatted version of the runbook"
     long_desc <<-LONGDESC
       Executes the runbook.
@@ -11,6 +13,7 @@ module Runbook
     LONGDESC
     option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
+      _load_config(options[:config], :view) if options[:config]
       runbook = _retrieve_runbook(runbook, :view)
       puts Runbook::Viewer.new(runbook).generate(options[:view])
     end
@@ -35,6 +38,7 @@ module Runbook
     option :"no-paranoid", aliases: :P, type: :boolean
     option :start_at, aliases: :s, type: :string
     def exec(runbook)
+      _load_config(options[:config], :exec) if options[:config]
       runbook = _retrieve_runbook(runbook, :exec)
       Runbook::Runner.new(runbook).run(
         run: options[:run],
@@ -46,6 +50,13 @@ module Runbook
     end
 
     private
+
+    def _load_config(config, cmd)
+      unless File.exist?(config)
+        raise Thor::UnknownArgumentError, "#{cmd}: cannot access #{config}: No such file or directory"
+      end
+      load(config)
+    end
 
     def _retrieve_runbook(runbook, cmd)
       unless File.exist?(runbook)

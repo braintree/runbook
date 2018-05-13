@@ -1,6 +1,14 @@
 require "spec_helper"
 
 RSpec.describe "runbook run", type: :aruba do
+  let(:config_file) { "runbook_config.rb" }
+  let(:config_content) do
+    <<-CONFIG
+    Runbook.configure do |config|
+      config.ssh_kit.use_format :dot
+    end
+    CONFIG
+  end
   let(:runbook_file) { "my_runbook.rb" }
   let(:runbook_registration) {}
   let(:content) do
@@ -17,6 +25,7 @@ RSpec.describe "runbook run", type: :aruba do
     RUNBOOK
   end
 
+  before(:each) { write_file(config_file, config_content) }
   before(:each) { write_file(runbook_file, content) }
   before(:each) { run(command) }
 
@@ -258,6 +267,35 @@ RSpec.describe "runbook run", type: :aruba do
           output_lines.each do |line|
             expect(last_command_started).to have_output(line)
           end
+        end
+      end
+    end
+
+    context "when config is passed" do
+      let(:command) { "runbook exec --config #{config_file} #{runbook_file}" }
+
+      it "executes the runbook using the specified configuration" do
+        expect(last_command_started).to have_output(/\n\./)
+      end
+
+      context "(when c is passed)" do
+        let(:command) { "runbook exec -c #{config_file} #{runbook_file}" }
+
+        it "executes the runbook using the specified configuration" do
+          expect(last_command_started).to have_output(/\n\./)
+        end
+      end
+
+      context "when config does not exist" do
+        let(:command) { "runbook exec --config unknown #{runbook_file}" }
+        let(:unknown_file_output) {
+          "exec: cannot access unknown: No such file or directory"
+        }
+
+        it "prints an unknown file message" do
+          expect(
+            last_command_started
+          ).to have_output(unknown_file_output)
         end
       end
     end
