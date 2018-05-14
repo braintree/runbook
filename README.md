@@ -102,9 +102,11 @@ assert(
   cmd_raw: false,
   interval: 3, # seconds
   timeout: 300, # seconds
-  timeout_cmd: "echo 'help' | mail -s 'need help' page-me@page-me.com",
-  timeout_cmd_ssh_config: {servers: [:local], parallelization: {strategy: :parallel}},
-  timeout_cmd_raw: false,
+  timeout_statement: Runbook::Statements::Command.new(
+    "echo 'help' | mail -s 'need help' page-me@page-me.com",
+    ssh_config: {servers: [:local], parallelization: {strategy: :parallel}},
+    raw: false
+  )
 )
 ```
 

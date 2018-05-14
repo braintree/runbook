@@ -9,6 +9,9 @@ RSpec.describe Runbook::Statements::Assert do
   let(:timeout_cmd) { %Q{mail -S "Error" me@me.com} }
   let(:timeout_cmd_ssh_config) { {servers: [], parallelization: {}} }
   let(:timeout_cmd_raw) { true }
+  let(:timeout_statement) do
+    Runbook::Statements::Command.new(timeout_cmd, ssh_config: timeout_cmd_ssh_config, raw: timeout_cmd_raw)
+  end
   let(:assert) do
     Runbook::Statements::Assert.new(
       cmd,
@@ -16,9 +19,7 @@ RSpec.describe Runbook::Statements::Assert do
       cmd_raw: cmd_raw,
       interval: interval,
       timeout: timeout,
-      timeout_cmd: timeout_cmd,
-      timeout_cmd_ssh_config: timeout_cmd_ssh_config,
-      timeout_cmd_raw: timeout_cmd_raw,
+      timeout_statement: timeout_statement,
     )
   end
 
@@ -42,16 +43,8 @@ RSpec.describe Runbook::Statements::Assert do
     expect(assert.timeout).to eq(timeout)
   end
 
-  it "has an timeout_cmd" do
-    expect(assert.timeout_cmd).to eq(timeout_cmd)
-  end
-
-  it "has an timeout_cmd_ssh_config" do
-    expect(assert.timeout_cmd_ssh_config).to eq(timeout_cmd_ssh_config)
-  end
-
-  it "has an timeout_cmd_raw" do
-    expect(assert.timeout_cmd_raw).to eq(timeout_cmd_raw)
+  it "has a timeout_statement" do
+    expect(assert.timeout_statement).to eq(timeout_statement)
   end
 
   describe "default values" do
@@ -75,16 +68,8 @@ RSpec.describe Runbook::Statements::Assert do
       expect(assert.timeout).to eq(0)
     end
 
-    it "sets defaults for timeout_cmd" do
-      expect(assert.timeout_cmd).to be_nil
-    end
-
-    it "sets defaults for timeout_cmd_ssh_config" do
-      expect(assert.timeout_cmd_ssh_config).to be_nil
-    end
-
-    it "sets defaults for timeout_cmd_raw" do
-      expect(assert.timeout_cmd_raw).to be_falsey
+    it "sets defaults for timeout_statement" do
+      expect(assert.timeout_statement).to be_nil
     end
   end
 end

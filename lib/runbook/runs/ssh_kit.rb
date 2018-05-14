@@ -13,9 +13,11 @@ module Runbook::Runs
           interval_msg = "(running every #{object.interval} second(s))"
           metadata[:toolbox].output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
           if object.timeout > 0
-            timeout_msg = object.timeout_cmd ? " run `#{object.timeout_cmd}` and" : ""
-            timeout_msg = "after #{object.timeout} seconds,#{timeout_msg} exit"
-            metadata[:toolbox].output(timeout_msg)
+            metadata[:toolbox].output("after #{object.timeout} second(s), timeout...")
+            if object.timeout_statement
+              object.timeout_statement.run(self, metadata.dup)
+            end
+            metadata[:toolbox].output("and exit")
           end
           return
         end
@@ -38,15 +40,8 @@ module Runbook::Runs
         if timed_out
           error_msg = "Error! Assertion `#{object.cmd}` failed"
           metadata[:toolbox].error(error_msg)
-          if (timeout_cmd = object.timeout_cmd)
-            ssh_config = find_ssh_config(object, :timeout_cmd_ssh_config)
-            timeout_cmd_args = ssh_kit_command(
-              timeout_cmd,
-              raw: object.timeout_cmd_raw,
-            )
-            with_ssh_config(ssh_config) do
-              execute(*timeout_cmd_args)
-            end
+          if object.timeout_statement
+            object.timeout_statement.run(self, metadata.dup)
           end
           raise Runbook::Runner::ExecutionError, error_msg
         end

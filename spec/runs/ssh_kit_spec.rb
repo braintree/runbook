@@ -107,11 +107,12 @@ RSpec.describe Runbook::Runs::SSHKit do
 
       context "when timeout_cmd is set" do
         let (:timeout_cmd) { "echo 'timed out!'" }
+        let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
         let (:object) do
           Runbook::Statements::Assert.new(
             cmd,
             timeout: timeout,
-            timeout_cmd: timeout_cmd
+            timeout_statement: timeout_statement
           )
         end
 
@@ -121,6 +122,7 @@ RSpec.describe Runbook::Runs::SSHKit do
             SSHKit::Backend::Abstract
           ).to receive(:test).with(*test_args).and_return(false)
           allow(subject).to receive(:with_ssh_config).and_call_original
+          allow(toolbox).to receive(:output)
         end
 
         it "calls the timeout_cmd" do
@@ -143,12 +145,12 @@ RSpec.describe Runbook::Runs::SSHKit do
           let (:timeout_cmd_ssh_config) do
             {servers: ["server01.stg"], parallelization: {}}
           end
+          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd, ssh_config: timeout_cmd_ssh_config) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_cmd: timeout_cmd,
-              timeout_cmd_ssh_config: timeout_cmd_ssh_config,
+              timeout_statement: timeout_statement,
             )
           end
 
@@ -170,12 +172,12 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         context "when timeout_cmd_raw is set to true" do
           let(:raw) { true }
+          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd, raw: raw) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_cmd: timeout_cmd,
-              timeout_cmd_raw: raw,
+              timeout_statement: timeout_statement,
             )
           end
 
@@ -214,27 +216,36 @@ RSpec.describe Runbook::Runs::SSHKit do
         end
 
         it "outputs the noop text for the timeout" do
-          msg = "after #{timeout} seconds, exit"
+          msg1 = "after #{timeout} second(s), timeout..."
+          msg2 = "and exit"
           allow(toolbox).to receive(:output)
-          expect(toolbox).to receive(:output).with(msg)
+          expect(toolbox).to receive(:output).with(msg1)
+          expect(toolbox).to receive(:output).with(msg2)
 
           subject.execute(object, metadata)
         end
 
         context "when timeout_cmd is specified" do
           let (:timeout_cmd) { "./notify_everyone" }
+          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_cmd: timeout_cmd,
+              timeout_statement: timeout_statement,
             )
           end
 
           it "outputs the noop text for the timeout_cmd" do
-            msg = "after #{timeout} seconds, run `#{timeout_cmd}` and exit"
+            msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
+            msg2 = "after #{timeout} second(s), timeout..."
+            msg3 = "[NOOP] Run: `./notify_everyone`"
+            msg4 = "and exit"
             allow(toolbox).to receive(:output)
-            expect(toolbox).to receive(:output).with(msg)
+            expect(toolbox).to receive(:output).with(msg1)
+            expect(toolbox).to receive(:output).with(msg2)
+            expect(toolbox).to receive(:output).with(msg3)
+            expect(toolbox).to receive(:output).with(msg4)
 
             subject.execute(object, metadata)
           end
