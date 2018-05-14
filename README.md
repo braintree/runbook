@@ -451,17 +451,17 @@ If you are looking to make a complex decision tree, it is recommended that you d
 
 ```ruby
 step "Inspect plate" do
-	ask "What's on the plate?", into: :vegetable
-	ruby_command do |rb_cmd, metadata|
-		case (veggie = rb_cmd.parent.vegetable)
-		when "carrots"
-			carrots_book.run(self, metadata.dup)
-		when "peas"
-			system("runbook exec samples/print_peas.rb")
-		else
-			_warn("Found #{veggie}!")
-		end
-	end
+  ask "What's on the plate?", into: :vegetable
+  ruby_command do |rb_cmd, metadata|
+    case (veggie = rb_cmd.parent.vegetable)
+    when "carrots"
+      carrots_book.run(self, metadata.dup)
+    when "peas"
+      system("runbook exec samples/print_peas.rb")
+    else
+      metadata[:toolbox].warn("Found #{veggie}!")
+    end
+  end
 end
 ```
 
