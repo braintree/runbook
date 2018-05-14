@@ -602,7 +602,7 @@ module MyRunbook::Extensions
 end
 ```
 
-### Add to configuration
+### Adding to Runbooks' Configuration
 
 You can add additional configuration to Runbook's configuration by prepending to Runbook::Configuration.
 
