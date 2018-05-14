@@ -111,27 +111,5 @@ RSpec.describe "runbook view", type: :aruba do
         end
       end
     end
-
-    context "runbook is written to standard in" do
-      it "prints a markdown representation of the runbook"
-    end
-
-    context "when input is specified as ruby" do
-      it "reads the file as a ruby file"
-    end
-
-    context "when input is specified as unknown" do
-      it "prints an unknown input format message"
-    end
-  end
-
-  describe "output specification" do
-    context "when output is specified as markdown" do
-      it "prints a markdown representation of the runbook"
-    end
-
-    context "when output is specified as unknown" do
-      it "prints an unknown output format message"
-    end
   end
 end
