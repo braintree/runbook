@@ -106,7 +106,6 @@ Section 1.2: Second Section
 Step 1.2.1: Step 1
 
 Notice: Some cheese is actually yellow plastic
-
 [NOOP] Run the following Ruby block:
 ```ruby
 ruby_command do |rb_cmd, metadata|

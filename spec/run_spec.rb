@@ -386,7 +386,7 @@ RSpec.describe "Runbook::Run" do
       let(:metadata_override) { {noop: true} }
 
       it "outputs the noop text for the ruby command statement" do
-        msg1 = "\n[NOOP] Run the following Ruby block:\n"
+        msg1 = "[NOOP] Run the following Ruby block:\n"
         expect(toolbox).to receive(:output).with(msg1)
         msg2 = "```ruby\nlet (:block) { ->(object, metadata) { raise \"This happened\" } }\n```\n"
         expect(toolbox).to receive(:output).with(msg2)
@@ -400,7 +400,7 @@ RSpec.describe "Runbook::Run" do
           expect(block).to receive(:source) do
             raise ::MethodSource::SourceNotFoundError
           end
-          msg1 = "\n[NOOP] Run the following Ruby block:\n"
+          msg1 = "[NOOP] Run the following Ruby block:\n"
           expect(toolbox).to receive(:output).with(msg1)
           msg2 = "Unable to retrieve source code"
           expect(toolbox).to receive(:output).with(msg2)

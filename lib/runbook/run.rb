@@ -107,7 +107,7 @@ module Runbook
 
       def runbook__statements__ruby_command(object, metadata)
         if metadata[:noop]
-          metadata[:toolbox].output("\n[NOOP] Run the following Ruby block:\n")
+          metadata[:toolbox].output("[NOOP] Run the following Ruby block:\n")
           begin
             source = deindent(object.block.source)
             metadata[:toolbox].output("```ruby\n#{source}\n```\n")

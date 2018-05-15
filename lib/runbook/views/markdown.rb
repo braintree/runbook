@@ -74,7 +74,7 @@ module Runbook::Views
       output << "   run:\n"
       output << "   ```ruby\n"
       begin
-        output << "   #{deindent(object.block.source)}"
+        output << "#{deindent(object.block.source, padding: 3)}\n"
       rescue ::MethodSource::SourceNotFoundError => e
         output << "   Unable to retrieve source code\n"
       end
