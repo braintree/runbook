@@ -29,7 +29,7 @@ module Factory
       attrs = {
         cmd: "echo 'hi'",
         interval: 1,
-        timeout: 0,
+        timeout: 5,
         timeout_statement: nil,
       }.merge!(overrides)
       return Runbook::Statements::Assert.new(
