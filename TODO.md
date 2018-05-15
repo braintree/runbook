@@ -1,7 +1,7 @@
 ## Desired Feature list
 
-* [] Pass a statement to assert (command, ruby_command, etc.)
-* [] Render ssh_config for runs and views
+* [] Add version argument to cli
+* [] Render ssh_config for runs
 * [] Add Appraisal
 * [] Add a revert section that does not get executed, but can be executed by passing a revert flag
 * Add support for sudo interaction handler for raw commands
