@@ -39,7 +39,8 @@ module Runbook
     def render(view, output, metadata={depth: 1, index: 0})
       view.render(self, output, metadata)
       items.each_with_index do |item, index|
-        item.render(view, output, _render_metadata(metadata, index))
+        new_metadata = _render_metadata(items, item, metadata, index)
+        item.render(view, output, new_metadata)
       end
     end
 
@@ -50,7 +51,11 @@ module Runbook
       end
     end
 
-    def _render_metadata(metadata, index)
+    def _render_metadata(items, item, metadata, index)
+      index = items.select do |item|
+        item.is_a?(Entity)
+      end.index(item)
+
       {
         depth: metadata[:depth] + 1,
         index: index,

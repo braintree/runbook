@@ -3,6 +3,10 @@ require "spec_helper"
 RSpec.describe Runbook::Viewer do
   let(:book) do
     Runbook.book "My Book" do
+      description <<-DESC
+My elaborate
+description
+      DESC
       section "Parent Section" do
         section "First Section" do
           step "Step 1" do
@@ -28,6 +32,9 @@ RSpec.describe Runbook::Viewer do
 
       expect(markdown).to eq(<<-MARKDOWN)
 # My Book
+
+My elaborate
+description
 
 ## 1. Parent Section
 
