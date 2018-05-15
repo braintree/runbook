@@ -20,5 +20,24 @@ STR
     it "strips redundant leading whitespace from the string" do
       expect(subject.deindent(str)).to eq(result.strip)
     end
+
+    context "when padding is specified" do
+      let(:str) do <<-STR
+          This message
+            has some
+          leading whitespace
+                      STR
+      end
+      let(:result) do <<-STR
+   This message
+     has some
+   leading whitespace
+      STR
+      end
+
+      it "adds padding in front of each line" do
+        expect(subject.deindent(str, padding: 3)).to eq(result.rstrip)
+      end
+    end
   end
 end
