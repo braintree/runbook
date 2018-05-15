@@ -31,7 +31,7 @@ RSpec.describe "runbook run", type: :aruba do
 
   describe "input specification" do
     context "runbook is passed as an argument" do
-      let(:command) { "runbook exec #{runbook_file}" }
+      let(:command) { "runbook exec -P #{runbook_file}" }
       let(:output_lines) {
         [
           /Executing My Runbook\.\.\./,
@@ -183,7 +183,7 @@ RSpec.describe "runbook run", type: :aruba do
     end
 
     context "when start_at is passed" do
-      let(:command) { "runbook exec --start-at 1.2 #{runbook_file}" }
+      let(:command) { "runbook exec -P --start-at 1.2 #{runbook_file}" }
       let(:content) do
         <<-RUNBOOK
         Runbook.book "My Runbook" do
@@ -230,7 +230,7 @@ RSpec.describe "runbook run", type: :aruba do
       end
 
       context "(when s is passed)" do
-        let(:command) { "runbook exec -s 1.2 #{runbook_file}" }
+        let(:command) { "runbook exec -P -s 1.2 #{runbook_file}" }
 
         it "starts at the specified position" do
           output_lines.each do |line|
@@ -244,7 +244,7 @@ RSpec.describe "runbook run", type: :aruba do
     end
 
     context "when run is passed" do
-      let(:command) { "runbook exec --run ssh_kit #{runbook_file}" }
+      let(:command) { "runbook exec -P --run ssh_kit #{runbook_file}" }
       let(:output_lines) {
         [
           /Executing My Runbook\.\.\./,
@@ -261,7 +261,7 @@ RSpec.describe "runbook run", type: :aruba do
       end
 
       context "(when r is passed)" do
-        let(:command) { "runbook exec -r ssh_kit #{runbook_file}" }
+        let(:command) { "runbook exec -P -r ssh_kit #{runbook_file}" }
 
         it "runs the runbook" do
           output_lines.each do |line|
@@ -272,14 +272,14 @@ RSpec.describe "runbook run", type: :aruba do
     end
 
     context "when config is passed" do
-      let(:command) { "runbook exec --config #{config_file} #{runbook_file}" }
+      let(:command) { "runbook exec -P --config #{config_file} #{runbook_file}" }
 
       it "executes the runbook using the specified configuration" do
         expect(last_command_started).to have_output(/\n\./)
       end
 
       context "(when c is passed)" do
-        let(:command) { "runbook exec -c #{config_file} #{runbook_file}" }
+        let(:command) { "runbook exec -P -c #{config_file} #{runbook_file}" }
 
         it "executes the runbook using the specified configuration" do
           expect(last_command_started).to have_output(/\n\./)
@@ -287,7 +287,7 @@ RSpec.describe "runbook run", type: :aruba do
       end
 
       context "when config does not exist" do
-        let(:command) { "runbook exec --config unknown #{runbook_file}" }
+        let(:command) { "runbook exec -P --config unknown #{runbook_file}" }
         let(:unknown_file_output) {
           "exec: cannot access unknown: No such file or directory"
         }

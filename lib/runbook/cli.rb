@@ -44,7 +44,7 @@ module Runbook
         run: options[:run],
         noop: options[:noop],
         auto: options[:auto],
-        paranoid: options[:paranoid],
+        paranoid: options[:"no-paranoid"] == nil,
         start_at: options[:start_at],
       )
     end
