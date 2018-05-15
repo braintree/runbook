@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "method_source", "~> 0.9.0"
   spec.add_runtime_dependency "sshkit", "1.16"
   spec.add_runtime_dependency "sshkit-sudo", "~> 0.1.0"
-  spec.add_runtime_dependency "airbrussh", "~> 1.3.0"
+  spec.add_runtime_dependency "airbrussh", "~> 1.3"
   spec.add_runtime_dependency "thor", "~> 0.20.0"
   spec.add_runtime_dependency "tty-progressbar", "~> 0.14.0"
   spec.add_runtime_dependency "tty-prompt", "~> 0.16.0"
