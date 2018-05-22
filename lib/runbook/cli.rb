@@ -3,6 +3,7 @@ require "runbook"
 
 module Runbook
   class CLI < Thor
+    map "--version" => :__print_version
     class_option :config, aliases: :c, type: :string
 
     desc "view RUNBOOK", "Generates a formatted version of the runbook"
@@ -47,6 +48,11 @@ module Runbook
         paranoid: options[:"no-paranoid"] == nil,
         start_at: options[:start_at],
       )
+    end
+
+    desc "--version", "Print runbook's version"
+    def __print_version
+      puts "Runbook v#{Runbook::VERSION}"
     end
 
     private

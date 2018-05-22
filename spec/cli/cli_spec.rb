@@ -37,4 +37,14 @@ RSpec.describe "runbook", type: :aruba do
       expect(last_command_started).to have_output(%q{Could not find command "unknown".})
     end
   end
+
+  context "--version is passed" do
+    let(:command) { "runbook --version" }
+    let(:version) { Runbook::VERSION }
+
+    it "prints out the version" do
+      expect(last_command_started).to have_output(/Runbook v#{version}/)
+    end
+  end
+
 end
