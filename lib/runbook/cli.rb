@@ -37,7 +37,7 @@ module Runbook
     option :noop, aliases: :n, type: :boolean
     option :auto, aliases: :a, type: :boolean
     option :"no-paranoid", aliases: :P, type: :boolean
-    option :start_at, aliases: :s, type: :string
+    option :start_at, aliases: :s, type: :string, default: "0"
     def exec(runbook)
       _load_config(options[:config], :exec) if options[:config]
       runbook = _retrieve_runbook(runbook, :exec)

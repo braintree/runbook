@@ -10,7 +10,7 @@ RSpec.describe "Runbook::Run" do
       noop: false,
       auto: false,
       paranoid: true,
-      start_at: 0,
+      start_at: "0",
       toolbox: toolbox,
       depth: 1,
       index: 0,

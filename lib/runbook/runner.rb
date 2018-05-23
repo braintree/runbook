@@ -11,7 +11,7 @@ module Runbook
       noop: false,
       auto: false,
       paranoid: true,
-      start_at: 0
+      start_at: "0"
     )
       run = "Runbook::Runs::#{run.to_s.camelize}".constantize
       toolbox = Runbook::Toolbox.new
