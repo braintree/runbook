@@ -20,7 +20,8 @@ module Runbook::Views
     end
 
     def self.runbook__statements__ask(object, output, metadata)
-      output << "   #{object.prompt}\n\n"
+      default_msg = object.default ?  " (default: #{object.default})" : ""
+      output << "   #{object.prompt} into #{object.into}#{default_msg}\n\n"
     end
 
     def self.runbook__statements__assert(object, output, metadata)

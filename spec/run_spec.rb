@@ -232,11 +232,27 @@ RSpec.describe "Runbook::Run" do
 
     it "prompts the user and stores the result on the parent object" do
       result = "result"
-      expect(toolbox).to receive(:ask).with(prompt).and_return(result)
+      expect(toolbox).to receive(:ask).with(prompt, default: nil).and_return(result)
 
       subject.execute(object, metadata)
 
       expect(object.parent.sky_color).to eq(result)
+    end
+
+    context "when default specified" do
+      let (:default) { "Pope where a hat?" }
+      let (:object) {
+        Runbook::Statements::Ask.new(prompt, into: into, default: default)
+      }
+
+      it "passes the default value to the ask statement" do
+        result = "result"
+        expect(toolbox).to receive(:ask).with(prompt, default: default).and_return(result)
+
+        subject.execute(object, metadata)
+
+        expect(object.parent.sky_color).to eq(result)
+      end
     end
   end
 

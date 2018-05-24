@@ -4,6 +4,7 @@ RSpec.describe Runbook::Toolbox do
   let(:prompt) { instance_double("TTY::Prompt") }
   let(:toolbox) { Runbook::Toolbox.new }
   let(:msg) { "Something I want to say" }
+  let(:default) { "default" }
   let(:choices) { [
     { key: "y", name: "Yes", value: true },
   ] }
@@ -20,8 +21,13 @@ RSpec.describe Runbook::Toolbox do
 
   describe "ask" do
     it "passes its argument to prompt.ask" do
-      expect(prompt).to receive(:ask).with(msg)
+      expect(prompt).to receive(:ask).with(msg, default: nil)
       toolbox.ask(msg)
+    end
+
+    it "passes its default to prompt.ask" do
+      expect(prompt).to receive(:ask).with(msg, default: default)
+      toolbox.ask(msg, default: default)
     end
   end
 

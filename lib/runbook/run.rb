@@ -64,7 +64,7 @@ module Runbook
           return
         end
 
-        result = metadata[:toolbox].ask(object.prompt)
+        result = metadata[:toolbox].ask(object.prompt, default: object.default)
         object.parent.define_singleton_method(object.into.to_sym) do
           result
         end
