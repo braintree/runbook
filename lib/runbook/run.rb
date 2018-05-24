@@ -46,13 +46,21 @@ module Runbook
 
       def runbook__statements__ask(object, metadata)
         if metadata[:auto]
+          if object.default
+            object.parent.define_singleton_method(object.into.to_sym) do
+              object.default
+            end
+            return
+          end
+
           error_msg = "ERROR! Can't execute ask statement in automatic mode!"
           metadata[:toolbox].error(error_msg)
           raise Runbook::Runner::ExecutionError, error_msg
         end
 
         if metadata[:noop]
-          metadata[:toolbox].output("[NOOP] Ask: #{object.prompt} (store in: #{object.into})")
+          default_msg = object.default ? " (default: #{object.default})" : ""
+          metadata[:toolbox].output("[NOOP] Ask: #{object.prompt} (store in: #{object.into})#{default_msg}")
           return
         end
 

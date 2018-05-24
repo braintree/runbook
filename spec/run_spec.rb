@@ -186,6 +186,20 @@ RSpec.describe "Runbook::Run" do
 
         subject.execute(object, metadata)
       end
+
+      context "when default specified" do
+        let (:default) { "Pope where a hat?" }
+        let (:object) {
+          Runbook::Statements::Ask.new(prompt, into: into, default: default)
+        }
+
+        it "outputs the default text for the ask statement" do
+          msg = "[NOOP] Ask: #{prompt} (store in: #{into}) (default: #{default})"
+          expect(toolbox).to receive(:output).with(msg)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
 
     context "auto" do
@@ -198,6 +212,21 @@ RSpec.describe "Runbook::Run" do
         expect do
           subject.execute(object, metadata)
         end.to raise_error(Runbook::Runner::ExecutionError, error_msg)
+      end
+
+      context "when default specified" do
+        let (:default) { "Pope where a hat?" }
+        let (:object) {
+          Runbook::Statements::Ask.new(prompt, into: into, default: default)
+        }
+
+        it "sets the default value for the ask statement" do
+          expect(toolbox).to_not receive(:ask)
+
+          subject.execute(object, metadata)
+
+          expect(object.parent.sky_color).to eq(default)
+        end
       end
     end
 

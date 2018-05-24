@@ -1,10 +1,11 @@
 ## Desired Feature list
 
-* [] Add version argument to cli
+* [X] Add version argument to cli
+* [X] Allow ask statement to take a default
+* [] Add support for sudo interaction handler for raw commands
 * [] Render ssh_config for runs
 * [] Add Appraisal
 * [] Add a revert section that does not get executed, but can be executed by passing a revert flag
-* Add support for sudo interaction handler for raw commands
 * Could provide a rake task for compiling and nooping runbooks?
 * Create a generator for a runbook? Allow for custom generators?
   * Generate runbook projects with Runbookfile, Gemfile, etc.
