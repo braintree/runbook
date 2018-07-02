@@ -2,6 +2,8 @@
 
 * [X] Add version argument to cli
 * [X] Allow ask statement to take a default
+* [] Allow for preventing echo when prompting for input
+* [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [] Add support for sudo interaction handler for raw commands
 * [] Render ssh_config for runs
 * [] Add Appraisal
