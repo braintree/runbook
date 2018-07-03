@@ -131,6 +131,14 @@ RSpec.describe "Runbook::Run" do
         end
       end
 
+      context "when :no_paranoid" do
+        it "no longer prompts" do
+          expect(toolbox).to receive(:expand).and_return(:no_paranoid)
+          subject.execute(object, metadata)
+          expect(metadata[:paranoid]).to eq(false)
+        end
+      end
+
       context "when :exit" do
         it "exits the process" do
           expect(toolbox).to receive(:expand).and_return(:exit)
