@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Runbook::Helpers::SSHKitHelper do
+RSpec.describe Runbook::Helpers::FormatHelper do
   subject { Class.new { include Runbook::Helpers::FormatHelper }.new }
 
   describe "deindent" do

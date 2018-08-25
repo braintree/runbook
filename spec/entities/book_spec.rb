@@ -34,18 +34,18 @@ RSpec.describe Runbook::Entities::Book do
 
   describe "#description" do
     it "adds a description to the book's items" do
-      desc = book.description("My Description") {}
+      desc = book.description("My Description")
       expect(book.items).to include(desc)
     end
 
     it "adds itself as the new description's parent" do
-      desc = book.description("My Description") {}
+      desc = book.description("My Description")
       expect(desc.parent).to eq(book)
     end
 
     it "adds to the book's existing items" do
-      desc1 = book.description("My description") {}
-      desc2 = book.description("My other description") {}
+      desc1 = book.description("My description")
+      desc2 = book.description("My other description")
       expect(book.items).to eq([desc1, desc2])
     end
   end
