@@ -177,7 +177,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__ask" do
+  describe "runbook__statements__ask" do
     let (:prompt) { "Sky blue?" }
     let (:into) { :sky_color }
     let (:object) { Runbook::Statements::Ask.new(prompt, into: into) }
@@ -265,7 +265,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__confirm" do
+  describe "runbook__statements__confirm" do
     let (:prompt) { "Sky blue?" }
     let (:object) { Runbook::Statements::Confirm.new(prompt) }
 
@@ -320,7 +320,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__description" do
+  describe "runbook__statements__description" do
     let (:description) { "\nMy lengthy description...\n\n" }
     let (:object) { Runbook::Statements::Description.new(description) }
 
@@ -365,7 +365,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__monitor" do
+  describe "runbook__statements__monitor" do
     let (:prompt) { "Sky blue?" }
     let (:cmd) { "echo 'hi'" }
     let (:object) do
@@ -437,7 +437,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__note" do
+  describe "runbook__statements__note" do
     let (:note) { "My note..." }
     let (:object) { Runbook::Statements::Note.new(note) }
 
@@ -448,7 +448,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__notice" do
+  describe "runbook__statements__notice" do
     let (:notice) { "Warning..." }
     let (:object) { Runbook::Statements::Notice.new(notice) }
 
@@ -459,7 +459,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__ruby_command" do
+  describe "runbook__statements__ruby_command" do
     let (:block) { ->(object, metadata) { raise "This happened" } }
     let (:object) { Runbook::Statements::RubyCommand.new(&block) }
 
@@ -526,7 +526,7 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
-  describe "runbook__entities__wait" do
+  describe "runbook__statements__wait" do
     let (:time) { 60 }
     let (:object) { Runbook::Statements::Wait.new(time) }
 
