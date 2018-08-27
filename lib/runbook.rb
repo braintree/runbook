@@ -46,6 +46,7 @@ require "runbook/statements/monitor"
 require "runbook/statements/note"
 require "runbook/statements/notice"
 require "runbook/statements/ruby_command"
+require "runbook/statements/tmux_command"
 require "runbook/statements/upload"
 require "runbook/statements/wait"
 

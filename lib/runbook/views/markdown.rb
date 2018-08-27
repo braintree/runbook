@@ -87,6 +87,10 @@ module Runbook::Views
       output << "   ```\n\n"
     end
 
+    def self.runbook__statements__tmux_command(object, output, metadata)
+      output << "   run: `#{object.cmd}` in pane #{object.pane}\n\n"
+    end
+
     def self.runbook__statements__upload(object, output, metadata)
       options = object.options
       to = " to #{object.to}" if object.to

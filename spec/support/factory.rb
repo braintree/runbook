@@ -124,6 +124,15 @@ module Factory
         cmd: cmd,
       }.merge!(overrides)
       return Runbook::Statements::RubyCommand.new(&attrs[:cmd])
+    when :tmux_command
+      attrs = {
+        cmd: "echo 'hi'",
+        pane: :pane1,
+      }.merge!(overrides)
+      return Runbook::Statements::TmuxCommand.new(
+        attrs[:cmd],
+        attrs[:pane],
+      )
     when :upload
       attrs = {
         from: "my_file.txt",

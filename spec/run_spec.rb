@@ -498,6 +498,34 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
+  describe "runbook__statements__tmux_command" do
+    let (:cmd) { "echo 'hi'" }
+    let (:pane) { :pane1 }
+    let (:pane_id) { "pane_id" }
+    let (:layout_panes) { {:pane1 => pane_id} }
+    let(:metadata_override) { {layout_panes: layout_panes} }
+    let (:object) do
+      Runbook::Statements::TmuxCommand.new(cmd, pane)
+    end
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the tmux command statement" do
+        msg = "[NOOP] Run: `echo 'hi'` in pane pane1"
+        expect(toolbox).to receive(:output).with(msg)
+        expect(subject).to_not receive(:send_keys)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    it "executes the command in the target pane" do
+      expect(subject).to receive(:send_keys).with(cmd, pane_id)
+      subject.execute(object, metadata)
+    end
+  end
+
   describe "runbook__entities__wait" do
     let (:time) { 60 }
     let (:object) { Runbook::Statements::Wait.new(time) }

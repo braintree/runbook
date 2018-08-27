@@ -124,6 +124,15 @@ module Runbook
         metadata[:toolbox].warn("Notice: #{object.msg}")
       end
 
+      def runbook__statements__tmux_command(object, metadata)
+        if metadata[:noop]
+          metadata[:toolbox].output("[NOOP] Run: `#{object.cmd}` in pane #{object.pane}")
+          return
+        end
+
+        send_keys(object.cmd, metadata[:layout_panes][object.pane])
+      end
+
       def runbook__statements__ruby_command(object, metadata)
         if metadata[:noop]
           metadata[:toolbox].output("[NOOP] Run the following Ruby block:\n")
