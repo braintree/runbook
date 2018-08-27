@@ -88,6 +88,13 @@ module Factory
       return Runbook::Statements::Download.new(
         attrs[:from],
       )
+    when :layout
+      attrs = {
+        structure: [],
+      }.merge!(overrides)
+      return Runbook::Statements::Layout.new(
+        attrs[:structure],
+      )
     when :monitor
       attrs = {
         cmd: "ps aux | grep redis",

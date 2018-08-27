@@ -21,6 +21,7 @@ require "runbook/entities/step"
 
 require "runbook/helpers/format_helper"
 require "runbook/helpers/ssh_kit_helper"
+require "runbook/helpers/tmux_helper"
 
 require "runbook/runner"
 require "runbook/run"
@@ -40,6 +41,7 @@ require "runbook/statements/command"
 require "runbook/statements/confirm"
 require "runbook/statements/description"
 require "runbook/statements/download"
+require "runbook/statements/layout"
 require "runbook/statements/monitor"
 require "runbook/statements/note"
 require "runbook/statements/notice"
@@ -54,6 +56,7 @@ require "runbook/extensions/set"
 require "runbook/extensions/ssh_config"
 require "runbook/extensions/statements"
 require "runbook/extensions/steps"
+require "runbook/extensions/tmux"
 
 require "runbook/version"
 

@@ -21,6 +21,7 @@ module Runbook
         paranoid: paranoid,
         start_at: start_at,
         toolbox: toolbox,
+        layout_panes: {},
       }.merge(Runbook::Entities::Book.initial_run_metadata)
 
       book.run(run, metadata)

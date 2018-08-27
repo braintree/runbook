@@ -50,6 +50,24 @@ RSpec.describe Runbook::Entities::Book do
     end
   end
 
+  describe "#layout" do
+    it "adds a layout to the book's items" do
+      layout = book.layout([])
+      expect(book.items).to include(layout)
+    end
+
+    it "adds itself as the new layout's parent" do
+      layout = book.layout([])
+      expect(layout.parent).to eq(book)
+    end
+
+    it "adds to the book's existing items" do
+      desc = book.description("My description")
+      layout = book.layout([])
+      expect(book.items).to eq([desc, layout])
+    end
+  end
+
   describe "#add" do
     let(:section) { Runbook.section("My Section") {} }
 

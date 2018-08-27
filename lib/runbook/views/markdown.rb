@@ -58,6 +58,11 @@ module Runbook::Views
       output << "   download: #{object.from}#{to}#{opts}\n\n"
     end
 
+    def self.runbook__statements__layout(object, output, metadata)
+      output << "layout:\n"
+      output << "#{object.structure.inspect}\n\n"
+    end
+
     def self.runbook__statements__monitor(object, output, metadata)
       output << "   run: `#{object.cmd}`\n\n"
       output << "   confirm: #{object.prompt}\n\n"

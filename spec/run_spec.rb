@@ -12,6 +12,7 @@ RSpec.describe "Runbook::Run" do
       paranoid: true,
       start_at: "0",
       toolbox: toolbox,
+      layout_panes: {},
       depth: 1,
       index: 0,
       parent: nil,
@@ -328,6 +329,39 @@ RSpec.describe "Runbook::Run" do
       expect(toolbox).to receive(:output).with("#{description}\n")
 
       subject.execute(object, metadata)
+    end
+  end
+
+  describe "runbook__statements__layout" do
+    let (:layout) { [:left, :right] }
+    let (:object) { Runbook::Statements::Layout.new(layout) }
+    let (:layout_panes) { {:left => "%1" , :right => "%2"} }
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the layout statement" do
+        msg = "[NOOP] Layout: #{layout.inspect}"
+        expect(toolbox).to receive(:output).with(msg)
+        expect(subject).to_not receive(:setup_layout)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    it "sets up the layout" do
+      expect(subject).to receive(:setup_layout).
+        with(layout).
+        and_return(layout_panes)
+      subject.execute(object, metadata)
+    end
+
+    it "adds the layout to metadata[:layout_panes]" do
+      allow(subject).to receive(:setup_layout).and_return(layout_panes)
+
+      subject.execute(object, metadata)
+
+      expect(metadata[:layout_panes]).to eq(layout_panes)
     end
   end
 

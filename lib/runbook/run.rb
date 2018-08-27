@@ -6,6 +6,7 @@ module Runbook
 
     module ClassMethods
       include Runbook::Helpers::FormatHelper
+      include Runbook::Helpers::TmuxHelper
 
       def execute(object,  metadata)
         position = Gem::Version.new(metadata[:position])
@@ -87,6 +88,16 @@ module Runbook
       def runbook__statements__description(object, metadata)
         metadata[:toolbox].output("Description:")
         metadata[:toolbox].output("#{object.msg}\n")
+      end
+
+      def runbook__statements__layout(object, metadata)
+        if metadata[:noop]
+          metadata[:toolbox].output("[NOOP] Layout: #{object.structure.inspect}")
+          return
+        end
+
+        layout_panes = setup_layout(object.structure)
+        metadata[:layout_panes].merge!(layout_panes)
       end
 
       def runbook__statements__monitor(object, metadata)
