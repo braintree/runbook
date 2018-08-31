@@ -18,14 +18,14 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     end
 
     context "with identity" do
-      let(:identity) { [] }
+      let(:structure) { [] }
 
       it "does not execute any tmux commands" do
         (tmux_mutator_methods).each do |method|
           expect(subject).to_not receive(method)
         end
 
-        subject.setup_layout(identity)
+        subject._setup_layout(structure)
       end
     end
 
@@ -33,7 +33,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
       let(:name) { :runbook_pane }
       let(:directory) { "/some/directory" }
       let(:command) { "echo hi" }
-      let(:configured_pane) do
+      let(:structure) do
         [{
           name: name,
           directory: directory,
@@ -46,7 +46,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         expect(subject).to receive(:send_keys).with("cd #{directory}", runbook_pane_id)
         expect(subject).to receive(:send_keys).with(command, runbook_pane_id)
 
-        layout_panes = subject.setup_layout(configured_pane)
+        layout_panes = subject._setup_layout(structure)
 
         expect(layout_panes).to eq({name => runbook_pane_id})
       end
@@ -54,14 +54,14 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
 
     context "with two pane vertical structure" do
       let(:pane_2_id) { "%20" }
-      let(:two_pane_vertical_structure) do
+      let(:structure) do
         [:pane1, :pane2]
       end
 
       it "returns a map of names to pane ids" do
         expect(subject).to receive(:_split).with(runbook_pane_id, 0, 50).and_return(pane_2_id)
 
-        layout_panes = subject.setup_layout(two_pane_vertical_structure)
+        layout_panes = subject._setup_layout(structure)
 
         expect(layout_panes).to eq(
           {pane1: runbook_pane_id, pane2: pane_2_id}
@@ -71,14 +71,14 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
 
     context "with two pane horizontal structure" do
       let(:pane_2_id) { "%20" }
-      let(:two_pane_horizontal_structure) do
+      let(:structure) do
         [[:pane1, :pane2]]
       end
 
       it "returns a map of names to pane ids" do
         expect(subject).to receive(:_split).with(runbook_pane_id, 1, 50).and_return(pane_2_id)
 
-        layout_panes = subject.setup_layout(two_pane_horizontal_structure)
+        layout_panes = subject._setup_layout(structure)
 
         expect(layout_panes).to eq(
           {pane1: runbook_pane_id, pane2: pane_2_id}
@@ -89,7 +89,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     context "with three panes" do
       let(:pane_2_id) { "%20" }
       let(:pane_3_id) { "%21" }
-      let(:three_panes) do
+      let(:structure) do
         [:pane1, :pane2, :pane3]
       end
 
@@ -97,7 +97,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         expect(subject).to receive(:_split).with(runbook_pane_id, 0, 67).and_return(pane_2_id)
         expect(subject).to receive(:_split).with(pane_2_id, 0, 50).and_return(pane_3_id)
 
-        layout_panes = subject.setup_layout(three_panes)
+        layout_panes = subject._setup_layout(structure)
 
         expect(layout_panes).to eq(
           {pane1: runbook_pane_id, pane2: pane_2_id, pane3: pane_3_id}
@@ -108,7 +108,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     context "with specified runbook pane" do
       let(:pane_2_id) { "%20" }
       let(:command) { "echo hi" }
-      let(:runbook_pane_structure) do
+      let(:structure) do
         [
           {name: :pane1, command: command},
           {name: :runbook_pane, runbook_pane: true},
@@ -120,7 +120,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         expect(subject).to receive(:_swap_panes).with(pane_2_id, runbook_pane_id)
         expect(subject).to receive(:send_keys).with(command, pane_2_id)
 
-        layout_panes = subject.setup_layout(runbook_pane_structure)
+        layout_panes = subject._setup_layout(structure)
 
         expect(layout_panes).to eq(
           {pane1: pane_2_id, runbook_pane: runbook_pane_id}
@@ -130,7 +130,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
 
     context "with uneven size structure" do
       let(:pane_2_id) { "%20" }
-      let(:uneven_structure) do
+      let(:structure) do
         [[
           {
             :pane1 => 1,
@@ -142,13 +142,13 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
       it "splits the structure appropriately" do
         expect(subject).to receive(:_split).with(runbook_pane_id, 2, 75).and_return(pane_2_id)
 
-        layout_panes = subject.setup_layout(uneven_structure)
+        subject._setup_layout(structure)
       end
     end
 
     context "with single window" do
       let(:window_name) { :window1 }
-      let(:runbook_window) do
+      let(:structure) do
         {
           window_name => [:pane1, :pane2],
         }
@@ -158,14 +158,14 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         expect(subject).to receive(:_rename_window).with(window_name)
         expect(subject).to_not receive(:_new_window)
 
-        layout_panes = subject.setup_layout(runbook_window)
+        subject._setup_layout(structure)
       end
     end
 
     context "with multiple windows" do
       let (:window_1) { "w1" }
       let (:window_2) { "w2" }
-      let(:runbook_windows) do
+      let(:structure) do
         {
           window_1 => [:pane],
           window_2 => [:left, :right],
@@ -176,7 +176,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         expect(subject).to receive(:_rename_window).with(window_1)
         expect(subject).to receive(:_new_window).with(window_2)
 
-        layout_panes = subject.setup_layout(runbook_windows)
+        subject._setup_layout(structure)
       end
     end
   end

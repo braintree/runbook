@@ -92,7 +92,9 @@ module Runbook
 
       def runbook__statements__layout(object, metadata)
         if metadata[:noop]
-          metadata[:toolbox].output("[NOOP] Layout: #{object.structure.inspect}")
+          metadata[:toolbox].output(
+            "[NOOP] Layout: #{object.structure.inspect}"
+          )
           return
         end
 
