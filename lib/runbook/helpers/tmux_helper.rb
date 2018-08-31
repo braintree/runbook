@@ -1,6 +1,52 @@
 module Runbook::Helpers
   module TmuxHelper
-    def setup_layout(structure)
+    def setup_layout(structure, runbook_title:)
+      _remove_stale_layouts
+      layout_file = _layout_file(_slug(runbook_title))
+      if File.exists?(layout_file)
+        stored_layout = ::YAML::load_file(layout_file)
+        if _all_panes_exist?(stored_layout)
+          return stored_layout
+        end
+      end
+
+      _setup_layout(structure).tap do |layout_panes|
+        File.open(layout_file, 'w') do |f|
+          f.write(layout_panes.to_yaml)
+        end
+      end
+    end
+
+    def _layout_file(runbook_title)
+      `tmux display-message -p "#{Dir.tmpdir}/runbook_layout_\#{pid}_\#{session_name}_\#{pane_pid}_\#{pane_id}_#{runbook_title}.yml"`.strip
+    end
+
+    def _slug(title)
+      title.titleize.gsub(/\s+/, "").underscore.dasherize
+    end
+
+    def _all_panes_exist?(stored_layout)
+      (stored_layout.values - _session_panes).empty?
+    end
+
+    def _remove_stale_layouts
+      session_panes = _session_panes
+      session_layout_files = _session_layout_files
+      session_layout_files.each do |file|
+        File.delete(file) unless session_panes.any? { |pane| /_#{pane}_/ =~ file }
+      end
+    end
+
+    def _session_panes
+      `tmux list-panes -s -F '#D'`.split("\n")
+    end
+
+    def _session_layout_files
+      session_layout_glob = `tmux display-message -p "#{Dir.tmpdir}/runbook_layout_\#{pid}_\#{session_name}_*.yml"`.strip
+      Dir[session_layout_glob]
+    end
+
+    def _setup_layout(structure)
       current_pane = _runbook_pane
       panes_to_init = []
       {}.tap do |layout_panes|

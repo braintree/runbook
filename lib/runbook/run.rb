@@ -98,7 +98,9 @@ module Runbook
           return
         end
 
-        layout_panes = setup_layout(object.structure)
+        structure = object.structure
+        title = object.parent.title
+        layout_panes = setup_layout(structure, runbook_title: title)
         metadata[:layout_panes].merge!(layout_panes)
       end
 

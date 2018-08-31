@@ -334,8 +334,12 @@ RSpec.describe "Runbook::Run" do
 
   describe "runbook__statements__layout" do
     let (:layout) { [:left, :right] }
+    let (:title) { "My Stellar Book Title" }
+    let (:book) { Runbook::Entities::Book.new(title) }
     let (:object) { Runbook::Statements::Layout.new(layout) }
     let (:layout_panes) { {:left => "%1" , :right => "%2"} }
+
+    before(:each) { book.add(object) }
 
     context "noop" do
       let(:metadata_override) { {noop: true} }
@@ -351,7 +355,7 @@ RSpec.describe "Runbook::Run" do
 
     it "sets up the layout" do
       expect(subject).to receive(:setup_layout).
-        with(layout).
+        with(layout, runbook_title: title).
         and_return(layout_panes)
       subject.execute(object, metadata)
     end

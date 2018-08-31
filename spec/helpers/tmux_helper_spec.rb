@@ -8,9 +8,142 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     :_new_window,
     :_split,
     :_swap_panes,
+    :_remove_stale_layouts,
   ]
 
   describe "setup_layout" do
+    let(:structure) { [:runbook, :other] }
+    let(:title) { "My Amazing Runbook" }
+    let(:layout_file) { "/tmp/runbook_layout_12345_me_%0_123_amazing_runbook.yml" }
+    let(:stored_layout) { {:runbook => "%1", :other => "%3", :new => "%5"} }
+    let(:layout_panes) { {:runbook => "%1", :other => "%3"} }
+    let(:session_panes) { ["%0", "%1", "%2", "%3", "%4"] }
+
+    before(:each) do
+      allow(subject).to receive(:_layout_file).and_return(layout_file)
+      allow(subject).to receive(:_setup_layout).and_return(layout_panes)
+      allow(subject).to receive(:_session_panes).and_return(session_panes)
+      allow(subject).to receive(:_session_layout_files).and_return([])
+      allow(File).to receive(:open)
+      allow(File).to receive(:delete)
+      tmux_mutator_methods.each { |method| allow(subject).to receive(method) }
+    end
+
+    it "removes stale layout files" do
+      expect(subject).to receive(:_remove_stale_layouts)
+
+      subject.setup_layout(structure, runbook_title: title)
+    end
+
+    it "generates a layout file name from _layout_file" do
+      expect(subject).to receive(:_layout_file).and_return(layout_file)
+      subject.setup_layout(structure, runbook_title: title)
+    end
+
+    context "when layout_file exists" do
+      before(:each) do
+        expect(File).to receive(:exists?).with(layout_file).and_return(true)
+      end
+
+      context "when all panes exist" do
+        let(:stored_layout) { {:runbook => "%1", :other => "%3"} }
+        let(:layout_panes) { {:runbook => "%1", :other => "%3"} }
+        let(:session_panes) { ["%0", "%1", "%2", "%3", "%4"] }
+
+        it "returns the stored layout" do
+          expect(YAML).to receive(:load_file).with(layout_file).and_return(stored_layout)
+          expect(subject).to receive(:_session_panes).and_return(session_panes)
+          subject.setup_layout(structure, runbook_title: title)
+        end
+      end
+    end
+
+    context "when layout file does not exist" do
+      before(:each) do
+        expect(File).to receive(:exists?).with(layout_file).and_return(false)
+      end
+
+      it "invokes _setup_layout" do
+        expect(subject).to receive(:_setup_layout).and_return(layout_panes)
+
+        subject.setup_layout(structure, runbook_title: title)
+      end
+
+      it "writes layout_panes to layout_file" do
+        expect(File).to receive(:open).with(layout_file, 'w')
+
+        subject.setup_layout(structure, runbook_title: title)
+      end
+
+      it "returns layout_panes" do
+        expect(subject).to receive(:_setup_layout).and_return(layout_panes)
+
+        result = subject.setup_layout(structure, runbook_title: title)
+        expect(result).to eq(layout_panes)
+      end
+    end
+  end
+
+  describe "_slug" do
+    let(:inputs) { [
+      "My Runbook Title",
+      "my Runbook title",
+      "OTHER Runbook TITLE",
+      "some      Runbook TITLE",
+    ] }
+
+    let(:outputs) { [
+      "my-runbook-title",
+      "my-runbook-title",
+      "other-runbook-title",
+      "some-runbook-title",
+    ] }
+
+    it "returns a slugified version of its argument" do
+      inputs.each_with_index do |input, index|
+        expect(subject._slug(input)).to eq(outputs[index])
+      end
+    end
+  end
+
+  describe "_remove_stale_layouts" do
+    let(:session_panes) { ["%0", "%1", "%2", "%3", "%4"] }
+    let(:fresh_session_layout_files) do
+      [
+        "/tmp/runbook_layout_25996_pair_2716_%1_example-layout-book.yml",
+        "/tmp/runbook_layout_25996_pair_2716_%4_example-layout-book.yml",
+      ]
+    end
+    let(:stale_session_layout_files) do
+      [
+        "/tmp/runbook_layout_25996_pair_2716_%14_example-layout-book.yml",
+        "/tmp/runbook_layout_25996_pair_2716_%44_example-layout-book.yml",
+      ]
+    end
+    let(:session_layout_files) do
+      fresh_session_layout_files + stale_session_layout_files
+    end
+
+    before(:each) do
+      allow(subject).to receive(:_session_panes).and_return(session_panes)
+      allow(
+        subject
+      ).to receive(:_session_layout_files).and_return(session_layout_files)
+    end
+
+    it "removes old layout files" do
+      stale_session_layout_files.each do |file|
+        expect(File).to receive(:delete).with(file)
+      end
+      fresh_session_layout_files.each do |file|
+        expect(File).to_not receive(:delete)
+      end
+
+      subject._remove_stale_layouts
+    end
+  end
+
+  describe "_setup_layout" do
     let(:runbook_pane_id) { "%19" }
     before(:each) do
       allow(subject).to receive(:_runbook_pane).and_return(runbook_pane_id)

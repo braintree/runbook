@@ -1,3 +1,6 @@
+require "tmpdir"
+require "yaml"
+
 require "active_support/inflector"
 require "method_source"
 require "pastel"
