@@ -5,10 +5,12 @@ module Runbook
     end
 
     module ClassMethods
+      include Runbook::Hooks
+
       def render(object, output, metadata)
         method = _method_name(object)
         if respond_to?(method)
-          send(_method_name(object), object, output, metadata)
+          send(method, object, output, metadata)
         else
           $stderr.puts("WARNING! No render rule for #{object.class} (#{_method_name(object)}) in #{self.to_s}")
         end

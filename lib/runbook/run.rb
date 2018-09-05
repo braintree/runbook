@@ -5,6 +5,7 @@ module Runbook
     end
 
     module ClassMethods
+      include Runbook::Hooks
       include Runbook::Helpers::FormatHelper
       include Runbook::Helpers::TmuxHelper
 

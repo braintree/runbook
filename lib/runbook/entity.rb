@@ -1,5 +1,6 @@
 module Runbook
   class Entity
+    include Runbook::Hooks::Invoker
     const_set(:DSL, Runbook::DSL.class)
 
     def self.inherited(child_class)
@@ -37,17 +38,22 @@ module Runbook
     end
 
     def render(view, output, metadata={depth: 1, index: 0})
-      view.render(self, output, metadata)
-      items.each_with_index do |item, index|
-        new_metadata = _render_metadata(items, item, metadata, index)
-        item.render(view, output, new_metadata)
+      invoke_with_hooks(view, self, output, metadata) do
+        view.render(self, output, metadata)
+        items.each_with_index do |item, index|
+          new_metadata = _render_metadata(items, item, metadata, index)
+          item.render(view, output, new_metadata)
+        end
       end
     end
 
     def run(run, metadata)
-      run.execute(self, metadata)
-      items.each_with_index do |item, index|
-        item.run(run, _run_metadata(items, item, metadata, index))
+      invoke_with_hooks(run, self, metadata) do
+        run.execute(self, metadata)
+        items.each_with_index do |item, index|
+          new_metadata = _run_metadata(items, item, metadata, index)
+          item.run(run, new_metadata)
+        end
       end
     end
 
