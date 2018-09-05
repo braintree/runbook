@@ -210,4 +210,138 @@ OUTPUT
       end
     end
   end
+
+  context "layout" do
+    let(:run) { :ssh_kit }
+    let(:title) { "My Book" }
+    let(:output) { StringIO.new }
+
+    before(:each) do
+      allow_any_instance_of(
+        Runbook::Toolbox
+      ).to receive(:output) do |instance, msg|
+        output.puts(msg)
+      end
+    end
+
+    context "without layout_panes" do
+      let(:book) do
+        Runbook.book(title) { }
+      end
+
+      it "does not kill all panes" do
+        expect(
+          Runbook::Runs::SSHKit
+        ).to_not receive(:kill_all_panes)
+
+        runner.run(run: run, paranoid: false)
+      end
+    end
+
+    context "with layout_panes" do
+      let(:my_layout) { [:runbook, :deploy] }
+      let(:layout_panes) {
+        {:runbook => "%1", :deploy => "%3"}
+      }
+      let(:book) do
+        Runbook.book title do
+          layout [:runbook, :deploy]
+        end
+      end
+
+      context "with noop: true" do
+        it "does not kill all panes" do
+          expect(
+            Runbook::Runs::SSHKit
+          ).to_not receive(:kill_all_panes)
+
+          runner.run(
+            run: run,
+            auto: true,
+            noop: true,
+            paranoid: false
+          )
+        end
+      end
+
+      context "with noop: false" do
+        before(:each) do
+          expect(
+            Runbook::Runs::SSHKit
+          ).to receive(:setup_layout).
+          with(my_layout, runbook_title: title).
+          and_return(layout_panes)
+        end
+
+        context "with auto: true" do
+          it "kills all panes without prompting" do
+            expect_any_instance_of(
+              Runbook::Toolbox
+            ).to_not receive(:yes?)
+
+            expect(
+              Runbook::Runs::SSHKit
+            ).to receive(:kill_all_panes).with(layout_panes)
+
+            runner.run(
+              run: run,
+              auto: true,
+              noop: false,
+              paranoid: false
+            )
+
+            expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Killing all opened tmux panes...
+  OUTPUT
+          end
+        end
+
+        context "with auto: false" do
+          context "when prompt returns true" do
+            before(:each) do
+              expect_any_instance_of(
+                Runbook::Toolbox
+              ).to receive(:yes?).and_return(true)
+            end
+
+            it "kills all panes" do
+              expect(
+                Runbook::Runs::SSHKit
+              ).to receive(:kill_all_panes)
+
+              runner.run(
+                run: run,
+                auto: false,
+                noop: false,
+                paranoid: false
+              )
+            end
+          end
+
+          context "when prompt returns false" do
+            before(:each) do
+              expect_any_instance_of(
+                Runbook::Toolbox
+              ).to receive(:yes?).and_return(false)
+            end
+
+            it "does not kill all panes" do
+              expect(
+                Runbook::Runs::SSHKit
+              ).to_not receive(:kill_all_panes)
+
+              runner.run(
+                run: run,
+                auto: false,
+                noop: false,
+                paranoid: false
+              )
+            end
+          end
+        end
+      end
+    end
+  end
 end

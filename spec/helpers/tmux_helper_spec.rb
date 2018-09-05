@@ -9,6 +9,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     :_split,
     :_swap_panes,
     :_remove_stale_layouts,
+    :_kill_pane,
   ]
 
   describe "setup_layout" do
@@ -81,6 +82,23 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
         result = subject.setup_layout(structure, runbook_title: title)
         expect(result).to eq(layout_panes)
       end
+    end
+  end
+
+  describe "kill_all_panes" do
+    let(:runbook_pane) { "%23" }
+    let(:layout_panes) { {:some => "%45", :runbook => "%23", :thing => "%3"} }
+
+    before(:each) do
+      allow(subject).to receive(:_runbook_pane).and_return(runbook_pane)
+    end
+
+    it "kills all panes in layout_panes (except the runbook pane)" do
+      expect(subject).to receive(:_kill_pane).with("%45")
+      expect(subject).to receive(:_kill_pane).with("%3")
+      expect(subject).to_not receive(:_kill_pane).with(runbook_pane)
+
+      subject.kill_all_panes(layout_panes)
     end
   end
 

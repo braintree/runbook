@@ -17,6 +17,21 @@ module Runbook::Helpers
       end
     end
 
+    def send_keys(command, target)
+      `tmux send-keys -t #{target} '#{command}' C-m`
+    end
+
+    def kill_all_panes(layout_panes)
+      runbook_pane = _runbook_pane
+      layout_panes.values.each do |pane_id|
+        _kill_pane(pane_id) unless pane_id == runbook_pane
+      end
+    end
+
+    def _kill_pane(pane_id)
+      `tmux kill-pane -t #{pane_id}`
+    end
+
     def _layout_file(runbook_title)
       `tmux display-message -p "#{Dir.tmpdir}/runbook_layout_\#{pid}_\#{session_name}_\#{pane_pid}_\#{pane_id}_#{runbook_title}.yml"`.strip
     end
@@ -67,10 +82,6 @@ module Runbook::Helpers
         _swap_runbook_pane(panes_to_init, layout_panes)
         _initialize_panes(panes_to_init, layout_panes)
       end
-    end
-
-    def send_keys(command, target)
-      `tmux send-keys -t #{target} '#{command}' C-m`
     end
 
     def _setup_panes(layout_panes, panes_to_init, current_pane, structure, depth=0)

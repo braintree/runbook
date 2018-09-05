@@ -2,6 +2,7 @@ module Runbook
   module Run
     def self.included(base)
       base.extend(ClassMethods)
+      _register_kill_all_panes_hook(base)
     end
 
     module ClassMethods
@@ -211,6 +212,26 @@ module Runbook
           metadata[:paranoid] = false
         when :exit
           toolbox.exit(0)
+        end
+      end
+    end
+
+    def self._register_kill_all_panes_hook(base)
+      base.register_hook(
+        :kill_all_panes_after_book,
+        :after,
+        Runbook::Entities::Book,
+      ) do |object, metadata|
+        next if metadata[:noop] || metadata[:layout_panes].none?
+        if metadata[:auto]
+          metadata[:toolbox].output("Killing all opened tmux panes...")
+          kill_all_panes(metadata[:layout_panes])
+        else
+          prompt = "Kill all opened panes?"
+          result = metadata[:toolbox].yes?(prompt)
+          if result
+            kill_all_panes(metadata[:layout_panes])
+          end
         end
       end
     end
