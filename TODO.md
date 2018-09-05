@@ -2,12 +2,22 @@
 
 * [X] Add version argument to cli
 * [X] Allow ask statement to take a default
+* [X] Add tmux_command statement
+* [X] Add tmux layout persistence
+* [X] Add code to kill all panes opened by runbook
+* [] Add documentation for tmux support
+* [] Add documentation for hooks
+* [] Add sanity checks for tmux support
+* [] Remove monitor statement
 * [] Allow for preventing echo when prompting for input
 * [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [] Add support for sudo interaction handler for raw commands
 * [] Render ssh_config for runs
 * [] Add Appraisal
 * [] Add a revert section that does not get executed, but can be executed by passing a revert flag
+* [] Add an ability for skipping mutation commands that will have an affect on the system
+* [] Update output to be more log friendly, including timestamps for operations
+* [] Override ssh_config at section, step levels
 * Could provide a rake task for compiling and nooping runbooks?
 * Create a generator for a runbook? Allow for custom generators?
   * Generate runbook projects with Runbookfile, Gemfile, etc.
