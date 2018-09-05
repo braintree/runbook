@@ -16,6 +16,7 @@ require "hacks/ssh_kit"
 
 require "runbook/dsl"
 require "runbook/errors"
+require "runbook/hooks"
 
 require "runbook/entity"
 require "runbook/entities/book"
