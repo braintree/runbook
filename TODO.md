@@ -5,8 +5,8 @@
 * [X] Add tmux_command statement
 * [X] Add tmux layout persistence
 * [X] Add code to kill all panes opened by runbook
-* [] Add documentation for tmux support
-* [] Add documentation for hooks
+* [X] Add documentation for tmux support
+* [X] Add documentation for hooks
 * [] Add sanity checks for tmux support
 * [] Remove monitor statement
 * [] Allow for preventing echo when prompting for input
@@ -18,6 +18,8 @@
 * [] Add an ability for skipping mutation commands that will have an affect on the system
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Override ssh_config at section, step levels
+* [] Provide more generic solution for storing and retrieving metadata when executing entities and statements
+* [] Replace Thor with a solution that is more easily extensible (adding new flags, etc.)
 * Could provide a rake task for compiling and nooping runbooks?
 * Create a generator for a runbook? Allow for custom generators?
   * Generate runbook projects with Runbookfile, Gemfile, etc.
