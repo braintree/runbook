@@ -358,7 +358,7 @@ Runbook automatically loads configuration from a number of predefined files. Run
 
 ## Working With Runbooks
 
-You can integrate with Runbook in several different ways. You can create your own project or incorporate Runbook into your existing projects. You can user Runbook via the command line. And you can even create self-executing runbooks.
+You can integrate with Runbook in several different ways. You can create your own project or incorporate Runbook into your existing projects. You can use Runbook via the command line. And you can even create self-executing runbooks.
 
 ### From Within Your Project
 
@@ -685,7 +685,7 @@ module MyRunbook::Extensions
 end
 ```
 
-Now you can access `log` in your handler functionality
+Now you can access `log` in your handler code using `metadata[:toolbox].log("Come on ride the train, train")`.
 
 ```ruby
 module MyRunbook::Extensions
