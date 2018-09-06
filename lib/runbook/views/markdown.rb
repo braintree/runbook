@@ -63,11 +63,6 @@ module Runbook::Views
       output << "#{object.structure.inspect}\n\n"
     end
 
-    def self.runbook__statements__monitor(object, output, metadata)
-      output << "   run: `#{object.cmd}`\n\n"
-      output << "   confirm: #{object.prompt}\n\n"
-    end
-
     def self.runbook__statements__note(object, output, metadata)
       output << "   #{object.msg}\n\n"
     end

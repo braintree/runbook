@@ -7,8 +7,8 @@
 * [X] Add code to kill all panes opened by runbook
 * [X] Add documentation for tmux support
 * [X] Add documentation for hooks
+* [X] Remove monitor statement
 * [] Add sanity checks for tmux support
-* [] Remove monitor statement
 * [] Allow for preventing echo when prompting for input
 * [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [] Add support for sudo interaction handler for raw commands

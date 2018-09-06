@@ -95,15 +95,6 @@ module Factory
       return Runbook::Statements::Layout.new(
         attrs[:structure],
       )
-    when :monitor
-      attrs = {
-        cmd: "ps aux | grep redis",
-        prompt: "Redis is no longer running",
-      }.merge!(overrides)
-      return Runbook::Statements::Monitor.new(
-        cmd: attrs[:cmd],
-        prompt: attrs[:cmd],
-      )
     when :note
       attrs = {
         msg: "fyi",

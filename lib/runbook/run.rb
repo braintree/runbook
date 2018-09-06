@@ -106,22 +106,6 @@ module Runbook
         metadata[:layout_panes].merge!(layout_panes)
       end
 
-      def runbook__statements__monitor(object, metadata)
-        metadata[:toolbox].output("Run the following in a separate pane:")
-        metadata[:toolbox].output("`#{object.cmd}`")
-        if metadata[:auto]
-          metadata[:toolbox].output("Skipping confirmation (auto): #{object.prompt}")
-        else
-          if metadata[:noop]
-            metadata[:toolbox].output("[NOOP] Prompt: #{object.prompt}")
-            return
-          end
-
-          result = metadata[:toolbox].yes?(object.prompt)
-          metadata[:toolbox].exit(1) unless result
-        end
-      end
-
       def runbook__statements__note(object, metadata)
         metadata[:toolbox].output("Note: #{object.msg}")
       end

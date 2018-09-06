@@ -130,10 +130,6 @@ This is a very elaborate runbook that does stuff
                 note "I like cheese"
                 confirm "You really like cheese?"
                 note "I also like carrots"
-                monitor(
-                  cmd: "tail -fn 100 /var/log/food_journal.log",
-                  prompt: "Did you eat cheese yesterday?",
-                )
               end
             end
           end
@@ -158,9 +154,6 @@ Step 1.1.1: Cheese inspection
 Note: I like cheese
 Skipping confirmation (auto): You really like cheese?
 Note: I also like carrots
-Run the following in a separate pane:
-`tail -fn 100 /var/log/food_journal.log`
-Skipping confirmation (auto): Did you eat cheese yesterday?
 
 NOOP
       end

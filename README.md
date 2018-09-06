@@ -140,12 +140,6 @@ layout [[
 ]]
 ```
 
-**monitor**: Print the `cmd` out to the user and `prompt` the user to ensure the monitoring requirement has been met. This is a more manual version of the `assert` statement.
-
-```ruby
-monitor(cmd: "tail -Fn 100 /var/log/nginx.log", prompt: "User requests are no longer failing")
-```
-
 **note**: Print a short note to the user.
 
 ```ruby
