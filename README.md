@@ -73,7 +73,7 @@ Runbook.book "Unbalance node" do
 end
 ```
 
-Every book requires a title. Books can have description and section children. Descriptions describe the book and are declared with the `description` keyword.
+Every book requires a title. Books can have description, layout, and section children. Descriptions describe the book and are declared with the `description` keyword.
 
 ##### Sections
 
@@ -131,6 +131,15 @@ additional formatting.
 DESC
 ```
 
+**layout**: Define a tmux layout to be used by your runbook. When executing the runbook, the specified layout will be initialized. This statement can only be specified at the book level. See [Tmux Layouts](#tmux-layouts) for more details.
+
+```ruby
+layout [[
+  [:runbook, :deploy],
+  [:monitor_1, :monitor_2, :monitor_3],
+]]
+```
+
 **monitor**: Print the `cmd` out to the user and `prompt` the user to ensure the monitoring requirement has been met. This is a more manual version of the `assert` statement.
 
 ```ruby
@@ -161,6 +170,12 @@ ruby_command do |rb_cmd, metadata|
 end
 ```
 
+**tmux_command**: Runs the provided `cmd` in the specified `pane`.
+
+```ruby
+tmux_command "tail -Fn 100 /var/log/nginx.log", :monitor_1
+```
+
 Metadata at execution time is structured as follows:
 
 ```ruby
@@ -172,6 +187,7 @@ Metadata at execution time is structured as follows:
   auto: false, # A boolean indicating if you are running in auto mode
   start_at: 0, # A string representing the string where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
+  layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to
 }
 ```
 
@@ -190,6 +206,64 @@ Additional methods that the `ruby_command` block has access to are:
 ```ruby
 wait 5
 ```
+
+##### Tmux Layouts
+
+Runbook provides native support for defining tmux layouts and executing commands in separate tmux panes. Layouts are specified by passing an array or hash to the `layout` statement in book blocks.
+
+```ruby
+Runbook.book "My Book" do
+  layout [
+    :left,
+    {name: :middle, directory: "/var/log", command: "tail -Fn 100 auth.log"},
+    [:top_right, {name: :bottom_right, runbook_pane: true}]
+  ]
+end
+```
+
+When layout is passed as an array, each element of the array represents a pane stacked side-by-side with the other elements. Elements of the array can be symbols, hashes, or arrays.
+
+Symbols and hashes represent panes. Hash keys for a pane include `name`, `directory`, `command`, and `runbook_pane`. `name` is the identifier used for the pane. This is used when specifying what pane you want to execute tmux commands in. `directory` indicates the starting directory of the pane. `command` is the initial command to execute in the pane when it is created. `runbook_pane` indicates which pane in the layout should hold the executing runbook. Only one pane should be designated as the `runbook_pane` and the runbook pane should not have a directory or command specified.
+
+Arrays nested underneath the initial array split the pane from top to bottom. Arrays nested under these arrays split the pane from side to side, ad infinitum. You can start spliting panes from top to bottom as opposed to side-by-side by immediately nesting an array.
+
+```ruby
+Runbook.book "Stacked Layout" do
+  layout [[
+    :top,
+    :middle,
+    :bottom,
+  ]]
+end
+```
+
+When a hash is passed to `layout`, the keys of the hash represent window names and the values represent pane layouts.
+
+```ruby
+Runbook.book "Multi Window Layout" do
+  layout {
+    :web_monitor => [
+      :left, :middle, :right,
+    ],
+    :db_monitor => [[
+      :top, :middle, :bottom,
+    ]]
+  }
+end
+```
+
+If you want panes to be un-evenly spaced, you can replace the array of panes with a hash where the keys are panes and the values are numbers. The panes will be spaced according to the specified numbers.
+
+```ruby
+Runbook.book "Uneven Layout" do
+  layout [[
+    {:left => 20, {name: :middle, runbook_pane: true} => 60, :right => 20},
+    {:bottom_left => 5, :bottom_right => 5},
+  ]]
+end
+```
+
+Tmux layouts are persisted between runs of the same runbook. As long as none of the panes initially created by the runbook are closed, running the same runbook in the same pane will not recreate the tmux layout, but will reuse the existing layout. This is helpful when a runbook does not complete and must be restarted. When a runbook finishes, it asks if you want to close all opened panes. If your runbook is running in auto mode it will automatically close all panes when finished.
 
 #### Setters
 
