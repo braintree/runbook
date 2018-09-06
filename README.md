@@ -641,6 +641,28 @@ end
 
 If you are not modifying existing methods, you can simply re-open the module to add new methods.
 
+### Augmenting Entity and Statement Functionality with Hooks
+
+You can add `before`, `after`, or `around` hooks to any statement or entity by defining a hook on a `Run` or `View`.
+
+```ruby
+Runbook::Runs::SSHKit.register_hook(
+  :notify_slack_of_step_run_time,
+  :around,
+  Runbook::Entities:Step,
+) do |object, metadata, block|
+  start = Time.now
+  block.call(object, metadata)
+  duration = Time.now - start
+  unless metadata[:noop]
+    message = "Step #{metadata[:position]}: #{object.title} took #{duration} seconds!"
+    notify_slack(message)
+  end
+end
+```
+
+When registering a hook, you specify the name of the hook, the type, and the statement or entity to add the hook to. `before` and `after` hooks execute the block before and after executing the entity or statement, respectively. `around` hooks take a block which executes the specified entity or statement. When specifying the class that the hook applies to, you can have the hook apply to all entities by specifying `Runbook::Entity`, all statements by specifying `Runbook::Statement`, or all items by specifying `Object`.
+
 ### Adding New Run Behaviors
 
 Every Entity and Statement gets access to a Toolbox in `metatada[:toolbox]`. This toolbox is used to provide methods with side effects (such as printing messages) when rendering and running your runbooks. Addtional behaviors can be added to the toolbox by prepending `Runbook::Toolbox`.
