@@ -179,6 +179,7 @@ Metadata at execution time is structured as follows:
   position: "1.1", # A string representing your current position within the tree
   noop: false, # A boolean indicating if you are running in noop mode. ruby_command blocks are never evaluated in noop mode
   auto: false, # A boolean indicating if you are running in auto mode
+  paranoid: true, # A boolean indicating if you are running in paranoid mode (prompting before each step)
   start_at: 0, # A string representing the string where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
   layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to
@@ -656,7 +657,7 @@ Runbook::Runs::SSHKit.register_hook(
 end
 ```
 
-When registering a hook, you specify the name of the hook, the type, and the statement or entity to add the hook to. `before` and `after` hooks execute the block before and after executing the entity or statement, respectively. `around` hooks take a block which executes the specified entity or statement. When specifying the class that the hook applies to, you can have the hook apply to all entities by specifying `Runbook::Entity`, all statements by specifying `Runbook::Statement`, or all items by specifying `Object`.
+When registering a hook, you specify the name of the hook, the type, and the statement or entity to add the hook to. `before` and `after` hooks execute the block before and after executing the entity or statement, respectively. `around` hooks take a block which executes the specified entity or statement. When specifying the class that the hook applies to, you can have the hook apply to all entities by specifying `Runbook::Entity`, all statements by specifying `Runbook::Statement`, or all items by specifying `Object`. Additionally, you can specify any specific entity or statement you would like the hook to apply to.
 
 ### Adding New Run Behaviors
 
