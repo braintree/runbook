@@ -8,6 +8,7 @@
 * [X] Add documentation for tmux support
 * [X] Add documentation for hooks
 * [X] Remove monitor statement
+* [X] Provide more generic solution for storing and retrieving metadata when executing entities and statements
 * [] Add sanity checks for tmux support
 * [] Allow for preventing echo when prompting for input
 * [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
@@ -18,7 +19,6 @@
 * [] Add an ability for skipping mutation commands that will have an affect on the system
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Override ssh_config at section, step levels
-* [] Provide more generic solution for storing and retrieving metadata when executing entities and statements
 * [] Replace Thor with a solution that is more easily extensible (adding new flags, etc.)
 * Could provide a rake task for compiling and nooping runbooks?
 * Create a generator for a runbook? Allow for custom generators?
