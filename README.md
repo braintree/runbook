@@ -694,6 +694,24 @@ module MyRunbook::Extensions
 end
 ```
 
+### Adding to Runbook's Run Metadata
+
+You may want to add additional data to metadata at the time it is initialized so every node can have access to this data. You can add additional metadata to runs by prepending `Runbook::Runner`.
+
+```ruby
+module MyRunbook::Extensions
+  module RunbookNotesMetadata
+    def additional_metadata
+      super.merge({
+        notes: []
+      })
+    end
+  end
+
+  Runbook::Runner.prepend(RunbookNotesMetadata)
+end
+```
+
 ### Adding to Runbook's Configuration
 
 You can add additional configuration to Runbook's configuration by prepending to Runbook::Configuration.
