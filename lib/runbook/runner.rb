@@ -30,6 +30,7 @@ module Runbook
     def additional_metadata
       {
         layout_panes: {},
+        repo: {},
       }
     end
   end

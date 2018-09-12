@@ -202,6 +202,46 @@ I like cheese whiz!
 OUTPUT
       end
     end
+
+    context "passing data between steps" do
+      let(:book) do
+        Runbook.book "My Book" do
+          section "Parent Section" do
+            step "Cheese inspection" do
+              ruby_command do |rb_cmd, metadata|
+                metadata[:repo][:result] = "Good cheese!"
+              end
+            end
+            step "?"
+            step "Profit" do
+              ruby_command do |rb_cmd, metadata|
+                metadata[:toolbox].output(metadata[:repo][:result])
+              end
+            end
+          end
+        end
+      end
+
+      it "allows data to be passed using the repo metadata" do
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-PARANOID)
+Executing My Book...
+
+Section 1: Parent Section
+
+Step 1.1: Cheese inspection
+
+
+Step 1.2: ?
+
+Step 1.3: Profit
+
+Good cheese!
+
+        PARANOID
+      end
+    end
   end
 
   context "layout" do
