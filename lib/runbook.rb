@@ -33,6 +33,8 @@ require "runbook/runs/ssh_kit"
 
 require "runbook/toolbox"
 
+require "runbook/util/sticky_hash"
+
 require "runbook/viewer"
 require "runbook/view"
 require "runbook/views/markdown"

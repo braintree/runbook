@@ -15,13 +15,14 @@ module Runbook
     )
       run = "Runbook::Runs::#{run.to_s.camelize}".constantize
       toolbox = Runbook::Toolbox.new
-      metadata = {
+      metadata = Util::StickyHash.new.merge({
         noop: noop,
         auto: auto,
-        paranoid: paranoid,
+        paranoid: Util::Glue.new(paranoid),
         start_at: start_at,
         toolbox: toolbox,
-      }.merge(Runbook::Entities::Book.initial_run_metadata).
+      }).
+      merge(Runbook::Entities::Book.initial_run_metadata).
       merge(additional_metadata)
 
       book.run(run, metadata)

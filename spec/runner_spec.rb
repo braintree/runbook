@@ -164,12 +164,14 @@ NOOP
         Runbook.book "My Book" do
           section "Parent Section" do
             step "Cheese inspection"
+            step "?"
+            step "Profit"
           end
         end
       end
 
       it "prompts to continue" do
-        expect_any_instance_of(Runbook::Toolbox).to receive(:expand).with("Continue?", Array)
+        expect_any_instance_of(Runbook::Toolbox).to receive(:expand).with("Continue?", Array).thrice
 
         runner.run(run: run, paranoid: true)
 
@@ -180,7 +182,32 @@ Section 1: Parent Section
 
 Step 1.1: Cheese inspection
 
+Step 1.2: ?
+
+Step 1.3: Profit
+
 NOOP
+      end
+
+      context "when prompt is told to disable paranoid mode" do
+        it "no longer prompts" do
+          expect_any_instance_of(Runbook::Toolbox).to receive(:expand).with("Continue?", Array).once.and_return(:no_paranoid)
+
+          runner.run(run: run, paranoid: true)
+
+          expect(output.string).to eq(<<-PARANOID)
+Executing My Book...
+
+Section 1: Parent Section
+
+Step 1.1: Cheese inspection
+
+Step 1.2: ?
+
+Step 1.3: Profit
+
+          PARANOID
+        end
       end
     end
 
