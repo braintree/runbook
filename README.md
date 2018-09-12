@@ -182,6 +182,7 @@ Metadata at execution time is structured as follows:
   start_at: 0, # A string representing the string where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
   layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to
+  repo: {}, # A repository for storing data and retrieving it between ruby_commands. This is the suggested way to pass data between steps
 }
 ```
 
