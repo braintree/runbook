@@ -196,6 +196,12 @@ RSpec.describe Runbook::Helpers::SSHKitHelper do
     end
 
     context "with users and groups" do
+      before(:each) do
+        allow_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:execute).with(/whoami/, any_args)
+      end
+
       context "with user specified" do
         let(:additional_config) { {user: "root"} }
 
