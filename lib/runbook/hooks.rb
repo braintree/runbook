@@ -15,7 +15,7 @@ module Runbook
 
     def hooks_for(type, klass)
       hooks.select do |hook|
-        hook[:type] == type && hook[:klass] <= klass
+        hook[:type] == type && klass <= hook[:klass]
       end
     end
 

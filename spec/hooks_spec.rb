@@ -63,9 +63,9 @@ RSpec.describe Runbook::Hooks do
     end
 
     it "returns a list of hooks of the specified type and class" do
-      before_entity_hooks = subject.hooks_for(:before, Runbook::Entity)
-      expect(before_entity_hooks).to include(hook_1, hook_2)
-      expect(before_entity_hooks).to_not include(hook_3, hook_4)
+      before_book_hooks = subject.hooks_for(:before, Runbook::Entities::Book)
+      expect(before_book_hooks).to include(hook_1, hook_2)
+      expect(before_book_hooks).to_not include(hook_3, hook_4)
     end
   end
 
