@@ -72,7 +72,7 @@ RSpec.describe Runbook::Hooks do
   describe "invoke_with_hooks" do
     subject {
       Class.new {
-        extend Runbook::Hooks
+        include Runbook::Run
 
         def self.result
           @result ||= []
@@ -81,6 +81,11 @@ RSpec.describe Runbook::Hooks do
     }
     let(:object) {
       Class.new { include Runbook::Hooks::Invoker }.new
+    }
+    let(:position) { "0" }
+    let(:start_at) { "0" }
+    let(:metadata) {
+      {position: position, start_at: start_at}
     }
     let (:hook_1) {
       {
@@ -111,7 +116,6 @@ RSpec.describe Runbook::Hooks do
           result << "around before hook_3"
           block.call(object, metadata)
           result << "around after hook_3"
-
         },
       }
     }
@@ -173,11 +177,45 @@ RSpec.describe Runbook::Hooks do
         "after hook_6",
       ]
 
-      object.invoke_with_hooks(subject, object, {}) do
+      object.invoke_with_hooks(subject, object, metadata) do
         subject.result << "book method invoked"
       end
 
       expect(subject.result).to eq(expected_result)
+    end
+
+    context "with position < start_at" do
+      let(:position) { "1" }
+      let(:start_at) { "2" }
+
+      it "skips the hooks" do
+        expected_result = ["book method invoked"]
+
+        object.invoke_with_hooks(subject, object, metadata) do
+          subject.result << "book method invoked"
+        end
+
+        expect(subject.result).to eq(expected_result)
+      end
+    end
+
+    context "with position < start_at and a sub-entity" do
+      let(:position) { "1" }
+      let(:start_at) { "1.1" }
+
+      it "skips the hooks before and around hooks" do
+        expected_result = [
+          "book method invoked",
+          "after hook_5",
+          "after hook_6",
+        ]
+
+        object.invoke_with_hooks(subject, object, metadata) do
+          subject.result << "book method invoked"
+        end
+
+        expect(subject.result).to eq(expected_result)
+      end
     end
   end
 end

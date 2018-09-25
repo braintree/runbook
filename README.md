@@ -659,6 +659,8 @@ end
 
 When registering a hook, you specify the name of the hook, the type, and the statement or entity to add the hook to. `before` and `after` hooks execute the block before and after executing the entity or statement, respectively. `around` hooks take a block which executes the specified entity or statement. When specifying the class that the hook applies to, you can have the hook apply to all entities by specifying `Runbook::Entity`, all statements by specifying `Runbook::Statement`, or all items by specifying `Object`. Additionally, you can specify any specific entity or statement you would like the hook to apply to.
 
+When starting at a certain position in the runbook, hooks for any preceding sections and steps will be skipped. After hooks will be run for a parent when starting at a child entity of a parent.
+
 ### Adding New Run Behaviors
 
 Every Entity and Statement gets access to a Toolbox in `metatada[:toolbox]`. This toolbox is used to provide methods with side effects (such as printing messages) when rendering and running your runbooks. Addtional behaviors can be added to the toolbox by prepending `Runbook::Toolbox`.

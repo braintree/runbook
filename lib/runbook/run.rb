@@ -10,10 +10,8 @@ module Runbook
       include Runbook::Helpers::FormatHelper
       include Runbook::Helpers::TmuxHelper
 
-      def execute(object,  metadata)
-        position = Gem::Version.new(metadata[:position])
-        start_at = Gem::Version.new(metadata[:start_at])
-        return unless metadata[:position].empty? || position >= start_at
+      def execute(object, metadata)
+        return if should_skip?(metadata)
 
         method = _method_name(object)
         if respond_to?(method)
@@ -162,6 +160,18 @@ module Runbook
           sleep(1)
           progress_bar.advance(1)
         end
+      end
+
+      def should_skip?(metadata)
+        return false if metadata[:position].empty?
+        position = Gem::Version.new(metadata[:position])
+        start_at = Gem::Version.new(metadata[:start_at])
+        return position < start_at
+      end
+
+      def start_at_is_substep?(metadata)
+        return false if metadata[:position].empty?
+        metadata[:start_at].start_with?(metadata[:position])
       end
 
       def _method_name(object)
