@@ -3,6 +3,7 @@ module Runbook
     def self.included(base)
       base.extend(ClassMethods)
       _register_kill_all_panes_hook(base)
+      _register_additional_step_whitespace_hook(base)
     end
 
     module ClassMethods
@@ -20,12 +21,6 @@ module Runbook
           msg = "ERROR! No execution rule for #{object.class} (#{_method_name(object)}) in #{to_s}"
           metadata[:toolbox].error(msg)
           return
-        end
-
-        if object.parent.is_a?(Runbook::Entities::Step)
-          if object.parent.items.last == object
-            metadata[:toolbox].output("\n")
-          end
         end
       end
 
@@ -225,6 +220,20 @@ module Runbook
           result = metadata[:toolbox].yes?(prompt)
           if result
             kill_all_panes(metadata[:layout_panes])
+          end
+        end
+      end
+    end
+
+    def self._register_additional_step_whitespace_hook(base)
+      base.register_hook(
+        :add_additional_step_whitespace_hook,
+        :after,
+        Runbook::Statement,
+      ) do |object, metadata|
+        if object.parent.is_a?(Runbook::Entities::Step)
+          if object.parent.items.last == object
+            metadata[:toolbox].output("\n")
           end
         end
       end

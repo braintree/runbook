@@ -23,22 +23,6 @@ require "runbook/entities/book"
 require "runbook/entities/section"
 require "runbook/entities/step"
 
-require "runbook/helpers/format_helper"
-require "runbook/helpers/ssh_kit_helper"
-require "runbook/helpers/tmux_helper"
-
-require "runbook/runner"
-require "runbook/run"
-require "runbook/runs/ssh_kit"
-
-require "runbook/toolbox"
-
-require "runbook/util/sticky_hash"
-
-require "runbook/viewer"
-require "runbook/view"
-require "runbook/views/markdown"
-
 require "runbook/statement"
 require "runbook/statements/ask"
 require "runbook/statements/assert"
@@ -54,6 +38,22 @@ require "runbook/statements/ruby_command"
 require "runbook/statements/tmux_command"
 require "runbook/statements/upload"
 require "runbook/statements/wait"
+
+require "runbook/helpers/format_helper"
+require "runbook/helpers/ssh_kit_helper"
+require "runbook/helpers/tmux_helper"
+
+require "runbook/runner"
+require "runbook/run"
+require "runbook/runs/ssh_kit"
+
+require "runbook/toolbox"
+
+require "runbook/util/sticky_hash"
+
+require "runbook/viewer"
+require "runbook/view"
+require "runbook/views/markdown"
 
 require "runbook/extensions/add"
 require "runbook/extensions/description"
