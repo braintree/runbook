@@ -269,6 +269,42 @@ Good cheese!
         PARANOID
       end
     end
+
+    context "invoking commands within ruby_command" do
+      let(:book) do
+        Runbook.book "My Book" do
+          section "Section" do
+            step do
+              ruby_command do |rb_cmd, metadata|
+                metadata[:repo][:cmd] = "note invoked!"
+              end
+
+              ruby_command do |rb_cmd, metadata|
+                note metadata[:repo][:cmd]
+              end
+
+              note "Run me last"
+            end
+          end
+        end
+      end
+
+      it "runs the commands as children of the step" do
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-PARANOID)
+Executing My Book...
+
+Section 1: Section
+
+Step 1.1:
+
+Note: note invoked!
+Note: Run me last
+
+        PARANOID
+      end
+    end
   end
 
   context "layout" do

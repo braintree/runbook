@@ -395,6 +395,10 @@ RSpec.describe "Runbook::Run" do
     let (:block) { ->(object, metadata) { raise "This happened" } }
     let (:object) { Runbook::Statements::RubyCommand.new(&block) }
 
+    before(:each) do
+      object.parent = Runbook::Entities::Step.new("step")
+    end
+
     it "runs the block" do
       expect do
         subject.execute(object, metadata)
