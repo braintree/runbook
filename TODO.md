@@ -9,14 +9,16 @@
 * [X] Add documentation for hooks
 * [X] Remove monitor statement
 * [X] Provide more generic solution for storing and retrieving metadata when executing entities and statements
+* [] Add a revert section that does not get executed, but can be executed by passing a revert flag
+* [] Add an ability for skipping mutation commands that will have an affect on the system
+* [] Add automatic state serialization support for resuming runbooks mid-run
+* [] Allow statements to take blocks to specify their arguments
 * [] Add sanity checks for tmux support
 * [] Allow for preventing echo when prompting for input
 * [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [] Add support for sudo interaction handler for raw commands
 * [] Render ssh_config for runs
 * [] Add Appraisal
-* [] Add a revert section that does not get executed, but can be executed by passing a revert flag
-* [] Add an ability for skipping mutation commands that will have an affect on the system
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Override ssh_config at section, step levels
 * [] Replace Thor with a solution that is more easily extensible (adding new flags, etc.)
