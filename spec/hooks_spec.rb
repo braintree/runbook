@@ -157,6 +157,7 @@ RSpec.describe Runbook::Hooks do
     }
 
     before(:each) do
+      subject.hooks.clear
       hooks.each do |hook|
         subject.register_hook(
           hook[:name], hook[:type], hook[:klass], &hook[:block]

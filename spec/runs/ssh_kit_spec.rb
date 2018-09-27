@@ -14,10 +14,14 @@ RSpec.describe Runbook::Runs::SSHKit do
       depth: 1,
       index: 2,
       position: "3.3",
+      book_title: "My Book Title",
     }.merge(metadata_override)
   }
 
   before(:each) { object.parent = parent }
+  before(:each) {
+    allow(Runbook::Util::Repo).to receive(:save)
+  }
 
   describe "runbook__entities__assert" do
     let (:cmd) { "echo 'hi'" }

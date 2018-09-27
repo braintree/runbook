@@ -4,6 +4,8 @@ module Runbook
       base.extend(ClassMethods)
       _register_kill_all_panes_hook(base)
       _register_additional_step_whitespace_hook(base)
+      ::Runbook::Util::Repo.register_save_repo_hook(base)
+      ::Runbook::Util::Repo.register_delete_stored_repo_hook(base)
     end
 
     module ClassMethods

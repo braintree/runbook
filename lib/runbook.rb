@@ -18,6 +18,9 @@ require "runbook/dsl"
 require "runbook/errors"
 require "runbook/hooks"
 
+require "runbook/util/repo"
+require "runbook/util/sticky_hash"
+
 require "runbook/entity"
 require "runbook/entities/book"
 require "runbook/entities/section"
@@ -48,8 +51,6 @@ require "runbook/run"
 require "runbook/runs/ssh_kit"
 
 require "runbook/toolbox"
-
-require "runbook/util/sticky_hash"
 
 require "runbook/viewer"
 require "runbook/view"

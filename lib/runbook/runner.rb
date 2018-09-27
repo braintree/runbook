@@ -21,9 +21,14 @@ module Runbook
         paranoid: Util::Glue.new(paranoid),
         start_at: start_at,
         toolbox: toolbox,
+        book_title: book.title,
       }).
       merge(Runbook::Entities::Book.initial_run_metadata).
       merge(additional_metadata)
+
+      if start_at != "0"
+        Util::Repo.load(metadata)
+      end
 
       book.run(run, metadata)
     end

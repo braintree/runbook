@@ -299,5 +299,67 @@ RSpec.describe "runbook run", type: :aruba do
         end
       end
     end
+
+    context "persisted state" do
+      let(:book_title) { "My Persisted Runbook" }
+      let(:repo_file) {
+        Runbook::Util::Repo._file(book_title)
+      }
+      let(:message) { "Hello!" }
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "#{book_title}" do
+          section "First Section" do
+            step do
+              ruby_command do |rb_cmd, metadata|
+                message = metadata[:repo][:message]
+                metadata[:toolbox].output("Message1: \#{message}")
+              end
+              ruby_command do |rb_cmd, metadata|
+                metadata[:repo][:message] = "#{message}"
+              end
+              ruby_command { exit }
+            end
+          end
+
+          section "Second Section" do
+            step do
+              ruby_command do |rb_cmd, metadata|
+                message = metadata[:repo][:message]
+                metadata[:toolbox].output("Message2: \#{message}")
+              end
+            end
+          end
+        end
+        RUNBOOK
+      end
+      let(:command) { "runbook exec -P #{runbook_file}" }
+      let(:second_command) { "runbook exec -P -s 2 #{runbook_file}" }
+
+      after(:each) do
+        FileUtils.rm_f(repo_file)
+      end
+
+      it "persists state across runbook invocations" do
+        expect(repo_file).to be_an_existing_file
+
+        run(second_command)
+
+        expect(
+          last_command_started
+        ).to have_output(/Message2: #{message}/)
+        expect(repo_file).to_not be_an_existing_file
+      end
+
+      context "when rerunning from scratch" do
+        it "does not load persisted state" do
+          run(command)
+
+          expect(
+            last_command_started
+          ).to_not have_output(/Message1: #{message}/)
+        end
+      end
+    end
   end
 end
