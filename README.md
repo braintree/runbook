@@ -90,7 +90,7 @@ Statements are the workhorses of runbooks. They comprise all the behavior runboo
 **ask**: Prompts the user for a string and stores its value in a method on the containing step entity. This value can be referenced in later statements such as the `ruby_command` statement.
 
 ```ruby
-ask "What percentage of requests are failing?", into: :failing_request_percentage
+ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100"
 ```
 
 **assert**: Runs the provided `cmd` repeatedly until it returns true. A timeout can be set and a command to be run if a timeout occurs. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
@@ -152,7 +152,7 @@ note "This operation kills all zombie processes"
 notice "There be dragons!"
 ```
 
-**ruby_command**: Executes its block in the context of the execution process. The block is passed the ruby_command statement and the execution metadata as arguments. Additionally, the block has access to all helpers and behaviors available to other statements being executed.
+**ruby_command**: Executes its block in the context of the parent step. The block is passed the ruby_command statement and the execution metadata as arguments.
 
 ```ruby
 ruby_command do |rb_cmd, metadata|
@@ -161,6 +161,7 @@ ruby_command do |rb_cmd, metadata|
   else
     `echo "Experienced failure rate of #{failure_rate}" | mail -s 'Help me eventually' not-urgent@my_site.com`
   end
+  notice "Email sent!"
 end
 ```
 
@@ -174,6 +175,7 @@ Metadata at execution time is structured as follows:
 
 ```ruby
 {
+  book_title: "Restart Nginx", # The title of the current runbook
   depth: 1, # The depth within the tree (book starts at depth 1)
   index: 0, # The index of the item in terms of it's parent's children (starts at 0 for first child)
   position: "1.1", # A string representing your current position within the tree
@@ -371,7 +373,7 @@ In this case book is a `Runbook::Entities::Book` and `:markdown` refers to the s
 #### Executing a runbook using `Runbook::Runner`
 
 ```ruby
-Runbook::Runner.new(book).run(run: :ssh_kit, noop: false, auto: false, paranoid: true, start_at: 0)
+Runbook::Runner.new(book).run(run: :ssh_kit, noop: false, auto: false, paranoid: true, start_at: "0")
 ```
 
 This will execute `book` using the `Runbook::Runs::SSHKit` run type. It will not run the book in `noop` mode. It will not run the book in `auto` mode. It will run the book in `paranoid` mode. And it will start at the beginning of the book. Noop mode runs the book without side-effects outside of printing what it will execute. Auto mode will skip any prompts in the runbook. If there are any required prompts in the runbook (such as the `ask` statement), then the run will fail. Paranoid mode will prompt the user for whether they should continue at every step. Finally `start_at` can be used to skip parts of the runbook or to restart at a certain point in the event of failures, stopping and starting the runbook, etc.
