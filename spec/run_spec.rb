@@ -341,6 +341,10 @@ RSpec.describe "Runbook::Run" do
 
     before(:each) { book.add(object) }
 
+    before(:each) do
+      allow(ENV).to receive(:[]).with("TMUX").and_return("something")
+    end
+
     context "noop" do
       let(:metadata_override) { {noop: true} }
 
@@ -348,6 +352,37 @@ RSpec.describe "Runbook::Run" do
         msg = "[NOOP] Layout: #{layout.inspect}"
         expect(toolbox).to receive(:output).with(msg)
         expect(subject).to_not receive(:setup_layout)
+
+        subject.execute(object, metadata)
+      end
+
+      context "when not in a tmux" do
+        before(:each) do
+          allow(toolbox).to receive(:output)
+          allow(ENV).to receive(:[]).and_call_original
+          allow(ENV).to receive(:[]).with("TMUX").and_return(nil)
+        end
+
+        it "warns that layout is invoked outside a tmux" do
+          msg = "Warning: layout statement called outside a tmux pane."
+          expect(toolbox).to receive(:warn).with(msg)
+
+          subject.execute(object, metadata)
+        end
+      end
+    end
+
+    context "when not in a tmux" do
+      before(:each) do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with("TMUX").and_return(nil)
+        allow(subject).to receive(:setup_layout).and_return({})
+      end
+
+      it "errors and exits" do
+        msg = "Error: layout statement called outside a tmux pane. Exiting..."
+        expect(toolbox).to receive(:error).with(msg)
+        expect(toolbox).to receive(:exit).with(1)
 
         subject.execute(object, metadata)
       end

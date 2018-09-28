@@ -93,7 +93,17 @@ module Runbook
           metadata[:toolbox].output(
             "[NOOP] Layout: #{object.structure.inspect}"
           )
+          unless ENV["TMUX"]
+            msg = "Warning: layout statement called outside a tmux pane."
+            metadata[:toolbox].warn(msg)
+          end
           return
+        end
+
+        unless ENV["TMUX"]
+          error_msg = "Error: layout statement called outside a tmux pane. Exiting..."
+          metadata[:toolbox].error(error_msg)
+          metadata[:toolbox].exit(1)
         end
 
         structure = object.structure
