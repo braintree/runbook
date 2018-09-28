@@ -1,39 +1,29 @@
 ## Desired Feature list
 
-* [X] Add version argument to cli
-* [X] Allow ask statement to take a default
-* [X] Add tmux_command statement
-* [X] Add tmux layout persistence
-* [X] Add code to kill all panes opened by runbook
-* [X] Add documentation for tmux support
-* [X] Add documentation for hooks
-* [X] Remove monitor statement
-* [X] Provide more generic solution for storing and retrieving metadata when executing entities and statements
-* [X] Add automatic state serialization support for resuming runbooks mid-run
-* [] Allow statements to take blocks to specify their arguments
-* [] Add a revert section that does not get executed, but can be executed by passing a revert flag
-* [] Add an ability for skipping mutation commands that will have an affect on the system
-* [] Add sanity checks for tmux support
-* [] Allow for preventing echo when prompting for input
-* [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
-* [] Add support for sudo interaction handler for raw commands
-* [] Render ssh_config for runs
+* [X] Allow statements to take blocks to specify their arguments
+* [X] Add sanity checks for tmux support
 * [] Add Appraisal
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Override ssh_config at section, step levels
+* [] Render ssh_config for runs
+* [] Add an ability for skipping mutation commands that will have an affect on the system
+* [] Add a revert section that does not get executed, but can be executed by passing a revert flag
+* [] Allow for preventing echo when prompting for input
+* [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
+* [] Add support for sudo interaction handler for raw commands
 * [] Replace Thor with a solution that is more easily extensible (adding new flags, etc.)
 * Could provide a rake task for compiling and nooping runbooks?
 * Create a generator for a runbook? Allow for custom generators?
   * Generate runbook projects with Runbookfile, Gemfile, etc.
   * Generate plugins
   * Generate runbooks templates
+* logging solution for alternate output
 * Guard for view updates (How to handle arguments?)
 * Be able to serve up markdown docs (web server) for easy viewing
 * Can specify input-format, output-format, input (file), and output (file)
 * Yaml specification format (subset of Ruby)
   * Will not contain as much flexibility as Ruby format
   * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
-* logging solution for alternate output
 * background declaration for ssh_config
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
