@@ -16,7 +16,9 @@ module Runbook
     def view(runbook)
       _load_config(options[:config], :view) if options[:config]
       runbook = _retrieve_runbook(runbook, :view)
-      puts Runbook::Viewer.new(runbook).generate(options[:view])
+      puts Runbook::Viewer.new(runbook).generate(
+        view: options[:view],
+      )
     end
 
     desc "exec RUNBOOK", "Executes the runbook"

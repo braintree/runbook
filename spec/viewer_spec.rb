@@ -28,7 +28,7 @@ description
     let(:view) { :markdown }
 
     it "generates a markdown representation of the book" do
-      markdown = viewer.generate(view)
+      markdown = viewer.generate(view: view)
 
       expect(markdown).to eq(<<-MARKDOWN)
 # My Book
@@ -74,7 +74,7 @@ MARKDOWN
         end
 
         it "renders the ssh_config within a step" do
-          markdown = viewer.generate(view)
+          markdown = viewer.generate(view: view)
 
           expect(markdown).to eq(<<-MARKDOWN)
 # My Book
@@ -120,7 +120,7 @@ MARKDOWN
         end
 
         it "renders an abbreviated server list" do
-          markdown = viewer.generate(view)
+          markdown = viewer.generate(view: view)
 
           expect(markdown).to eq(<<-MARKDOWN)
 # My Book
@@ -150,7 +150,7 @@ MARKDOWN
         end
 
         it "renders in: with limit and wait" do
-          markdown = viewer.generate(view)
+          markdown = viewer.generate(view: view)
 
           expect(markdown).to eq(<<-MARKDOWN)
 # My Book
@@ -180,7 +180,7 @@ MARKDOWN
         end
 
         it "renders in without limit or wait" do
-          markdown = viewer.generate(view)
+          markdown = viewer.generate(view: view)
 
           expect(markdown).to eq(<<-MARKDOWN)
 # My Book

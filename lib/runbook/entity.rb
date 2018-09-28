@@ -37,7 +37,7 @@ module Runbook
       !!(dsl.respond_to?(name) || super)
     end
 
-    def render(view, output, metadata={depth: 1, index: 0})
+    def render(view, output, metadata)
       invoke_with_hooks(view, self, output, metadata) do
         view.render(self, output, metadata)
         items.each_with_index do |item, index|
@@ -62,10 +62,12 @@ module Runbook
         item.is_a?(Entity)
       end.index(item)
 
-      {
-        depth: metadata[:depth] + 1,
-        index: index,
-      }
+      metadata.merge(
+        {
+          depth: metadata[:depth] + 1,
+          index: index,
+        }
+      )
     end
 
     def _run_metadata(items, item, metadata, index)
