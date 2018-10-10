@@ -18,7 +18,7 @@ module Runbook::Helpers
     end
 
     def send_keys(command, target)
-      `tmux send-keys -t #{target} '#{command}' C-m`
+      `tmux send-keys -t #{target} #{_pager_escape_sequence} '#{command}' C-m`
     end
 
     def kill_all_panes(layout_panes)
@@ -26,6 +26,10 @@ module Runbook::Helpers
       layout_panes.values.each do |pane_id|
         _kill_pane(pane_id) unless pane_id == runbook_pane
       end
+    end
+
+    def _pager_escape_sequence
+      "q C-u"
     end
 
     def _kill_pane(pane_id)
