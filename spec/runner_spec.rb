@@ -268,6 +268,20 @@ Good cheese!
 
         PARANOID
       end
+
+      context "when starting in the middle of a runbook" do
+        it "attempts to load an existing repo" do
+          expect(Runbook::Util::Repo).to receive(:load).and_call_original
+          runner.run(run: run, paranoid: false, start_at: "1")
+        end
+      end
+
+      context "when start_at is nil" do
+        it "does not attempt to load an existing repo" do
+          expect(Runbook::Util::Repo).to_not receive(:load)
+          runner.run(run: run, paranoid: false, start_at: nil)
+        end
+      end
     end
 
     context "invoking commands within ruby_command" do
