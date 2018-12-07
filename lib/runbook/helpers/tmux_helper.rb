@@ -37,7 +37,7 @@ module Runbook::Helpers
     end
 
     def _layout_file(runbook_title)
-      `tmux display-message -p "#{Dir.tmpdir}/runbook_layout_\#{pid}_\#{session_name}_\#{pane_pid}_\#{pane_id}_#{runbook_title}.yml"`.strip
+      `tmux display-message -p -t $TMUX_PANE "#{Dir.tmpdir}/runbook_layout_\#{pid}_\#{session_name}_\#{pane_pid}_\#{pane_id}_#{runbook_title}.yml"`.strip
     end
 
     def _slug(title)

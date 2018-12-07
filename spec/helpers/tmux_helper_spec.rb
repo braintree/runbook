@@ -15,7 +15,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
   describe "setup_layout" do
     let(:structure) { [:runbook, :other] }
     let(:title) { "My Amazing Runbook" }
-    let(:layout_file) { "/tmp/runbook_layout_12345_me_%0_123_amazing_runbook.yml" }
+    let(:layout_file) { "/tmp/runbook_layout_12345_me_123_%0_amazing_runbook.yml" }
     let(:stored_layout) { {:runbook => "%1", :other => "%3", :new => "%5"} }
     let(:layout_panes) { {:runbook => "%1", :other => "%3"} }
     let(:session_panes) { ["%0", "%1", "%2", "%3", "%4"] }
