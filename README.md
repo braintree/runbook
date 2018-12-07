@@ -647,7 +647,7 @@ You can add `before`, `after`, or `around` hooks to any statement or entity by d
 Runbook::Runs::SSHKit.register_hook(
   :notify_slack_of_step_run_time,
   :around,
-  Runbook::Entities:Step,
+  Runbook::Entities::Step
 ) do |object, metadata, block|
   start = Time.now
   block.call(object, metadata)
