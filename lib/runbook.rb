@@ -19,6 +19,7 @@ require "runbook/errors"
 require "runbook/hooks"
 
 require "runbook/util/repo"
+require "runbook/util/runbook"
 require "runbook/util/sticky_hash"
 
 require "runbook/entity"
@@ -92,19 +93,5 @@ module Runbook
 
   def self.books
     @books ||= {}
-  end
-
-  def self.entities
-    _child_classes(Runbook::Entities)
-  end
-
-  def self.statements
-    _child_classes(Runbook::Statements)
-  end
-
-  def self._child_classes(mod)
-    mod.constants.map { |const|
-      "#{mod.to_s}::#{const}".constantize
-    }.select { |const| const.is_a?(Class) }
   end
 end
