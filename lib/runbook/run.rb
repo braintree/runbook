@@ -46,8 +46,12 @@ module Runbook
       def runbook__statements__ask(object, metadata)
         if metadata[:auto]
           if object.default
-            object.parent.define_singleton_method(object.into.to_sym) do
-              object.default
+            if object.parent.dsl.respond_to?("#{object.into}=".to_sym)
+              object.parent.dsl.send("#{object.into}=".to_sym, object.default)
+            else
+              object.parent.define_singleton_method(object.into.to_sym) do
+                object.default
+              end
             end
             return
           end
@@ -64,8 +68,12 @@ module Runbook
         end
 
         result = metadata[:toolbox].ask(object.prompt, default: object.default)
-        object.parent.define_singleton_method(object.into.to_sym) do
-          result
+        if object.parent.dsl.respond_to?("#{object.into}=".to_sym)
+          object.parent.dsl.send("#{object.into}=".to_sym, result)
+        else
+          object.parent.define_singleton_method(object.into.to_sym) do
+            result
+          end
         end
       end
 
@@ -86,6 +94,12 @@ module Runbook
       def runbook__statements__description(object, metadata)
         metadata[:toolbox].output("Description:")
         metadata[:toolbox].output("#{object.msg}\n")
+      end
+
+      def runbook__statements__global(object, metadata)
+        msg = "Globals defined: #{object.globals.join(", ")}\n\n"
+        metadata[:toolbox].output(msg)
+        metadata[:globals].concat(object.globals)
       end
 
       def runbook__statements__layout(object, metadata)

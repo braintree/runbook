@@ -50,6 +50,29 @@ RSpec.describe Runbook::Entities::Book do
     end
   end
 
+  describe "#global" do
+    it "adds a global statement to the book's items" do
+      global = book.global(:global1)
+      expect(book.items).to include(global)
+    end
+
+    it "adds itself as the new global's parent" do
+      global = book.global(:global1)
+      expect(global.parent).to eq(book)
+    end
+
+    it "adds to the book's existing globals" do
+      global1 = book.global(:global1)
+      global2 = book.global(:global2)
+      expect(book.items).to include(global1, global2)
+    end
+
+    it "defines #globals as an alias for #global" do
+      global = book.globals(:global1)
+      expect(global.parent).to eq(book)
+    end
+  end
+
   describe "#layout" do
     it "adds a layout to the book's items" do
       layout = book.layout([])

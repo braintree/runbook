@@ -7,6 +7,11 @@ RSpec.describe Runbook::Viewer do
 My elaborate
 description
       DESC
+
+      global :accessible_in_all_ruby_commands
+      global :global0, :global1
+      globals :global2, :global3
+
       section "Parent Section" do
         section "First Section" do
           step "Step 1" do
@@ -35,6 +40,12 @@ description
 
 My elaborate
 description
+
+**globals:** accessible_in_all_ruby_commands
+
+**globals:** global0, global1
+
+**globals:** global2, global3
 
 ## 1. Parent Section
 

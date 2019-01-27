@@ -15,6 +15,7 @@ module Runbook::Runs
           if object.timeout > 0
             metadata[:toolbox].output("after #{object.timeout} second(s), timeout...")
             if object.timeout_statement
+              object.timeout_statement.parent = object.parent
               object.timeout_statement.run(self, metadata.dup)
             end
             metadata[:toolbox].output("and exit")
@@ -41,6 +42,7 @@ module Runbook::Runs
           error_msg = "Error! Assertion `#{object.cmd}` failed"
           metadata[:toolbox].error(error_msg)
           if object.timeout_statement
+            object.timeout_statement.parent = object.parent
             object.timeout_statement.run(self, metadata.dup)
           end
           raise Runbook::Runner::ExecutionError, error_msg
@@ -63,8 +65,12 @@ module Runbook::Runs
           result = capture(*capture_args, strip: object.strip)
         end
 
-        object.parent.define_singleton_method(object.into.to_sym) do
-          result
+        if object.parent.dsl.respond_to?("#{object.into}=".to_sym)
+          object.parent.dsl.send("#{object.into}=".to_sym, result)
+        else
+          object.parent.define_singleton_method(object.into.to_sym) do
+            result
+          end
         end
       end
 

@@ -15,6 +15,7 @@ RSpec.describe Runbook::Runs::SSHKit do
       index: 2,
       position: "3.3",
       book_title: "My Book Title",
+      globals: []
     }.merge(metadata_override)
   }
 

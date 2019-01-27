@@ -454,4 +454,401 @@ Killing all opened tmux panes...
       end
     end
   end
+
+  context "with globals" do
+    let(:run) { :ssh_kit }
+    let(:output) { StringIO.new }
+    let(:book) do
+      Runbook.book "My Book" do
+        globals :my_global, :global2
+
+        section "My Section" do
+          step do
+            ruby_command do |rb_cmd, metadata|
+              val = "a global val"
+              note "Setting my_global to #{val}"
+              @my_global = val
+            end
+          end
+
+          step do
+            ruby_command do |rb_cmd, metadata|
+              note @my_global
+            end
+          end
+        end
+      end
+    end
+
+    before(:each) do
+      allow_any_instance_of(Runbook::Toolbox).to receive(:output) do |instance, msg|
+        output.puts(msg)
+      end
+    end
+
+    it "exposes global values between ruby_command blocks" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: my_global, global2
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Setting my_global to a global val
+
+Step 1.2:
+
+Note: a global val
+
+OUTPUT
+    end
+
+    context "with globals set in entities" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :global1
+          global :global2
+
+          @global2 = "party time"
+
+          section "My Section" do
+            @global1 = "excellent"
+            step do
+              ruby_command do |rb_cmd, metadata|
+                note @global2
+              end
+            end
+          end
+
+          section "Section 2" do
+            step do
+              ruby_command { note @global1 }
+            end
+          end
+        end
+      end
+
+      it "Exposes the global in the ruby_command context" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: global1
+
+Globals defined: global2
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: party time
+
+Section 2: Section 2
+
+Step 2.1:
+
+Note: excellent
+
+OUTPUT
+      end
+    end
+
+    context "with globals set via repo" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :global1
+
+          section "My Section" do
+            @not_global = "excellent"
+
+            step do
+              ruby_command do |rb_cmd, metadata|
+                metadata[:repo][:global1] = "Sweet!"
+              end
+
+              ruby_command { note @global1 }
+            end
+          end
+        end
+      end
+
+      it "exposes the global in the ruby_command context" do
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: global1
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Sweet!
+
+OUTPUT
+      end
+    end
+
+    context "with globals set via instance_variable" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :global1
+
+          section "My Section" do
+            step do
+              ruby_command do
+                @global1 = "Sweet!"
+              end
+
+              ruby_command do |_, metadata|
+                note metadata[:repo][:global1]
+              end
+            end
+          end
+        end
+      end
+
+      it "exposes the global in the repo" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: global1
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Sweet!
+
+OUTPUT
+      end
+    end
+
+    context "with globals set via settter method" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :global1
+
+          section "My Section" do
+            step do
+              ruby_command do
+                self.global1 = "Gnarly!"
+              end
+
+              ruby_command do |_, metadata|
+                note @global1
+              end
+            end
+          end
+        end
+      end
+
+      it "exposes the global in the repo" do
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: global1
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Gnarly!
+
+OUTPUT
+      end
+    end
+
+    context "with globals set via repo" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :global1
+
+          section "My Section" do
+            step do
+              ruby_command do |_, metadata|
+                metadata[:repo][:global1] = "Bodacious!"
+              end
+
+              ruby_command do |_, metadata|
+                note global1
+              end
+            end
+          end
+        end
+      end
+
+      it "exposes the global via attr_reader" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: global1
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Bodacious!
+
+OUTPUT
+      end
+    end
+
+    context "with auto: false" do
+      before(:each) do
+        expect_any_instance_of(
+          Runbook::Toolbox
+        ).to receive(:ask).and_return("Blue!")
+      end
+
+      let(:book) do
+        Runbook.book "My Book" do
+          global :color
+
+          section "My Section" do
+            step do
+              ask "Favorite Color?", into: :color
+            end
+          end
+
+          section "Section 2" do
+            step do
+              ruby_command do |_, metadata|
+                note color
+              end
+            end
+          end
+        end
+      end
+
+      it "stores the result of ask in a defined global" do
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: color
+
+Section 1: My Section
+
+Step 1.1:
+
+
+Section 2: Section 2
+
+Step 2.1:
+
+Note: Blue!
+
+OUTPUT
+      end
+    end
+
+    context "with auto: true" do
+      let(:book) do
+        Runbook.book "My Book" do
+          global :color
+
+          section "My Section" do
+            step do
+              ask "Favorite Color?", into: :color, default: "Yellow!"
+            end
+          end
+
+          section "Section 2" do
+            step do
+              ruby_command do |_, metadata|
+                note color
+              end
+            end
+          end
+        end
+      end
+
+      it "stores the default value of ask in a defined global" do
+        runner.run(run: run, auto: true, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: color
+
+Section 1: My Section
+
+Step 1.1:
+
+
+Section 2: Section 2
+
+Step 2.1:
+
+Note: Yellow!
+
+OUTPUT
+      end
+    end
+
+    context "capture command" do
+      let(:result) { "hi!" }
+      let(:book) do
+        Runbook.book "My Book" do
+          global :capture_result
+
+          section "My Section" do
+            step do
+              capture "echo 'hi!'", into: :capture_result
+            end
+          end
+
+          section "Section 2" do
+            step do
+              ruby_command do |_, metadata|
+                note metadata[:repo][:capture_result]
+              end
+            end
+          end
+        end
+      end
+
+      it "captures cmd" do
+        capture_args = [:echo, "'hi!'", {:strip => true}]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args).and_return(result)
+
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Globals defined: capture_result
+
+Section 1: My Section
+
+Step 1.1:
+
+
+
+Section 2: Section 2
+
+Step 2.1:
+
+Note: hi!
+
+OUTPUT
+      end
+    end
+  end
 end

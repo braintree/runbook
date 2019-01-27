@@ -37,6 +37,7 @@ module Runbook
       {
         layout_panes: {},
         repo: {},
+        globals: [],
       }
     end
   end

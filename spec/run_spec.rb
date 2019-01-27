@@ -13,6 +13,7 @@ RSpec.describe "Runbook::Run" do
       start_at: "0",
       toolbox: toolbox,
       layout_panes: {},
+      globals: [],
       depth: 1,
       index: 0,
       parent: nil,
@@ -329,6 +330,27 @@ RSpec.describe "Runbook::Run" do
       expect(toolbox).to receive(:output).with("#{description}\n")
 
       subject.execute(object, metadata)
+    end
+  end
+
+  describe "runbook__statements__global" do
+    let (:global) { :global }
+    let (:object) { Runbook::Statements::Global.new(global) }
+    let (:metadata_override) { {globals: [:global0]} }
+
+    it "outputs the global" do
+      allow(toolbox).to receive(:output)
+      expect(toolbox).to receive(:output).with("Globals defined: global\n\n")
+
+      subject.execute(object, metadata)
+    end
+
+    it "adds the global to metadata[:globals]" do
+      allow(toolbox).to receive(:output)
+
+      subject.execute(object, metadata)
+
+      expect(metadata[:globals]).to eq([:global0, :global])
     end
   end
 

@@ -73,6 +73,7 @@ RSpec.describe Runbook do
       end
     end
   end
+
   describe "self.books" do
     it "persists a set of books" do
       Runbook.books[:my_book] = book

@@ -58,6 +58,10 @@ module Runbook::Views
       output << "   download: #{object.from}#{to}#{opts}\n\n"
     end
 
+    def self.runbook__statements__global(object, output, metadata)
+      output << "**globals:** #{object.globals.join(", ")}\n\n"
+    end
+
     def self.runbook__statements__layout(object, output, metadata)
       output << "layout:\n"
       output << "#{object.structure.inspect}\n\n"
