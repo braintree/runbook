@@ -9,12 +9,32 @@ RSpec.describe Runbook::Hooks do
     let(:klass) { Runbook::Entities::Book }
     let(:block) { Proc.new {} }
 
-    it "Adds a hook to the list of hooks" do
+    it "adds a hook to the list of hooks" do
       subject.register_hook(name, type, klass, &block)
 
       expect(subject.hooks).to include(
         {name: name, type: type, klass: klass, block: block}
       )
+    end
+
+    context "when :before argument is passed" do
+      it "adds the new hook before the specified hook" do
+        subject.register_hook(:hook1, type, klass, &block)
+        subject.register_hook(:hook2, type, klass, before: :hook1, &block)
+
+        hook_names = subject.hooks.map { |hook| hook[:name] }
+        expect(hook_names).to eq([:hook2, :hook1])
+      end
+    end
+
+    context "when bogus :before argument is passed" do
+      it "adds the new hook at the end" do
+        subject.register_hook(:hook1, type, klass, &block)
+        subject.register_hook(:hook2, type, klass, before: :bogus, &block)
+
+        hook_names = subject.hooks.map { |hook| hook[:name] }
+        expect(hook_names).to eq([:hook1, :hook2])
+      end
     end
   end
 

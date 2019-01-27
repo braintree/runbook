@@ -4,19 +4,29 @@ module Runbook
       @hooks ||= []
     end
 
-    def register_hook(name, type, klass, &block)
-      hooks << {
+    def register_hook(name, type, klass, before: nil, &block)
+      hook = {
         name: name,
         type: type,
         klass: klass,
         block: block,
       }
+
+      if before
+        hooks.insert(_hook_index(before), hook)
+      else
+        hooks << hook
+      end
     end
 
     def hooks_for(type, klass)
       hooks.select do |hook|
         hook[:type] == type && klass <= hook[:klass]
       end
+    end
+
+    def _hook_index(hook_name)
+      hooks.index { |hook| hook[:name] == hook_name } || -1
     end
 
     module Invoker
