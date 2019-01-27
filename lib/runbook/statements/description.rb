@@ -7,4 +7,3 @@ module Runbook::Statements
     end
   end
 end
-
