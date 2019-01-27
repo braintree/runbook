@@ -88,13 +88,6 @@ module Factory
       return Runbook::Statements::Download.new(
         attrs[:from],
       )
-    when :global
-      attrs = {
-        globals: [:global1, :global2],
-      }.merge!(overrides)
-      return Runbook::Statements::Global.new(
-        *attrs[:globals],
-      )
     when :layout
       attrs = {
         structure: [],

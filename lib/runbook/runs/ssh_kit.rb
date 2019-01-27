@@ -65,13 +65,9 @@ module Runbook::Runs
           result = capture(*capture_args, strip: object.strip)
         end
 
-        if object.parent.dsl.respond_to?("#{object.into}=".to_sym)
-          object.parent.dsl.send("#{object.into}=".to_sym, result)
-        else
-          object.parent.define_singleton_method(object.into.to_sym) do
-            result
-          end
-        end
+        target = object.parent.dsl
+        target.singleton_class.class_eval { attr_accessor object.into }
+        target.send("#{object.into}=".to_sym, result)
       end
 
       def runbook__statements__command(object, metadata)

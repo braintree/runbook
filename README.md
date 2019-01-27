@@ -87,7 +87,7 @@ Steps hold state and group together a set of statements. Steps do not require ti
 
 Statements are the workhorses of runbooks. They comprise all the behavior runbooks execute. Runbook comes with the following statements:
 
-**ask**: Prompts the user for a string and stores its value in a method on the containing step entity. This value can be referenced in later statements such as the `ruby_command` statement.
+**ask**: Prompts the user for a string and stores its value on the containing step entity. Once this statement is executed, its value is accessed as an instance variable under the `into` parameter. This value can be referenced in later statements such as the `ruby_command` statement.
 
 ```ruby
 ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100"
@@ -185,7 +185,7 @@ Metadata at execution time is structured as follows:
   start_at: 0, # A string representing the string where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
   layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to
-  repo: {}, # A repository for storing data and retrieving it between ruby_commands. This is the suggested way to pass data between steps
+  repo: {}, # A repository for storing data and retrieving it between ruby_commands. Any data stored in the repo is persisted if a runbook is stopped and later resumed.
 }
 ```
 
@@ -557,6 +557,48 @@ runbook = eval(File.read("my_runbook.rb"))
 ```
 
 Loading your runbook file is more ideal, but adds slight complexity. This method is prefered because the Ruby mechanism for retrieving source code does not work for code that has been `eval`ed. This means that you will not see `ruby_command` code blocks in view and noop output when using the `eval` method. You will see an "Unable to retrieve source code" message instead.
+
+### Passing State Between Entities and Statements
+
+Runbook provides a number of different mechanisms for passing state throughout a runbook. For any data that is known at compile time, local variables can be used because Runbooks are lexically scoped.
+
+```ruby
+home_planet = "Krypton"
+Runbook.book "Book Using Local Variables" do
+  hometown = "Smallville"
+
+  section "My Biography" do
+    step do
+      note "Home Planet: #{home_planet}"
+      note "Home Town: #{hometown}"
+    end
+  end
+end
+```
+
+When looking to pass data generated at runtime, for example data from `ruby_command`, `ask`, or `capture` statements, Runbook persists and synchronizes instance variables for these commands.
+
+```ruby
+Runbook.book "Book Using Instance Variables" do
+  section "The Transported Man" do
+    step do
+      ask "Who's the greatest magician?", into: :greatest, default: "Alfred Borden"
+      ruby_command { @magician = "Robert Angier" }
+    end
+
+    step do
+      ruby_command {
+        note "Magician: #{@magician}"
+        note "Greatest Magician: #{@greatest}"
+      }
+    end
+  end
+end
+```
+
+Instance variables are only passed between statements such as `ruby_command`. They should not be set on entities such as steps, sections, or books. Instance variables are persisted using `metadata[:repo]`. They are copied to the repo after each statement finishes executing and copied from the repo before each statement starts executing. Because instance variables utilize the repo, they are persisted if the runbook is stopped and restarted at the same step.
+
+Be careful with your naming of instance variables as it is possible to clobber the step's DSL methods because they share the same namespace.
 
 ## Extending Runbook
 

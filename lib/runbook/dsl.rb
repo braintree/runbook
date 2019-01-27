@@ -13,5 +13,9 @@ module Runbook
         end
       end
     end
+
+    def self.dsl_ivars
+      [:@parent]
+    end
   end
 end
