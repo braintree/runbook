@@ -267,12 +267,6 @@ Tmux layouts are persisted between runs of the same runbook. As long as none of 
 
 Setters set state on the parent item, typically the containing step. Runbook comes with the following setters:
 
-**set**: Creates a method named "key" on the step that provides a value of "value". This method can be referenced in the `ruby_command` statement to get access to compile-time values at runtime.
-
-```ruby
-set :key, "value"
-```
-
 **parallelization**: Specifies the SSHKit parallelization parameters for all commands in the entity. The default parallelization strategy is `:parallel`. See SSHKit for more details on these options.
 
 ```ruby

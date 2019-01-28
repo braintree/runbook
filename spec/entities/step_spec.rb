@@ -194,16 +194,6 @@ RSpec.describe Runbook::Entities::Step do
     end
   end
 
-  describe "#set" do
-    let(:key) { :key }
-    let(:value) { :value }
-
-    it "sets method 'key' that returns 'value'" do
-      step.set(key, value)
-      expect(step.key).to eq(value)
-    end
-  end
-
   describe "#add" do
     let(:note) { Runbook::Statements::Note.new("Read me") }
 
