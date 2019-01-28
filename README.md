@@ -521,7 +521,7 @@ If you are looking to make a complex decision tree, it is recommended that you d
 step "Inspect plate" do
   ask "What's on the plate?", into: :vegetable
   ruby_command do |rb_cmd, metadata|
-    case (veggie = rb_cmd.parent.vegetable)
+    case (veggie = @vegetable)
     when "carrots"
       add carrots_book
     when "peas"
