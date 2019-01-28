@@ -511,26 +511,30 @@ OUTPUT
           section "My Section" do
             @shared1 = "excellent"
             step do
+              @shared3 = "old value"
+            end
+
+            step do
               ruby_command do |rb_cmd, metadata|
-                note @shared2
+                note "value:#{@shared2}"
               end
-              @shared2 = "new value"
             end
           end
 
           section "Section 2" do
             step do
-              ruby_command { note @shared1 }
-              ruby_command { note @shared2 }
-              ruby_command { note @shared3 }
+              ruby_command { note "1.#{@shared1}" }
+              ruby_command { note "2.#{@shared2}" }
+              ruby_command { note "3.#{@shared3}" }
+              ruby_command { note "4.#{@shared4}" }
             end
           end
 
-          @shared3 = "late to the party"
+          @shared4 = "late to the party"
         end
       end
 
-      it "Exposes the ivars in the ruby_command context" do
+      it "Does not expose the ivars in the ruby_command context" do
       runner.run(run: run, paranoid: false)
 
       expect(output.string).to eq(<<-OUTPUT)
@@ -540,15 +544,61 @@ Section 1: My Section
 
 Step 1.1:
 
-Note: new value
+Step 1.2:
+
+Note: value:
 
 Section 2: Section 2
 
 Step 2.1:
 
-Note: excellent
+Note: 1.
+Note: 2.
+Note: 3.
+Note: 4.
+
+OUTPUT
+      end
+    end
+
+    context "with locals set in entities" do
+      let(:book) do
+        shared1 = "Show time"
+
+        Runbook.book "My Book" do
+          shared2 = "Wayne's World"
+
+          section "My Section" do
+            shared3 = "party time"
+
+            step do
+              shared4 = "excellent"
+
+              ruby_command do |rb_cmd, metadata|
+                note shared1
+                note shared2
+                note shared3
+                note shared4
+              end
+            end
+          end
+        end
+      end
+
+      it "Exposes the locals in the ruby_command context" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Section 1: My Section
+
+Step 1.1:
+
+Note: Show time
+Note: Wayne's World
 Note: party time
-Note: late to the party
+Note: excellent
 
 OUTPUT
       end
@@ -623,7 +673,11 @@ OUTPUT
     context "with ivars set via setter method" do
       let(:book) do
         Runbook.book "My Book" do
-          @shared1 = nil
+          section "S1" do
+            step do
+              ruby_command { @shared1 = nil }
+            end
+          end
 
           section "My Section" do
             step do
@@ -645,9 +699,14 @@ OUTPUT
         expect(output.string).to eq(<<-OUTPUT)
 Executing My Book...
 
-Section 1: My Section
+Section 1: S1
 
 Step 1.1:
+
+
+Section 2: My Section
+
+Step 2.1:
 
 Note: Gnarly!
 
