@@ -1,6 +1,6 @@
 # Runbook
 
-Runbook is a tool for defining runbooks using a Ruby DSL. Once your runbook is defined, you can use it generate a formatted representation of the book or even execute the runbook interactively. You can, for example, export your runbook to markdown or use the same runbook to automatically orchestrate a fleet of servers. Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
+Runbook is a tool for defining runbooks using a Ruby DSL. Once your runbook is defined, you can use it to generate a formatted representation of the book or even execute the runbook interactively. You can, for example, export your runbook to markdown or use the same runbook to automatically orchestrate a fleet of servers. Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
 
 Runbook provides two modes for evaluating your runbook once it is defined. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook such as executing commands on remote servers.
 
@@ -359,7 +359,7 @@ Runbooks can be executed using the `Runbook::Viewer` and `Runbook::Runner` class
 #### Executing a runbook using `Runbook::Viewer`
 
 ```ruby
-Runbook::Viewer.new(book).generate(:markdown)
+Runbook::Viewer.new(book).generate(view: :markdown)
 ```
 
 In this case book is a `Runbook::Entities::Book` and `:markdown` refers to the specific view type (`Runbook::Views::Markdown`).
@@ -523,7 +523,7 @@ step "Inspect plate" do
   ruby_command do |rb_cmd, metadata|
     case (veggie = rb_cmd.parent.vegetable)
     when "carrots"
-      carrots_book.run(self, metadata.dup)
+      add carrots_book
     when "peas"
       system("runbook exec samples/print_peas.rb")
     else
@@ -533,7 +533,7 @@ step "Inspect plate" do
 end
 ```
 
-The first delegation `carrots_book.run` evaluates the book in the context of the current runbook. Sections and steps become sub-sections and sub-steps of the current step. The second delegation spins up an entirely new process to run the `print_peas` runbook in isolation. Either delegation could be preferred, depending on your needs.
+The first delegation `add carrots_book` adds the book to the execution tree of the current runbook. Sections and steps become sub-sections and sub-steps of the current step. The second delegation spins up an entirely new process to run the `print_peas` runbook in isolation. Either delegation could be preferred, depending on your needs.
 
 ### Load vs. Eval
 
