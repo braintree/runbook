@@ -19,7 +19,7 @@ module Runbook
         noop: noop,
         auto: auto,
         paranoid: Util::Glue.new(paranoid),
-        start_at: start_at || "0",
+        start_at: Util::Glue.new(start_at || "0"),
         toolbox: toolbox,
         book_title: book.title,
       }).

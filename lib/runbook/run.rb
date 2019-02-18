@@ -211,10 +211,10 @@ module Runbook
           current_step = position.split(".")[-1].to_i
           new_step = current_step + 1
           start_at = position.gsub(/\.#{current_step}$/, ".#{new_step}")
-          metadata[:start_at].gsub!(/^.*$/, start_at)
+          metadata[:start_at] = start_at
         when :jump
           result = toolbox.ask("What position would you like to jump to?")
-          metadata[:start_at].gsub!(/^.*$/, result)
+          metadata[:start_at] = result
         when :no_paranoid
           metadata[:paranoid] = false
         when :exit

@@ -182,6 +182,147 @@ RSpec.describe "runbook run", type: :aruba do
       end
     end
 
+    context "when paranoid is passed" do
+      let(:command) { "runbook exec #{runbook_file}" }
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "My Runbook" do
+          section "First Section" do
+            step "Ask for continue" do
+              note "hi"
+            end
+
+            step "Another step" do
+              note "step here"
+            end
+          end
+
+          section "Second Section" do
+            step "skip me" do
+              note "never run"
+            end
+
+            step "Jump here" do
+              note "you jumped"
+            end
+          end
+        end
+        RUNBOOK
+      end
+      let(:total_output) {
+        title_output +
+        section_1_output +
+        section_2_output
+      }
+      let(:title_output) {
+        [/Executing My Runbook\.\.\./]
+      }
+      let(:section_1_output) {
+        [
+          /Section 1: First Section/,
+        ] +
+        step_1_1_title +
+        step_1_1_output +
+        step_1_2_title +
+        step_1_2_output
+      }
+      let(:step_1_1_title) {
+        [/Step 1\.1: Ask for continue/]
+      }
+      let(:step_1_1_output) {
+        [/Note: hi/]
+      }
+      let(:step_1_2_title) {
+        [/Step 1\.2: Another step/]
+      }
+      let(:step_1_2_output) {
+        [/Note: step here/]
+      }
+      let(:section_2_output) {
+        section_2_title +
+        step_2_1_title +
+        step_2_1_output +
+        step_2_2_title +
+        step_2_2_output
+      }
+      let(:section_2_title) {
+        [/Section 2: Second Section/]
+      }
+      let(:step_2_1_title) {
+        [/Step 2\.1: skip me/]
+      }
+      let(:step_2_1_output) {
+        [/Note: never run/]
+      }
+      let(:step_2_2_title) {
+        [/Step 2\.2: Jump here/]
+      }
+      let(:step_2_2_output) {
+        [/Note: you jumped/]
+      }
+
+      it "prompts to continue" do
+        type("c\nc\nc\nc\n")
+
+        total_output.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
+        expect(last_command_started).to have_output(/Continue\?/)
+      end
+
+      context "when skip is passed" do
+        it "skips the step" do
+          type("s\nc\nc\nc\n")
+
+          (total_output - step_1_1_output).each do |line|
+            expect(last_command_started).to have_output(line)
+          end
+          step_1_1_output.each do |line|
+            expect(last_command_started).to_not have_output(line)
+          end
+        end
+      end
+
+      context "when jump is passed" do
+        it "jumps to the step" do
+          type("j\n2.2\nc\nc\n")
+
+          excludes = step_1_1_output +
+            step_1_2_title +
+            step_1_2_output +
+            section_2_title +
+            step_2_1_title +
+            step_2_1_output
+          (total_output - excludes).each do |line|
+            expect(last_command_started).to have_output(line)
+          end
+          (excludes).each do |line|
+            expect(last_command_started).to_not have_output(line)
+          end
+        end
+      end
+
+      context "when no paranoid is passed" do
+        it "stops prompting to continue" do
+          type("P\ns\n")
+
+          total_output.each do |line|
+            expect(last_command_started).to have_output(line)
+          end
+        end
+      end
+
+      context "when exit is passed" do
+        it "exits the run" do
+          type("e\n")
+
+          (step_1_1_output + step_1_2_title + section_2_output).each do |line|
+            expect(last_command_started).to_not have_output(line)
+          end
+        end
+      end
+    end
+
     context "when start_at is passed" do
       let(:command) { "runbook exec -P --start-at 1.2 #{runbook_file}" }
       let(:content) do
