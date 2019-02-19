@@ -110,6 +110,12 @@ assert(
 )
 ```
 
+**capture**: Runs the provided `cmd` and captures its output into `into`. An optional `ssh_config` can be specified to configure how the capture command gets run. Capture commands take an optional `strip` parameter that indicates if the returned output should have leading and trailing whitespace removed. Capture commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
+
+```ruby
+capture %Q{wc -l file.txt | cut -d " " -f 1}, into: :num_lines, strip: true, ssh_config: {user: "root"}
+```
+
 **command**: Runs the provided `cmd`. An optional `ssh_config` can be specified to configure how the command gets run. Commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
 
 ```ruby
@@ -129,6 +135,12 @@ description <<-DESC
 This message will print directly to the user as written, without
 additional formatting.
 DESC
+```
+
+**download**: Downloads the specified file to `to`. An optional `ssh_config` can be specified to configure how the download command gets run, for example specifying the remote host and remote directory to download from. Optional `options` can be specified that get passed down to the underlying sshkit implementation
+
+```ruby
+download /home/pblesi/rad_file.txt, to: my_rad_file.txt, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
 ```
 
 **layout**: Define a tmux layout to be used by your runbook. When executing the runbook, the specified layout will be initialized. This statement can only be specified at the book level. See [Tmux Layouts](#tmux-layouts) for more details.
@@ -169,6 +181,12 @@ end
 
 ```ruby
 tmux_command "tail -Fn 100 /var/log/nginx.log", :monitor_1
+```
+
+**upload**: Uploads the specified file to `to`. An optional `ssh_config` can be specified to configure how the upload command gets run, for example specifying the remote host and remote directory to upload to. Optional `options` can be specified that get passed down to the underlying sshkit implementation
+
+```ruby
+upload my_secrets.yml, to: secrets.yml, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
 ```
 
 Metadata at execution time is structured as follows:
