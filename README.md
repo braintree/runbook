@@ -795,6 +795,32 @@ command "echo '\\''I love cheese'\\''"
 
 Alternatively, if you wish to avoid issues with SSHKit command wrapping, you can specify that your commands be executed in raw form, passed directly as written to the specified host.
 
+### Specifying env values
+
+When specifying the env for running commands, if you place curly braces `{}` around the env values, it is required to enclose the arguments in parenthesis `()`, otherwise the following syntax error will result:
+
+```
+syntax error, unexpected ':', expecting '}' (SyntaxError)
+```
+
+Env should be specified as:
+
+```
+env rails_env: :production
+```
+
+or:
+
+```
+env ({rails_env: :production})
+```
+
+not as:
+
+```
+env {rails_env: :production}
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
