@@ -21,6 +21,46 @@ RSpec.describe Runbook::Helpers::SSHKitHelper do
     end
   end
 
+  describe "ssh_kit_command_options" do
+    let(:ssh_config) { {user: "bob"} }
+
+    before(:each) do
+      allow(
+        Runbook.configuration
+      ).to receive(:enable_sudo_prompt).and_return(true)
+    end
+
+    it "sets an ::SSHKit::Sudo::InteractionHandler as the interaction handler" do
+      expect(
+        subject.ssh_kit_command_options(ssh_config)[:interaction_handler]
+      ).to be_a(::SSHKit::Sudo::InteractionHandler)
+    end
+
+    context "when no user is specified" do
+      let(:ssh_config) { {} }
+
+      it "does not return an interaction handler" do
+        expect(
+          subject.ssh_kit_command_options(ssh_config)
+        ).to_not have_key(:interaction_handler)
+      end
+    end
+
+    context "when enable_sudo_prompt is disabled" do
+      before(:each) do
+        allow(
+          Runbook.configuration
+        ).to receive(:enable_sudo_prompt).and_return(false)
+      end
+
+      it "does not return an interaction handler" do
+        expect(
+          subject.ssh_kit_command_options(ssh_config)
+        ).to_not have_key(:interaction_handler)
+      end
+    end
+  end
+
   describe "find_ssh_config" do
     let(:metadata) { {} }
     let(:blank_ssh_config) {

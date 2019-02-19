@@ -21,10 +21,10 @@
           false
         fi
       EOTEST
+      yield
     ensure
       ::SSHKit::Backend::Netssh.config.pty = old_pty
     end
-    yield
   ensure
     remove_instance_variable(:@user)
     remove_instance_variable(:@group)

@@ -39,7 +39,7 @@ RSpec.describe Runbook::Runs::SSHKit do
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
       expect_any_instance_of(
         SSHKit::Backend::Abstract
-      ).to receive(:test).with(*test_args).and_return(true)
+      ).to receive(:test).with(*test_args, {}).and_return(true)
       expect(subject).to_not receive(:sleep)
 
       subject.execute(object, metadata)
@@ -63,8 +63,40 @@ RSpec.describe Runbook::Runs::SSHKit do
         ).to receive(:with_ssh_config).with(cmd_ssh_config).and_call_original
         expect_any_instance_of(
           SSHKit::Backend::Abstract
-        ).to receive(:test).with(*test_args).and_return(true)
+        ).to receive(:test).with(*test_args, {}).and_return(true)
         expect(subject).to_not receive(:sleep)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with user and enable_sudo_prompt set" do
+      let(:cmd_ssh_config) do
+        {servers: ["host.stg"], parallelization: {}, user: "root"}
+      end
+      let (:object) do
+        Runbook::Statements::Assert.new(
+          cmd,
+          cmd_ssh_config: cmd_ssh_config
+        )
+      end
+
+      before(:each) do
+        allow(
+          Runbook.configuration
+        ).to receive(:enable_sudo_prompt).and_return(true)
+      end
+
+      it "uses the ::SSHKit::Sudo::InteractionHandler" do
+        test_args = [:echo, "'hi'"]
+        command_options = subject.ssh_kit_command_options(cmd_ssh_config)
+        expect(subject).to receive(:ssh_kit_command_options).with(cmd_ssh_config).and_return(command_options)
+        test_options = {interaction_handler: command_options[:interaction_handler]}
+        # Needed for sudo check
+        expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:test).with(*test_args, test_options).and_return(true)
 
         subject.execute(object, metadata)
       end
@@ -80,7 +112,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         test_args = ["echo 'hi'"]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
-        ).to receive(:test).with(*test_args).and_return(true)
+        ).to receive(:test).with(*test_args, {}).and_return(true)
 
         subject.execute(object, metadata)
       end
@@ -100,7 +132,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         test_args = [:echo, "'hi'"]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
-        ).to receive(:test).with(*test_args).and_return(false)
+        ).to receive(:test).with(*test_args, {}).and_return(false)
         expect(subject).to_not receive(:sleep)
 
         error_msg = "Error! Assertion `#{cmd}` failed"
@@ -125,7 +157,7 @@ RSpec.describe Runbook::Runs::SSHKit do
           test_args = [:echo, "'hi'"]
           expect_any_instance_of(
             SSHKit::Backend::Abstract
-          ).to receive(:test).with(*test_args).and_return(false)
+          ).to receive(:test).with(*test_args, {}).and_return(false)
           allow(subject).to receive(:with_ssh_config).and_call_original
           allow(toolbox).to receive(:output)
         end
@@ -139,7 +171,7 @@ RSpec.describe Runbook::Runs::SSHKit do
           ).to receive(:with_ssh_config).with(ssh_config).and_call_original
           expect_any_instance_of(
             SSHKit::Backend::Abstract
-          ).to receive(:execute).with(*timeout_cmd_args)
+          ).to receive(:execute).with(*timeout_cmd_args, {})
 
           expect do
             subject.execute(object, metadata)
@@ -167,7 +199,7 @@ RSpec.describe Runbook::Runs::SSHKit do
               and_call_original
             expect_any_instance_of(
               SSHKit::Backend::Abstract
-            ).to receive(:execute).with(*timeout_cmd_args)
+            ).to receive(:execute).with(*timeout_cmd_args, {})
 
             expect do
               subject.execute(object, metadata)
@@ -192,7 +224,7 @@ RSpec.describe Runbook::Runs::SSHKit do
             expect(toolbox).to receive(:error)
             expect_any_instance_of(
               SSHKit::Backend::Abstract
-            ).to receive(:execute).with(*timeout_cmd_args)
+            ).to receive(:execute).with(*timeout_cmd_args, {})
 
             expect do
               subject.execute(object, metadata)
@@ -275,7 +307,7 @@ RSpec.describe Runbook::Runs::SSHKit do
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
       expect_any_instance_of(
         SSHKit::Backend::Abstract
-      ).to receive(:execute).with(*execute_args)
+      ).to receive(:execute).with(*execute_args, {})
 
       subject.execute(object, metadata)
     end
@@ -289,13 +321,42 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       it "uses the ssh_config" do
-        execute_args = [:echo, "'hi'"]
+        execute_args = [:echo, "'hi'", {}]
         expect(
           subject
         ).to receive(:with_ssh_config).with(ssh_config).and_call_original
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:execute).with(*execute_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with user and enable_sudo_prompt set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}, user: "root"}
+      end
+      let (:object) do
+        Runbook::Statements::Command.new(cmd, ssh_config: ssh_config)
+      end
+
+      before(:each) do
+        allow(
+          Runbook.configuration
+        ).to receive(:enable_sudo_prompt).and_return(true)
+      end
+
+      it "uses the ::SSHKit::Sudo::InteractionHandler" do
+        exec_args = [:echo, "'hi'"]
+        options = subject.ssh_kit_command_options(ssh_config)
+        expect(subject).to receive(:ssh_kit_command_options).with(ssh_config).and_return(options)
+        exec_options = {interaction_handler: options[:interaction_handler]}
+        # Needed for sudo check
+        expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:execute).with(*exec_args, exec_options).and_return(true)
 
         subject.execute(object, metadata)
       end
@@ -311,7 +372,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         execute_args = ["echo 'hi'"]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
-        ).to receive(:execute).with(*execute_args)
+        ).to receive(:execute).with(*execute_args, {})
 
         subject.execute(object, metadata)
       end
@@ -379,6 +440,42 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
     end
 
+    context "with user and enable_sudo_prompt set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}, user: "root"}
+      end
+      let (:object) do
+        Runbook::Statements::Capture.new(
+          cmd,
+          into: into,
+          ssh_config: ssh_config,
+        )
+      end
+
+      before(:each) do
+        allow(
+          Runbook.configuration
+        ).to receive(:enable_sudo_prompt).and_return(true)
+      end
+
+      it "uses the ::SSHKit::Sudo::InteractionHandler" do
+        capture_args = [:echo, "'hi'"]
+        options = subject.ssh_kit_command_options(ssh_config)
+        expect(subject).to receive(:ssh_kit_command_options).with(ssh_config).and_return(options)
+        capture_options = {
+          interaction_handler: options[:interaction_handler],
+          strip: true,
+        }
+        # Needed for sudo check
+        expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args, capture_options).and_return(true)
+
+        subject.execute(object, metadata)
+      end
+    end
+
     context "with raw true" do
       let(:raw) { true }
       let (:object) do
@@ -408,6 +505,43 @@ RSpec.describe Runbook::Runs::SSHKit do
         ).to receive(:capture).with(*capture_args)
 
         subject.execute(object, metadata)
+      end
+
+      context "with user and enable_sudo_prompt set" do
+        let(:ssh_config) do
+          {servers: ["host.stg"], parallelization: {}, user: "root"}
+        end
+        let (:object) do
+          Runbook::Statements::Capture.new(
+            cmd,
+            into: into,
+            strip: strip,
+            ssh_config: ssh_config,
+          )
+        end
+
+        before(:each) do
+          allow(
+            Runbook.configuration
+          ).to receive(:enable_sudo_prompt).and_return(true)
+        end
+
+        it "uses the ::SSHKit::Sudo::InteractionHandler and strip: false" do
+          capture_args = [:echo, "'hi'"]
+          options = subject.ssh_kit_command_options(ssh_config)
+          expect(subject).to receive(:ssh_kit_command_options).with(ssh_config).and_return(options)
+          capture_options = {
+            interaction_handler: options[:interaction_handler],
+            strip: false,
+          }
+          # Needed for sudo check
+          expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+          expect_any_instance_of(
+            SSHKit::Backend::Abstract
+          ).to receive(:capture).with(*capture_args, capture_options).and_return(true)
+
+          subject.execute(object, metadata)
+        end
       end
     end
 

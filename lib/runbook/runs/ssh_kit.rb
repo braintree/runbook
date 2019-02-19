@@ -27,9 +27,10 @@ module Runbook::Runs
         cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
         timed_out = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
+        test_options = ssh_kit_command_options(cmd_ssh_config)
 
         with_ssh_config(cmd_ssh_config) do
-          while !(test(*test_args))
+          while !(test(*test_args, test_options))
             if (object.timeout > 0 && Time.now - time > object.timeout)
               timed_out = true
               break
@@ -59,10 +60,12 @@ module Runbook::Runs
 
         ssh_config = find_ssh_config(object)
         capture_args = ssh_kit_command(object.cmd, raw: object.raw)
+        capture_options = ssh_kit_command_options(ssh_config)
+        capture_options.merge!(strip: object.strip)
 
         result = ""
         with_ssh_config(ssh_config) do
-          result = capture(*capture_args, strip: object.strip)
+          result = capture(*capture_args, capture_options)
         end
 
         target = object.parent.dsl
@@ -80,9 +83,10 @@ module Runbook::Runs
 
         ssh_config = find_ssh_config(object)
         execute_args = ssh_kit_command(object.cmd, raw: object.raw)
+        exec_options = ssh_kit_command_options(ssh_config)
 
         with_ssh_config(ssh_config) do
-          execute(*execute_args)
+          execute(*execute_args, exec_options)
         end
       end
 

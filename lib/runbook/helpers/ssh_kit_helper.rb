@@ -6,6 +6,14 @@ module Runbook::Helpers
       [cmd.to_sym, args]
     end
 
+    def ssh_kit_command_options(ssh_config)
+      {}.tap do |options|
+        if ssh_config[:user] && Runbook.configuration.enable_sudo_prompt
+          options[:interaction_handler] ||= ::SSHKit::Sudo::InteractionHandler.new
+        end
+      end
+    end
+
     def find_ssh_config(object, ssh_config_method=:ssh_config)
       blank_config = Runbook::Extensions::SSHConfig.blank_ssh_config
       nil_or_blank = ->(config) { config.nil? || config == blank_config }
