@@ -30,6 +30,51 @@ module Runbook::Helpers
       return blank_config
     end
 
+    def render_ssh_config_output(ssh_config)
+      "".tap do |output|
+        if (servers = ssh_config[:servers]).any?
+          server_str = servers.join(", ")
+          if server_str.size > 80
+            server_str = "#{server_str[0..38]}...#{server_str[-38..-1]}"
+          end
+          output << "   on: #{server_str}\n"
+        end
+
+        if (strategy = ssh_config[:parallelization][:strategy])
+          limit = ssh_config[:parallelization][:limit]
+          wait = ssh_config[:parallelization][:wait]
+          in_str = "   in: #{strategy}"
+          in_str << ", limit: #{limit}" if strategy == :groups
+          in_str << ", wait: #{wait}" if [:sequence, :groups].include?(strategy)
+          output << "#{in_str}\n"
+        end
+
+        if ssh_config[:user] || ssh_config[:group]
+          user = ssh_config[:user]
+          group = ssh_config[:group]
+          as_str = "   as:"
+          as_str << " user: #{user}" if user
+          as_str << " group: #{group}" if group
+          output << "#{as_str}\n"
+        end
+
+        if (path = ssh_config[:path])
+          output << "   within: #{path}\n"
+        end
+
+        if (env = ssh_config[:env])
+          env_str = env.map do |k, v|
+            "#{k.to_s.upcase}=#{v}"
+          end.join(" ")
+          output << "   with: #{env_str}\n"
+        end
+
+        if (umask = ssh_config[:umask])
+          output << "   umask: #{umask}\n"
+        end
+      end
+    end
+
     def with_ssh_config(ssh_config, &exec_block)
       user = ssh_config[:user]
       group = ssh_config[:group]

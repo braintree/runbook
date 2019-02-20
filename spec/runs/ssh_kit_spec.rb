@@ -246,6 +246,42 @@ RSpec.describe Runbook::Runs::SSHKit do
         subject.execute(object, metadata)
       end
 
+      context "when ssh_config is specified" do
+        let(:cmd_ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::Assert.new(
+            cmd,
+            interval: interval,
+            cmd_ssh_config: cmd_ssh_config
+          )
+        end
+
+        it "outputs the noop text for the assert statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Assert: `#{cmd}` returns 0"
+          msg2 += " (running every #{interval} second(s))"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
+      end
+
       context "when timeout > 0" do
         let (:timeout) { 1 }
         let (:object) do
@@ -387,6 +423,40 @@ RSpec.describe Runbook::Runs::SSHKit do
         expect(subject).to_not receive(:with_ssh_config)
 
         subject.execute(object, metadata)
+      end
+
+      context "when ssh_config is specified" do
+        let(:ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::Command.new(
+            cmd,
+            ssh_config: ssh_config
+          )
+        end
+
+        it "outputs the noop ssh config for the command statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Run: `#{cmd}`"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
       end
     end
   end
@@ -555,6 +625,41 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         subject.execute(object, metadata)
       end
+
+      context "when ssh_config is specified" do
+        let(:ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::Capture.new(
+            cmd,
+            into: :destination,
+            ssh_config: ssh_config
+          )
+        end
+
+        it "outputs the noop ssh config for the capture statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Capture: `#{cmd}` into destination"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 
@@ -618,6 +723,42 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         subject.execute(object, metadata)
       end
+
+      context "when ssh_config is specified" do
+        let(:ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::Download.new(
+            from,
+            to: to,
+            ssh_config: ssh_config,
+            options: options,
+          )
+        end
+
+        it "outputs the noop ssh config for the download statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Download: #{from} to #{to} with options #{options}"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 
@@ -680,6 +821,42 @@ RSpec.describe Runbook::Runs::SSHKit do
         expect(subject).to_not receive(:with_ssh_config)
 
         subject.execute(object, metadata)
+      end
+
+      context "when ssh_config is specified" do
+        let(:ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::Upload.new(
+            from,
+            to: to,
+            ssh_config: ssh_config,
+            options: options,
+          )
+        end
+
+        it "outputs the noop ssh config for the upload statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Upload: #{from} to #{to} with options #{options}"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
       end
     end
   end

@@ -9,7 +9,11 @@ module Runbook::Runs
 
     module ClassMethods
       def runbook__statements__assert(object, metadata)
+        cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
+
         if metadata[:noop]
+          ssh_config_output = render_ssh_config_output(cmd_ssh_config)
+          metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           interval_msg = "(running every #{object.interval} second(s))"
           metadata[:toolbox].output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
           if object.timeout > 0
@@ -24,7 +28,6 @@ module Runbook::Runs
         end
 
         time = Time.now
-        cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
         timed_out = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
         test_options = ssh_kit_command_options(cmd_ssh_config)
@@ -51,14 +54,17 @@ module Runbook::Runs
       end
 
       def runbook__statements__capture(object, metadata)
+        ssh_config = find_ssh_config(object)
+
         if metadata[:noop]
+          ssh_config_output = render_ssh_config_output(ssh_config)
+          metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           metadata[:toolbox].output("[NOOP] Capture: `#{object.cmd}` into #{object.into}")
           return
         end
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = find_ssh_config(object)
         capture_args = ssh_kit_command(object.cmd, raw: object.raw)
         capture_options = ssh_kit_command_options(ssh_config)
         capture_options.merge!(strip: object.strip)
@@ -74,14 +80,17 @@ module Runbook::Runs
       end
 
       def runbook__statements__command(object, metadata)
+        ssh_config = find_ssh_config(object)
+
         if metadata[:noop]
+          ssh_config_output = render_ssh_config_output(ssh_config)
+          metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           metadata[:toolbox].output("[NOOP] Run: `#{object.cmd}`")
           return
         end
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = find_ssh_config(object)
         execute_args = ssh_kit_command(object.cmd, raw: object.raw)
         exec_options = ssh_kit_command_options(ssh_config)
 
@@ -91,7 +100,11 @@ module Runbook::Runs
       end
 
       def runbook__statements__download(object, metadata)
+        ssh_config = find_ssh_config(object)
+
         if metadata[:noop]
+          ssh_config_output = render_ssh_config_output(ssh_config)
+          metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           options = object.options
           to = " to #{object.to}" if object.to
           opts = " with options #{options}" unless options == {}
@@ -102,15 +115,17 @@ module Runbook::Runs
 
         metadata[:toolbox].output("\n") # for formatting
 
-        ssh_config = find_ssh_config(object)
-
         with_ssh_config(ssh_config) do
           download!(object.from, object.to, object.options)
         end
       end
 
       def runbook__statements__upload(object, metadata)
+        ssh_config = find_ssh_config(object)
+
         if metadata[:noop]
+          ssh_config_output = render_ssh_config_output(ssh_config)
+          metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           options = object.options
           to = " to #{object.to}" if object.to
           opts = " with options #{options}" unless options == {}
@@ -120,8 +135,6 @@ module Runbook::Runs
         end
 
         metadata[:toolbox].output("\n") # for formatting
-
-        ssh_config = find_ssh_config(object)
 
         with_ssh_config(ssh_config) do
           upload!(object.from, object.to, object.options)
