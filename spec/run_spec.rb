@@ -5,18 +5,20 @@ RSpec.describe "Runbook::Run" do
   let (:object) { Runbook::Entities::Book.new("title") }
   let (:metadata_override) { {} }
   let (:toolbox) { instance_double("Runbook::Toolbox") }
+  let (:start_at) { "0" }
+  let (:position) { "" }
   let (:metadata) {
     {
       noop: false,
       auto: false,
       paranoid: true,
-      start_at: "0",
+      start_at: start_at,
       toolbox: toolbox,
       layout_panes: {},
       depth: 1,
       index: 0,
       parent: nil,
-      position: "",
+      position: position,
     }.merge(metadata_override)
   }
 
@@ -520,6 +522,58 @@ RSpec.describe "Runbook::Run" do
       expect(subject).to receive(:sleep).exactly(time).times
 
       subject.execute(object, metadata)
+    end
+  end
+
+  describe "start_at_is_substep?" do
+    context "when a non-entity is passed" do
+      let(:object) {
+        Runbook::Statements::Note.new("note")
+      }
+
+      it "returns false" do
+        expect(
+          subject.start_at_is_substep?(object, metadata)
+        ).to be_falsey
+      end
+    end
+
+    context "when an entity is passed" do
+      let(:object) {
+        Runbook::Entities::Book.new("title")
+      }
+
+      context "when metadata[:position] is empty" do
+        let(:position) { "" }
+
+        it "returns true" do
+          expect(
+            subject.start_at_is_substep?(object, metadata)
+          ).to be_truthy
+        end
+      end
+
+      context "when metadata[:start_at] starts with metadata[:position]" do
+        let(:start_at) { "1.2.3.4" }
+        let(:position) { "1.2" }
+
+        it "returns true" do
+          expect(
+            subject.start_at_is_substep?(object, metadata)
+          ).to be_truthy
+        end
+      end
+
+      context "when metadata[:start_at] does not start with metadata[:position]" do
+        let(:start_at) { "1.2.3.4" }
+        let(:position) { "1.1" }
+
+        it "returns false" do
+          expect(
+            subject.start_at_is_substep?(object, metadata)
+          ).to be_falsey
+        end
+      end
     end
   end
 end

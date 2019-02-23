@@ -184,8 +184,9 @@ module Runbook
         return position < start_at
       end
 
-      def start_at_is_substep?(metadata)
-        return false if metadata[:position].empty?
+      def start_at_is_substep?(object, metadata)
+        return false unless object.is_a?(Entity)
+        return true if metadata[:position].empty?
         metadata[:start_at].start_with?(metadata[:position])
       end
 

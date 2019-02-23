@@ -100,7 +100,10 @@ RSpec.describe Runbook::Hooks do
       }
     }
     let(:object) {
-      Class.new { include Runbook::Hooks::Invoker }.new
+      Class.new(Runbook::Entity) {
+        include Runbook::Hooks::Invoker
+        def initialize; end
+      }.new
     }
     let(:position) { "0" }
     let(:start_at) { "0" }
@@ -224,7 +227,7 @@ RSpec.describe Runbook::Hooks do
       let(:position) { "1" }
       let(:start_at) { "1.1" }
 
-      it "skips the hooks before and around hooks" do
+      it "skips the before and around hooks" do
         expected_result = [
           "book method invoked",
           "after hook_5",
