@@ -1,5 +1,7 @@
 module Runbook::Util
   module Repo
+    FILE_ID = "data"
+
     def self.load(metadata)
       title = metadata[:book_title]
       file = _file(title)
@@ -21,7 +23,7 @@ module Runbook::Util
     end
 
     def self._file(book_title)
-      "#{Dir.tmpdir}/runbook_data_#{ENV["USER"]}_#{_slug(book_title)}.yml"
+      "#{Dir.tmpdir}/runbook_#{FILE_ID}_#{ENV["USER"]}_#{_slug(book_title)}.yml"
     end
 
     def self._slug(title)

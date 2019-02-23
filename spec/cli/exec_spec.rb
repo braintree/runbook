@@ -262,7 +262,7 @@ RSpec.describe "runbook run", type: :aruba do
       }
 
       it "prompts to continue" do
-        type("c\nc\nc\nc\n")
+        type("c\nc\nc\nc")
 
         total_output.each do |line|
           expect(last_command_started).to have_output(line)
@@ -272,7 +272,7 @@ RSpec.describe "runbook run", type: :aruba do
 
       context "when skip is passed" do
         it "skips the step" do
-          type("s\nc\nc\nc\n")
+          type("s\nc\nc\nc")
 
           (total_output - step_1_1_output).each do |line|
             expect(last_command_started).to have_output(line)
@@ -285,7 +285,7 @@ RSpec.describe "runbook run", type: :aruba do
 
       context "when jump is passed" do
         it "jumps to the step" do
-          type("j\n2.2\nc\nc\n")
+          type("j\n2.2\nc\nc")
 
           excludes = step_1_1_output +
             step_1_2_title +
@@ -304,7 +304,7 @@ RSpec.describe "runbook run", type: :aruba do
 
       context "when no paranoid is passed" do
         it "stops prompting to continue" do
-          type("P\ns\n")
+          type("P\ns")
 
           total_output.each do |line|
             expect(last_command_started).to have_output(line)
@@ -314,7 +314,7 @@ RSpec.describe "runbook run", type: :aruba do
 
       context "when exit is passed" do
         it "exits the run" do
-          type("e\n")
+          type("e")
 
           (step_1_1_output + step_1_2_title + section_2_output).each do |line|
             expect(last_command_started).to_not have_output(line)
