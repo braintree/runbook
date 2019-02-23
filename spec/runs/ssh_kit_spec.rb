@@ -22,6 +22,7 @@ RSpec.describe Runbook::Runs::SSHKit do
   before(:each) { object.parent = parent }
   before(:each) {
     allow(Runbook::Util::Repo).to receive(:save)
+    allow(Runbook::Util::StoredPose).to receive(:save)
   }
 
   describe "runbook__entities__assert" do

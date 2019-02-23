@@ -1,8 +1,9 @@
 require "spec_helper"
 
 RSpec.describe Runbook::Runner do
+  let(:book_title) { "My Book" }
   let(:book) do
-    Runbook.book "My Book" do
+    Runbook.book book_title do
       description <<-DESC
 This is a very elaborate runbook that does stuff
       DESC
@@ -207,6 +208,67 @@ Step 1.2: ?
 Step 1.3: Profit
 
           PARANOID
+        end
+      end
+    end
+
+    context "with start_at == 0" do
+      context "when there is a stored position" do
+        let(:current_pose) { "1.2" }
+
+        before(:each) do
+          Runbook::Util::StoredPose.save(current_pose, book_title: book_title)
+        end
+
+        it "prompts to resume at the stored position" do
+          expect_any_instance_of(
+            Runbook::Toolbox
+          ).to receive(:yes?).and_return(true)
+          runner.run(run: run, paranoid: false)
+          pose_output = "Previous position detected: #{current_pose}"
+          expect(output.string).to include(pose_output)
+        end
+
+        context "when running in auto mode" do
+          it "does not update :start_at" do
+            expect_any_instance_of(Runbook::Toolbox).to_not receive(:yes?)
+            runner.run(run: run, paranoid: false, auto: true)
+            expect(output.string).to include("Section 1:")
+          end
+        end
+
+        context "when running in noop mode" do
+          it "does not update :start_at" do
+            expect_any_instance_of(Runbook::Toolbox).to_not receive(:yes?)
+            runner.run(run: run, paranoid: false, noop: true)
+            expect(output.string).to include("Section 1:")
+          end
+        end
+
+        context "when starting at the stored position" do
+          before(:each) do
+            expect_any_instance_of(
+              Runbook::Toolbox
+            ).to receive(:yes?).and_return(true)
+          end
+
+          it "updates :start_at" do
+            runner.run(run: run, paranoid: false)
+            expect(output.string).to_not include("Section 1:")
+          end
+        end
+
+        context "when not starting at the stored position" do
+          before(:each) do
+            expect_any_instance_of(
+              Runbook::Toolbox
+            ).to receive(:yes?).and_return(false)
+          end
+
+          it "does not update :start_at" do
+            runner.run(run: run, paranoid: false)
+            expect(output.string).to include("Section 1:")
+          end
         end
       end
     end

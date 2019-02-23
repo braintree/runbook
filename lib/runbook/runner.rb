@@ -26,6 +26,13 @@ module Runbook
       merge(Runbook::Entities::Book.initial_run_metadata).
       merge(additional_metadata)
 
+      stored_pose = _stored_position(metadata)
+      if metadata[:start_at] == "0" && stored_pose
+        if _resume_previous_pose?(metadata, stored_pose)
+          metadata[:start_at] = stored_pose
+        end
+      end
+
       if metadata[:start_at] != "0"
         Util::Repo.load(metadata)
       end
@@ -38,6 +45,18 @@ module Runbook
         layout_panes: {},
         repo: {},
       }
+    end
+
+    def _stored_position(metadata)
+      Runbook::Util::StoredPose.load(metadata)
+    end
+
+    def _resume_previous_pose?(metadata, pose)
+      return false if metadata[:auto] || metadata[:noop]
+      pose_msg = "Previous position detected: #{pose}"
+      metadata[:toolbox].output(pose_msg)
+      resume_msg = "Do you want to resume at this position?"
+      metadata[:toolbox].yes?(resume_msg)
     end
   end
 end

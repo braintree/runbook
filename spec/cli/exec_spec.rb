@@ -446,11 +446,15 @@ RSpec.describe "runbook run", type: :aruba do
       let(:repo_file) {
         Runbook::Util::Repo._file(book_title)
       }
+      let(:stored_pose_file) {
+        Runbook::Util::StoredPose._file(book_title)
+      }
       let(:message) { "Hello!" }
       let(:content) do
         <<-RUNBOOK
         Runbook.book "#{book_title}" do
           section "First Section" do
+            step { note "I get skipped" }
             step do
               ruby_command do |rb_cmd, metadata|
                 message = metadata[:repo][:message]
@@ -479,10 +483,12 @@ RSpec.describe "runbook run", type: :aruba do
 
       after(:each) do
         FileUtils.rm_f(repo_file)
+        FileUtils.rm_f(stored_pose_file)
       end
 
       it "persists state across runbook invocations" do
         expect(repo_file).to be_an_existing_file
+        expect(stored_pose_file).to be_an_existing_file
 
         run(second_command)
 
@@ -490,12 +496,51 @@ RSpec.describe "runbook run", type: :aruba do
           last_command_started
         ).to have_output(/Message2: #{message}/)
         expect(repo_file).to_not be_an_existing_file
+        expect(stored_pose_file).to_not be_an_existing_file
+      end
+
+      context "when start_at is not passed in second invocation" do
+        let(:second_command) { "runbook exec -P #{runbook_file}" }
+
+        it "prompts to resume stopped runbook invocations" do
+          # This spec becomes flaky without this assertion
+          expect(stored_pose_file).to be_an_existing_file
+
+          run(second_command)
+
+          # Yes to resume from previous pose prompt
+          type("y")
+
+          expect(
+            last_command_started
+          ).to_not have_output(/I get skipped/)
+        end
+      end
+
+      context "when start_at is passed in second invocation" do
+        let(:second_command) { "runbook exec -P -s 1 #{runbook_file}" }
+
+        it "does not prompt to resume stopped runbook invocations" do
+          expect(stored_pose_file).to be_an_existing_file
+
+          run(second_command)
+
+          expect(
+            last_command_started
+          ).to have_output(/I get skipped/)
+        end
       end
 
       context "when rerunning from scratch" do
         it "does not load persisted state" do
           run(command)
 
+          # No to resume from previous pose prompt
+          type("n")
+
+          expect(
+            last_command_started
+          ).to have_output(/Message1:/)
           expect(
             last_command_started
           ).to_not have_output(/Message1: #{message}/)

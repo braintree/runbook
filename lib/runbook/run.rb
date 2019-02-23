@@ -6,6 +6,8 @@ module Runbook
       _register_additional_step_whitespace_hook(base)
       ::Runbook::Util::Repo.register_save_repo_hook(base)
       ::Runbook::Util::Repo.register_delete_stored_repo_hook(base)
+      ::Runbook::Util::StoredPose.register_save_pose_hook(base)
+      ::Runbook::Util::StoredPose.register_delete_stored_pose_hook(base)
     end
 
     module ClassMethods

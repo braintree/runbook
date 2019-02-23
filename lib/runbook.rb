@@ -21,6 +21,7 @@ require "runbook/hooks"
 require "runbook/util/repo"
 require "runbook/util/runbook"
 require "runbook/util/sticky_hash"
+require "runbook/util/stored_pose"
 
 require "runbook/entity"
 require "runbook/entities/book"
