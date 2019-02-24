@@ -46,26 +46,29 @@ module Runbook
       end
 
       def runbook__statements__ask(object, metadata)
+        target = object.parent.dsl
+        existing_val = target.instance_variable_get(:"@#{object.into}")
+        default = existing_val || object.default
+
         if metadata[:auto]
-          if object.default
-            target = object.parent.dsl
+          if default
             target.singleton_class.class_eval { attr_accessor object.into }
-            target.send("#{object.into}=".to_sym, object.default)
+            target.send("#{object.into}=".to_sym, default)
             return
           end
 
-          error_msg = "ERROR! Can't execute ask statement in automatic mode!"
+          error_msg = "ERROR! Can't execute ask statement without default in automatic mode!"
           metadata[:toolbox].error(error_msg)
           raise Runbook::Runner::ExecutionError, error_msg
         end
 
         if metadata[:noop]
-          default_msg = object.default ? " (default: #{object.default})" : ""
+          default_msg = default ? " (default: #{default})" : ""
           metadata[:toolbox].output("[NOOP] Ask: #{object.prompt} (store in: #{object.into})#{default_msg}")
           return
         end
 
-        result = metadata[:toolbox].ask(object.prompt, default: object.default)
+        result = metadata[:toolbox].ask(object.prompt, default: default)
 
         target = object.parent.dsl
         target.singleton_class.class_eval { attr_accessor object.into }

@@ -230,13 +230,28 @@ RSpec.describe "Runbook::Run" do
           subject.execute(object, metadata)
         end
       end
+
+      context "when previous instance variable set" do
+        let (:existing_val) { "Kineval ride a bike?" }
+
+        before(:each) do
+          object.parent.dsl.instance_variable_set(:"@#{into}", existing_val)
+        end
+
+        it "outputs the existing value for the ask statement" do
+          msg = "[NOOP] Ask: #{prompt} (store in: #{into}) (default: #{existing_val})"
+          expect(toolbox).to receive(:output).with(msg)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
 
     context "auto" do
       let(:metadata_override) { {auto: true} }
 
       it "raises an ExecutionError" do
-        error_msg = "ERROR! Can't execute ask statement in automatic mode!"
+        error_msg = "ERROR! Can't execute ask statement without default in automatic mode!"
         expect(toolbox).to receive(:error).with(error_msg)
 
         expect do
@@ -256,6 +271,22 @@ RSpec.describe "Runbook::Run" do
           subject.execute(object, metadata)
 
           expect(object.parent.sky_color).to eq(default)
+        end
+      end
+
+      context "when previous instance variable set" do
+        let (:existing_val) { "Kineval ride a bike?" }
+
+        before(:each) do
+          object.parent.dsl.instance_variable_set(:"@#{into}", existing_val)
+        end
+
+        it "sets the existing value for the ask statement" do
+          expect(toolbox).to_not receive(:ask)
+
+          subject.execute(object, metadata)
+
+          expect(object.parent.sky_color).to eq(existing_val)
         end
       end
     end
@@ -282,6 +313,29 @@ RSpec.describe "Runbook::Run" do
         subject.execute(object, metadata)
 
         expect(object.parent.sky_color).to eq(result)
+      end
+
+      context "when previous instance variable set" do
+        let (:default) { "Pope where a hat?" }
+        let (:existing_val) { "Kineval ride a bike?" }
+        let (:object) {
+          Runbook::Statements::Ask.new(prompt, into: into, default: default)
+        }
+
+        before(:each) do
+          object.parent.dsl.instance_variable_set(:"@#{into}", existing_val)
+        end
+
+        it "passes the existing value to the ask statement" do
+          result = "result"
+          expect(toolbox).to receive(
+            :ask
+          ).with(prompt, default: existing_val).and_return(result)
+
+          subject.execute(object, metadata)
+
+          expect(object.parent.sky_color).to eq(result)
+        end
       end
     end
   end

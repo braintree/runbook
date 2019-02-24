@@ -195,6 +195,42 @@ RSpec.describe "runbook run", type: :aruba do
       end
     end
 
+    context "When resuming a stopped runbook" do
+      let(:content) do
+        <<-RUNBOOK
+        runbook = Runbook.book "#{book_title}" do
+          section "First Section" do
+            step "Ask stuff" do
+              ask "What's the meaning of life?", into: :life_meaning, default: "42"
+            end
+
+            step do
+              ruby_command { note life_meaning }
+            end
+          end
+        end
+        #{runbook_registration}
+        RUNBOOK
+      end
+
+      let(:command) { "runbook exec #{runbook_file}" }
+      let(:second_command) { "runbook exec -s 1.1 #{runbook_file}" }
+
+      it "sets previous values as ask defaults" do
+        type("c\ncandy\ne")
+
+        expect(repo_file).to be_an_existing_file
+
+        run(second_command)
+
+        type("c\n\nP")
+
+        expect(
+          last_command_started
+        ).to have_output(/candy/)
+      end
+    end
+
     context "when paranoid is passed" do
       let(:command) { "runbook exec #{runbook_file}" }
       let(:book_title) { "My Runbook" }
