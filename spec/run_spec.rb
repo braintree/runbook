@@ -7,6 +7,8 @@ RSpec.describe "Runbook::Run" do
   let (:toolbox) { instance_double("Runbook::Toolbox") }
   let (:start_at) { "0" }
   let (:position) { "" }
+  let (:reverse) { Runbook::Util::Glue.new(false) }
+  let (:reversed) { Runbook::Util::Glue.new(false) }
   let (:metadata) {
     {
       noop: false,
@@ -19,6 +21,8 @@ RSpec.describe "Runbook::Run" do
       index: 0,
       parent: nil,
       position: position,
+      reverse: reverse,
+      reversed: reversed,
     }.merge(metadata_override)
   }
 
@@ -125,12 +129,27 @@ RSpec.describe "Runbook::Run" do
 
       context "when :jump" do
         let (:ask_msg) { "What position would you like to jump to?" }
+        let (:result) { "1.13" }
+
+        before(:each) do
+          expect(toolbox).to receive(:expand).and_return(:jump)
+          expect(toolbox).to receive(:ask).with(ask_msg).and_return(result)
+        end
 
         it "jumps to the specified step" do
-          expect(toolbox).to receive(:expand).and_return(:jump)
-          expect(toolbox).to receive(:ask).with(ask_msg).and_return("1.13")
           subject.execute(object, metadata)
           expect(metadata[:start_at]).to eq("1.13")
+        end
+
+        context "when jumping to a past position" do
+          let(:position) { "1.14" }
+          let(:result) { "1.13" }
+
+          it "sets reverse and reversed to true" do
+            subject.execute(object, metadata)
+            expect(metadata[:reverse]).to be_truthy
+            expect(metadata[:reversed]).to be_truthy
+          end
         end
       end
 
@@ -522,6 +541,106 @@ RSpec.describe "Runbook::Run" do
       expect(subject).to receive(:sleep).exactly(time).times
 
       subject.execute(object, metadata)
+    end
+  end
+
+  describe "should_skip?" do
+    context "when metadata[:reversed] is true" do
+      let(:reversed) { true }
+
+      context "when metadata[:position] is empty" do
+        let(:position) { "" }
+
+        context "when position < start_at" do
+          let(:start_at) { "100" }
+
+          it "returns true" do
+            expect(subject.should_skip?(metadata)).to be_truthy
+          end
+        end
+
+        context "when position == start_at" do
+          let(:start_at) { "0" }
+
+          it "returns false" do
+            expect(subject.should_skip?(metadata)).to be_falsey
+          end
+        end
+      end
+    end
+
+    context "when metadata[:reversed] is false" do
+      let(:reversed) { false }
+
+      context "when metadata[:position] is empty" do
+        let(:position) { "" }
+
+        it "returns false" do
+          expect(subject.should_skip?(metadata)).to be_falsey
+        end
+      end
+
+      context "when position < start_at" do
+        let(:position) { "1.2" }
+        let(:start_at) { "1.11" }
+
+        it "returns true" do
+          expect(subject.should_skip?(metadata)).to be_truthy
+        end
+      end
+
+      context "when position == start_at" do
+        let(:position) { "1.02" }
+        let(:start_at) { "1.2" }
+
+        it "returns false" do
+          expect(subject.should_skip?(metadata)).to be_falsey
+        end
+      end
+
+      context "when position > start_at" do
+        let(:position) { "1.21" }
+        let(:start_at) { "1.2" }
+
+        it "returns false" do
+          expect(subject.should_skip?(metadata)).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "past_position?" do
+    context "when current_position < position" do
+      let(:current_position) { "1.2" }
+      let(:position) { "1.11" }
+
+      it "returns false" do
+        expect(
+          subject.past_position?(current_position, position)
+        ).to be_falsey
+      end
+    end
+
+    context "when current_position == position" do
+      let(:current_position) { "1.11" }
+      let(:position) { "1.11" }
+
+      it "returns true" do
+        expect(
+          subject.past_position?(current_position, position)
+        ).to be_truthy
+      end
+    end
+
+    context "when current_position > position" do
+      let(:current_position) { "1.12" }
+      let(:position) { "1.11" }
+
+      it "returns true" do
+        expect(
+          subject.past_position?(current_position, position)
+        ).to be_truthy
+      end
     end
   end
 

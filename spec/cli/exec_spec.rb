@@ -11,9 +11,10 @@ RSpec.describe "runbook run", type: :aruba do
   end
   let(:runbook_file) { "my_runbook.rb" }
   let(:runbook_registration) {}
+  let(:book_title) { "My Runbook" }
   let(:content) do
     <<-RUNBOOK
-    Runbook.book "My Runbook" do
+    runbook = Runbook.book "#{book_title}" do
       section "First Section" do
         step "Print stuff" do
           command "echo 'hi'"
@@ -24,9 +25,20 @@ RSpec.describe "runbook run", type: :aruba do
     #{runbook_registration}
     RUNBOOK
   end
+  let(:repo_file) {
+    Runbook::Util::Repo._file(book_title)
+  }
+  let(:stored_pose_file) {
+    Runbook::Util::StoredPose._file(book_title)
+  }
 
   before(:each) { write_file(config_file, config_content) }
   before(:each) { write_file(runbook_file, content) }
+  before(:each) do
+    FileUtils.rm_f(repo_file)
+    FileUtils.rm_f(stored_pose_file)
+  end
+
   before(:each) { run(command) }
 
   describe "input specification" do
@@ -90,6 +102,7 @@ RSpec.describe "runbook run", type: :aruba do
         end
 
         it "renders code blocks" do
+          expect(last_command_started).to have_output(/My Runbook/)
           expect(last_command_started).to_not have_output(/Unable to retrieve source code/)
         end
       end
@@ -184,9 +197,28 @@ RSpec.describe "runbook run", type: :aruba do
 
     context "when paranoid is passed" do
       let(:command) { "runbook exec #{runbook_file}" }
+      let(:book_title) { "My Runbook" }
       let(:content) do
         <<-RUNBOOK
-        Runbook.book "My Runbook" do
+        Runbook::Runs::SSHKit.register_hook(
+          :after_desc_hook,
+          :after,
+          Runbook::Statements::Description
+        ) do |object, metadata|
+          metadata[:toolbox].output(" After description hook\n")
+        end
+
+        Runbook::Runs::SSHKit.register_hook(
+          :after_step_hook,
+          :after,
+          Runbook::Entities::Step
+        ) do |object, metadata|
+          metadata[:toolbox].output(" After Step \#{metadata[:position]}\n")
+        end
+
+        runbook = Runbook.book "#{book_title}" do
+          description "My description\n"
+
           section "First Section" do
             step "Ask for continue" do
               note "hi"
@@ -207,15 +239,25 @@ RSpec.describe "runbook run", type: :aruba do
             end
           end
         end
+
+        Runbook.books[:my_runbook] = runbook
         RUNBOOK
       end
       let(:total_output) {
         title_output +
+        description_output +
+        after_description_output +
         section_1_output +
         section_2_output
       }
       let(:title_output) {
         [/Executing My Runbook\.\.\./]
+      }
+      let(:description_output) {
+        [/My description/]
+      }
+      let(:after_description_output) {
+        [/After description hook/]
       }
       let(:section_1_output) {
         [
@@ -298,6 +340,68 @@ RSpec.describe "runbook run", type: :aruba do
           end
           (excludes).each do |line|
             expect(last_command_started).to_not have_output(line)
+          end
+        end
+
+        context "when jumping to the same step" do
+          it "replays the step" do
+            type("j\n1.1\nP")
+
+            regex = /#{step_1_1_title[0]}.*#{step_1_1_title[0]}/m
+            expect(last_command_started).to have_output(regex)
+          end
+        end
+
+        context "when jumping to a past step" do
+          it "resumes at that step" do
+            type("j\n2.1\nj\n1.2\nP")
+
+            regex = /step here/
+            expect(last_command_started).to have_output(regex)
+            step_2_2_regex = /#{step_2_2_title[0]}.*#{step_2_2_title[0]}/m
+            expect(last_command_started).to_not have_output(step_2_2_regex)
+          end
+
+          it "runs after hooks for the current step" do
+            type("j\n2.2\nj\n1.2\nP")
+
+            regex = / After Step 2\.2.* After Step 2\.2/m
+            expect(last_command_started).to have_output(regex)
+          end
+
+          it "does not re-execute the book's description" do
+            type("j\n2.2\nj\n1.2\nP")
+
+            regex = /#{description_output[0]}.*#{description_output[0]}/m
+            expect(last_command_started).to_not have_output(regex)
+          end
+
+          it "does not re-execute the book's description after hook" do
+            type("j\n2.2\nj\n1.2\nP")
+
+            regex = /#{after_description_output[0]}.*#{after_description_output[0]}/m
+            expect(last_command_started).to_not have_output(regex)
+          end
+        end
+
+        context "when jumping to the beginning of the book" do
+          it "re-execute's the book's description" do
+            type("j\n2.2\nj\n0\nP")
+
+            regex = /#{description_output[0]}.*#{description_output[0]}/m
+            expect(last_command_started).to have_output(regex)
+          end
+        end
+
+        context "when jumping to a non-existent step" do
+          it "resumes at the immediately following step" do
+            type("j\n2.2\nj\n1.5\nP")
+
+            step_1_2_regex = /#{step_1_2_output[0]}.*#{step_1_2_output[0]}/m
+            expect(last_command_started).to_not have_output(step_1_2_regex)
+            section_2_output.each do |line|
+              expect(last_command_started).to have_output(line)
+            end
           end
         end
       end

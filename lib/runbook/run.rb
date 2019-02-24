@@ -178,8 +178,13 @@ module Runbook
       end
 
       def should_skip?(metadata)
-        return false if metadata[:position].empty?
-        position = Gem::Version.new(metadata[:position])
+        if metadata[:reversed] && metadata[:position].empty?
+          current_pose = "0"
+        else
+          current_pose = metadata[:position]
+        end
+        return false if current_pose.empty?
+        position = Gem::Version.new(current_pose)
         start_at = Gem::Version.new(metadata[:start_at])
         return position < start_at
       end
@@ -188,6 +193,12 @@ module Runbook
         return false unless object.is_a?(Entity)
         return true if metadata[:position].empty?
         metadata[:start_at].start_with?(metadata[:position])
+      end
+
+      def past_position?(current_position, position)
+        current_pose = Gem::Version.new(current_position)
+        pose = Gem::Version.new(position)
+        return pose <= current_pose
       end
 
       def _method_name(object)
@@ -217,6 +228,10 @@ module Runbook
           metadata[:start_at] = start_at
         when :jump
           result = toolbox.ask("What position would you like to jump to?")
+          if past_position?(metadata[:position], result)
+            metadata[:reverse] = true
+            metadata[:reversed] = true
+          end
           metadata[:start_at] = result
         when :no_paranoid
           metadata[:paranoid] = false

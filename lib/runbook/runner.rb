@@ -44,6 +44,8 @@ module Runbook
       {
         layout_panes: {},
         repo: {},
+        reverse: Util::Glue.new(false),
+        reversed: Util::Glue.new(false),
       }
     end
 
