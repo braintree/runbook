@@ -2,6 +2,7 @@
 
 * [X] Allow statements to take blocks to specify their arguments
 * [X] Add sanity checks for tmux support
+* [] Add helper for registering runbooks
 * [] Allow for preventing echo when prompting for input
 * [] Render ssh_config for runs
 * [] Override ssh_config at section, step levels
@@ -14,6 +15,9 @@
 * [] Replace Thor with a solution that is more easily extendable (adding new flags, etc.)
 * [] Add goto statements for repeating steps (functionality exists in paranoid mode)
 * [] Add test statement
+* [] Feedback on completion of tmux commands (when they complete, return values, outputs)
+* [] Revise README.md
+* [] Don't prompt for steps without titles
 * Create a generator for a runbook? Allow for custom generators?
   * Generate runbook templates
   * Generate runbook projects with Runbookfile, Gemfile, etc.
