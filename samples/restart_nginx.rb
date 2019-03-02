@@ -6,7 +6,6 @@ it starts successfully
 
   section "Restart Nginx" do
     server "app01.prod"
-    user "root"
 
     step "Stop Nginx" do
       note "Stopping Nginx..."
@@ -20,7 +19,7 @@ it starts successfully
       note "Starting Nginx..."
       command "service nginx start"
       assert %q{service nginx status | grep "is running"}
-      confirm "Nginx is taking traffic"
+      confirm "Nginx is taking traffic?"
       notice "Make sure to report why you restarted nginx"
     end
   end
