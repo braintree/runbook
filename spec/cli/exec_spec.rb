@@ -39,7 +39,7 @@ RSpec.describe "runbook run", type: :aruba do
     FileUtils.rm_f(stored_pose_file)
   end
 
-  before(:each) { run(command) }
+  before(:each) { run_command(command) }
 
   describe "input specification" do
     context "runbook is passed as an argument" do
@@ -221,7 +221,7 @@ RSpec.describe "runbook run", type: :aruba do
 
         expect(repo_file).to be_an_existing_file
 
-        run(second_command)
+        run_command(second_command)
 
         type("c\n\nP")
 
@@ -630,7 +630,7 @@ RSpec.describe "runbook run", type: :aruba do
         expect(repo_file).to be_an_existing_file
         expect(stored_pose_file).to be_an_existing_file
 
-        run(second_command)
+        run_command(second_command)
 
         expect(
           last_command_started
@@ -646,7 +646,7 @@ RSpec.describe "runbook run", type: :aruba do
           # This spec becomes flaky without this assertion
           expect(stored_pose_file).to be_an_existing_file
 
-          run(second_command)
+          run_command(second_command)
 
           # Yes to resume from previous pose prompt
           type("y")
@@ -663,7 +663,7 @@ RSpec.describe "runbook run", type: :aruba do
         it "does not prompt to resume stopped runbook invocations" do
           expect(stored_pose_file).to be_an_existing_file
 
-          run(second_command)
+          run_command(second_command)
 
           expect(
             last_command_started
@@ -673,7 +673,7 @@ RSpec.describe "runbook run", type: :aruba do
 
       context "when rerunning from scratch" do
         it "does not load persisted state" do
-          run(command)
+          run_command(command)
 
           # No to resume from previous pose prompt
           type("n")

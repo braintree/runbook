@@ -27,7 +27,7 @@ RSpec.describe "runbook view", type: :aruba do
 
   before(:each) { write_file(config_file, config_content) }
   before(:each) { write_file(runbook_file, content) }
-  before(:each) { run(command) }
+  before(:each) { run_command(command) }
 
   describe "input specification" do
     context "runbook is passed as an argument" do
