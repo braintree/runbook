@@ -61,14 +61,14 @@ module Runbook
 
     def _load_config(config, cmd)
       unless File.exist?(config)
-        raise Thor::UnknownArgumentError, "#{cmd}: cannot access #{config}: No such file or directory"
+        raise Thor::InvocationError, "#{cmd}: cannot access #{config}: No such file or directory"
       end
       load(config)
     end
 
     def _retrieve_runbook(runbook, cmd)
       unless File.exist?(runbook)
-        raise Thor::UnknownArgumentError, "#{cmd}: cannot access #{runbook}: No such file or directory"
+        raise Thor::InvocationError, "#{cmd}: cannot access #{runbook}: No such file or directory"
       end
       load(runbook)
       runbook_key = File.basename(runbook, ".rb").to_sym
