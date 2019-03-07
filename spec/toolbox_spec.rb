@@ -43,7 +43,19 @@ RSpec.describe Runbook::Toolbox do
       expect(prompt).to receive(:yes?).with(msg)
       toolbox.yes?(msg)
     end
+
+    it "re-prompts when receiving unknown input" do
+      msg = "Unknown input: Please type 'y' or 'n'."
+      expect(prompt).to receive(:yes?).with(msg) do
+        raise TTY::Prompt::ConversionError
+      end
+      expect(prompt).to receive(:yes?)
+      expect(prompt).to receive(:warn).with(msg)
+
+      toolbox.yes?(msg)
+    end
   end
+
   describe "output" do
     it "passes its argument to prompt.say" do
       expect(prompt).to receive(:say).with(msg)

@@ -58,6 +58,28 @@ RSpec.describe "runbook run", type: :aruba do
           expect(last_command_started).to have_output(line)
         end
       end
+
+      context "when bad input is entered on confirm" do
+        let(:content) do
+          <<-RUNBOOK
+          runbook = Runbook.book "#{book_title}" do
+            section "First Section" do
+              step "Print stuff" do
+                confirm "blow up?"
+              end
+            end
+          end
+          #{runbook_registration}
+          RUNBOOK
+        end
+
+        it "re-prompts" do
+          type("YY\ny")
+
+            expected_output = /.*Unknown input: Please type 'y' or 'n'\..*/
+          expect(last_command_started).to have_output(expected_output)
+        end
+      end
     end
 
     context "when an unknown file is passed in as an argument" do

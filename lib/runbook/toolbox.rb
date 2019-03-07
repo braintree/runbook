@@ -15,7 +15,13 @@ module Runbook
     end
 
     def yes?(msg)
-      prompt.yes?(msg)
+      begin
+        prompt.yes?(msg)
+      rescue TTY::Prompt::ConversionError
+        err_msg = "Unknown input: Please type 'y' or 'n'."
+        warn(err_msg)
+        retry
+      end
     end
 
     def output(msg)
