@@ -257,16 +257,18 @@ When a hash is passed to `layout`, the keys of the hash represent window names a
 
 ```ruby
 Runbook.book "Multi Window Layout" do
-  layout {
+  layout({
     :web_monitor => [
       :left, :middle, :right,
     ],
     :db_monitor => [[
       :top, :middle, :bottom,
     ]]
-  }
+  })
 end
 ```
+
+Notice in the example that parenthesis are used to wrap the hash. Ruby will raise a syntax error if `layout`'s argument is not wrapped in parenthesis when passing a hash.
 
 If you want panes to be un-evenly spaced, you can replace the array of panes with a hash where the keys are panes and the values are numbers. The panes will be spaced according to the specified numbers.
 
