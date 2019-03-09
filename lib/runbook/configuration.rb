@@ -4,12 +4,14 @@ module Runbook
   end
 
   def self.configure
+    Configuration.load_config
     self.configuration ||= Configuration.new
     yield(configuration) if block_given?
   end
 
   def self.reset_configuration
     self.configuration = Configuration.new
+    Configuration.loaded = false
   end
 
   class Configuration
@@ -21,11 +23,36 @@ module Runbook
     ProjectConfigFile = "Runbookfile"
     UserConfigFile = ".runbook.conf"
 
+    def self.cli_config_file
+      @cli_config_file
+    end
+
+    def self.cli_config_file=(cli_config_file)
+      @cli_config_file = cli_config_file
+    end
+
+    def self.loaded
+      @loaded
+    end
+
+    def self.loaded=(loaded)
+      @loaded = loaded
+    end
+
     def self.load_config
+      return if @loaded
+      @loaded = true
       _load_global_config
       _load_project_config
       _load_user_config
+      _load_cli_config
+      # Set defaults
       Runbook.configure
+    end
+
+    def self.reconfigure
+      @loaded = false
+      load_config
     end
 
     def self._load_global_config
@@ -48,6 +75,12 @@ module Runbook
     def self._load_user_config
       user_config_file = File.join(ENV["HOME"], UserConfigFile)
       load(user_config_file) if File.exist?(user_config_file)
+    end
+
+    def self._load_cli_config
+      if cli_config_file && File.exist?(cli_config_file)
+        load(cli_config_file)
+      end
     end
 
     def initialize
@@ -74,6 +107,4 @@ module Runbook
       end
     end
   end
-
-  Configuration.load_config
 end

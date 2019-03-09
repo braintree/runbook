@@ -75,18 +75,21 @@ end
 
 module Runbook
   def self.book(title, &block)
+    Configuration.load_config
     Entities::Book.new(title).tap do |book|
       book.dsl.instance_eval(&block)
     end
   end
 
   def self.section(title, &block)
+    Configuration.load_config
     Entities::Section.new(title).tap do |section|
       section.dsl.instance_eval(&block)
     end
   end
 
   def self.step(title=nil, &block)
+    Configuration.load_config
     Entities::Step.new(title).tap do |step|
       step.dsl.instance_eval(&block) if block
     end

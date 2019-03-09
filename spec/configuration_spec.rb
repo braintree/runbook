@@ -59,6 +59,17 @@ RSpec.describe "Runbook Configuration" do
   end
 
   describe "self.configure" do
+    let(:global_config_file) { "runbook.conf" }
+    let(:global_const) { "Runbook::Configuration::GlobalConfigFile" }
+    let(:global_enable_sudo_prompt) { "false" }
+    let(:global_config_content) do
+      <<-CONFIG
+      Runbook.configure do |config|
+        config.enable_sudo_prompt = #{global_enable_sudo_prompt}
+      end
+      CONFIG
+    end
+
     it "allows you to modify the runbook's configuration" do
       old_ssh_kit = Runbook.configuration.ssh_kit
       begin
@@ -71,9 +82,35 @@ RSpec.describe "Runbook Configuration" do
         Runbook.configuration.ssh_kit = old_ssh_kit
       end
     end
+
+    it "loads config files if not previously loaded" do
+      global_config = Tempfile.new(global_config_file)
+      begin
+        global_config.write(global_config_content)
+        global_config.rewind
+        stub_const(global_const, global_config.path)
+        expect(Runbook::Configuration).to receive(:load).with(global_config.path).once.and_call_original
+        Runbook.configure
+        Runbook.configure
+      ensure
+        global_config.close
+        global_config.unlink
+      end
+    end
   end
 
   describe "self.reset_configuration" do
+    let(:global_config_file) { "runbook.conf" }
+    let(:global_const) { "Runbook::Configuration::GlobalConfigFile" }
+    let(:global_enable_sudo_prompt) { "false" }
+    let(:global_config_content) do
+      <<-CONFIG
+      Runbook.configure do |config|
+        config.enable_sudo_prompt = #{global_enable_sudo_prompt}
+      end
+      CONFIG
+    end
+
     it "resets the configuration" do
       Runbook.configure do |config|
         config.ssh_kit = "an ssh kit"
@@ -81,6 +118,25 @@ RSpec.describe "Runbook Configuration" do
 
       Runbook.reset_configuration
       expect(Runbook.configuration.ssh_kit).to_not eq("an ssh kit")
+    end
+
+    it "allows config to be reloaded" do
+      expect(Runbook.configuration.enable_sudo_prompt).to be_truthy
+      global_config = Tempfile.new(global_config_file)
+      begin
+        global_config.write(global_config_content)
+        global_config.rewind
+        stub_const(global_const, global_config.path)
+
+        Runbook::Configuration.load_config
+        Runbook.reset_configuration
+        expect(Runbook.configuration.enable_sudo_prompt).to_not be_falsey
+        Runbook::Configuration.load_config
+        expect(Runbook.configuration.enable_sudo_prompt).to be_falsey
+      ensure
+        global_config.close
+        global_config.unlink
+      end
     end
   end
 
@@ -116,6 +172,36 @@ RSpec.describe "Runbook Configuration" do
         config.enable_sudo_prompt = #{user_enable_sudo_prompt}
       end
       CONFIG
+    end
+
+    let(:cli_config_file) { "runbook.conf" }
+    let(:cli_enable_sudo_prompt) { "false" }
+    let(:cli_config_content) do
+      <<-CONFIG
+      Runbook.configure do |config|
+        config.enable_sudo_prompt = #{cli_enable_sudo_prompt}
+      end
+      CONFIG
+    end
+
+    it "is memoized" do
+      expect(Runbook.configuration.enable_sudo_prompt).to be_truthy
+      global_config = Tempfile.new(global_config_file)
+      begin
+        global_config.write(global_config_content)
+        global_config.rewind
+        stub_const(global_const, global_config.path)
+        Runbook::Configuration.load_config
+        expect(Runbook.configuration.enable_sudo_prompt).to be_falsey
+        Runbook.configure do |config|
+          config.enable_sudo_prompt = true
+        end
+        Runbook::Configuration.load_config
+        expect(Runbook.configuration.enable_sudo_prompt).to be_truthy
+      ensure
+        global_config.close
+        global_config.unlink
+      end
     end
 
     context "when GlobalConfigFile is present" do
@@ -215,6 +301,56 @@ RSpec.describe "Runbook Configuration" do
           user_config.close
           user_config.unlink
         end
+      end
+    end
+
+    context "when cli_config_file is set" do
+      it "loads the config file" do
+        expect(Runbook.configuration.enable_sudo_prompt).to be_truthy
+        cli_config = Tempfile.new(cli_config_file)
+        begin
+          cli_config.write(cli_config_content)
+          cli_config.rewind
+          allow(Runbook::Configuration).to receive(:cli_config_file).and_return(cli_config.path)
+          Runbook::Configuration.load_config
+          expect(Runbook.configuration.enable_sudo_prompt).to be_falsey
+        ensure
+          cli_config.close
+          cli_config.unlink
+        end
+      end
+    end
+  end
+
+  describe "self.reconfigure" do
+    let(:global_config_file) { "runbook.conf" }
+    let(:global_const) { "Runbook::Configuration::GlobalConfigFile" }
+    let(:global_enable_sudo_prompt) { "false" }
+    let(:global_config_content) do
+      <<-CONFIG
+      Runbook.configure do |config|
+        config.enable_sudo_prompt = #{global_enable_sudo_prompt}
+      end
+      CONFIG
+    end
+
+    it "reloads configuration files" do
+      expect(Runbook.configuration.enable_sudo_prompt).to be_truthy
+      global_config = Tempfile.new(global_config_file)
+      begin
+        global_config.write(global_config_content)
+        global_config.rewind
+        stub_const(global_const, global_config.path)
+        Runbook::Configuration.load_config
+        expect(Runbook.configuration.enable_sudo_prompt).to be_falsey
+        Runbook.configure do |config|
+          config.enable_sudo_prompt = true
+        end
+        Runbook::Configuration.reconfigure
+        expect(Runbook.configuration.enable_sudo_prompt).to be_falsey
+      ensure
+        global_config.close
+        global_config.unlink
       end
     end
   end

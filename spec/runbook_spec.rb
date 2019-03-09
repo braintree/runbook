@@ -22,6 +22,11 @@ RSpec.describe Runbook do
       out_book = Runbook.book(title) { in_book = self }
       expect(in_book).to eq(out_book.dsl)
     end
+
+    it "loads Runbook's configuration" do
+      expect(Runbook::Configuration).to receive(:load_config)
+      book
+    end
   end
 
   describe "self.section" do
@@ -40,6 +45,11 @@ RSpec.describe Runbook do
       out_section = Runbook.section(title) { in_section = self }
       expect(in_section).to eq(out_section.dsl)
     end
+
+    it "loads Runbook's configuration" do
+      expect(Runbook::Configuration).to receive(:load_config)
+      section
+    end
   end
 
   describe "self.step" do
@@ -57,6 +67,11 @@ RSpec.describe Runbook do
       in_step = nil
       out_step = Runbook.step(title) { in_step = self }
       expect(in_step).to eq(out_step.dsl)
+    end
+
+    it "loads Runbook's configuration" do
+      expect(Runbook::Configuration).to receive(:load_config)
+      step
     end
 
     context "when no title is given" do

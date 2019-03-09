@@ -14,7 +14,7 @@ module Runbook
     LONGDESC
     option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
-      _load_config(options[:config], :view) if options[:config]
+      _set_cli_config(options[:config], :view) if options[:config]
       runbook = _retrieve_runbook(runbook, :view)
       puts Runbook::Viewer.new(runbook).generate(
         view: options[:view],
@@ -41,7 +41,7 @@ module Runbook
     option :"no-paranoid", aliases: :P, type: :boolean
     option :start_at, aliases: :s, type: :string, default: "0"
     def exec(runbook)
-      _load_config(options[:config], :exec) if options[:config]
+      _set_cli_config(options[:config], :exec) if options[:config]
       runbook = _retrieve_runbook(runbook, :exec)
       Runbook::Runner.new(runbook).run(
         run: options[:run],
@@ -59,11 +59,11 @@ module Runbook
 
     private
 
-    def _load_config(config, cmd)
+    def _set_cli_config(config, cmd)
       unless File.exist?(config)
         raise Thor::InvocationError, "#{cmd}: cannot access #{config}: No such file or directory"
       end
-      load(config)
+      Runbook::Configuration.cli_config_file = config
     end
 
     def _retrieve_runbook(runbook, cmd)
