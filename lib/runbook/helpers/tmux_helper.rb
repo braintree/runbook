@@ -168,7 +168,7 @@ module Runbook::Helpers
     end
 
     def _set_directory(directory, target)
-      send_keys("cd #{directory}", target)
+      send_keys("cd #{directory}; clear", target)
     end
   end
 end

@@ -194,7 +194,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
       end
 
       it "initializes the pane" do
-        expect(subject).to receive(:send_keys).with("cd #{directory}", runbook_pane_id)
+        expect(subject).to receive(:send_keys).with("cd #{directory}; clear", runbook_pane_id)
         expect(subject).to receive(:send_keys).with(command, runbook_pane_id)
 
         layout_panes = subject._setup_layout(structure)
