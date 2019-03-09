@@ -29,6 +29,10 @@ This is a very elaborate runbook that does stuff
   end
   let(:runner) { Runbook::Runner.new(book) }
 
+  before(:each) do
+    allow(Runbook::Util::StoredPose).to receive(:save)
+  end
+
   it "defaults to run using ssh_kit" do
     expect(book).to receive(:run).with(Runbook::Runs::SSHKit, Hash)
     runner.run
@@ -217,6 +221,7 @@ Step 1.3: Profit
         let(:current_pose) { "1.2" }
 
         before(:each) do
+          allow(Runbook::Util::StoredPose).to receive(:save).and_call_original
           Runbook::Util::StoredPose.save(current_pose, book_title: book_title)
         end
 
