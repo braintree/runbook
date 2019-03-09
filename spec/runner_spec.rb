@@ -921,7 +921,8 @@ OUTPUT
       end
 
       it "captures cmd" do
-        capture_args = [:echo, "'hi!'", {:strip => true}]
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = [:echo, "'hi!'", capture_opts]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:capture).with(*capture_args).and_return(result)
@@ -936,6 +937,7 @@ Section 1: My Section
 Step 1.1:
 
 
+Capturing output of `echo 'hi!'`
 
 Section 2: Section 2
 

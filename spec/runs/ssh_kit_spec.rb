@@ -473,7 +473,8 @@ RSpec.describe Runbook::Runs::SSHKit do
     end
 
     it "captures cmd" do
-      capture_args = [:echo, "'hi'", {:strip => true}]
+      capture_opts = {strip: true, verbosity: Logger::INFO}
+      capture_args = [:echo, "'hi'", capture_opts]
       ssh_config = object.parent.ssh_config
       expect(
         subject
@@ -499,7 +500,8 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       it "uses the ssh_config" do
-        capture_args = [:echo, "'hi'", {:strip => true}]
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = [:echo, "'hi'", capture_opts]
         expect(
           subject
         ).to receive(:with_ssh_config).with(ssh_config).and_call_original
@@ -536,6 +538,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         capture_options = {
           interaction_handler: options[:interaction_handler],
           strip: true,
+          verbosity: Logger::INFO,
         }
         # Needed for sudo check
         expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
@@ -554,7 +557,8 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       it "executes the raw command string" do
-        capture_args = ["echo 'hi'", {:strip => true}]
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = ["echo 'hi'", capture_opts]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:capture).with(*capture_args)
@@ -570,7 +574,8 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       it "executes the raw command string" do
-        capture_args = [:echo, "'hi'", {:strip => false}]
+        capture_opts = {strip: false, verbosity: Logger::INFO}
+        capture_args = [:echo, "'hi'", capture_opts]
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:capture).with(*capture_args)
@@ -604,6 +609,7 @@ RSpec.describe Runbook::Runs::SSHKit do
           capture_options = {
             interaction_handler: options[:interaction_handler],
             strip: false,
+            verbosity: Logger::INFO,
           }
           # Needed for sudo check
           expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once

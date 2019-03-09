@@ -67,8 +67,11 @@ module Runbook::Runs
 
         capture_args = ssh_kit_command(object.cmd, raw: object.raw)
         capture_options = ssh_kit_command_options(ssh_config)
-        capture_options.merge!(strip: object.strip)
+        capture_options[:strip] = object.strip
+        capture_options[:verbosity] = Logger::INFO
 
+        capture_msg = "Capturing output of `#{object.cmd}`"
+        metadata[:toolbox].output(capture_msg)
         result = ""
         with_ssh_config(ssh_config) do
           result = capture(*capture_args, capture_options)
