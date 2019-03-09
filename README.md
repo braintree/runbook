@@ -268,7 +268,7 @@ Runbook.book "Multi Window Layout" do
 end
 ```
 
-Notice in the example that parenthesis are used to wrap the hash. Ruby will raise a syntax error if `layout`'s argument is not wrapped in parenthesis when passing a hash.
+Notice in the example that parenthesis are used to wrap the hash. Ruby will raise a syntax error if `layout`'s argument is not wrapped in parenthesis when passing a hash. Runbook expects that it is running in the last window in a tmux session. If you are running a runbook that uses a multi-window layout, the layout will not work unless runbook is running in the last window in the session.
 
 If you want panes to be un-evenly spaced, you can replace the array of panes with a hash where the keys are panes and the values are numbers. The panes will be spaced according to the specified numbers.
 
