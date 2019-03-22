@@ -195,6 +195,15 @@ RSpec.describe "Runbook::Run" do
           subject.execute(object, metadata)
         end
       end
+
+      context "when step does not have a title" do
+        let (:object) { Runbook::Entities::Step.new }
+
+        it "does not prompt" do
+          expect(toolbox).to_not receive(:expand)
+          subject.execute(object, metadata)
+        end
+      end
     end
   end
 

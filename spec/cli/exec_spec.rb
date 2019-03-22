@@ -226,7 +226,7 @@ RSpec.describe "runbook run", type: :aruba do
               ask "What's the meaning of life?", into: :life_meaning, default: "42"
             end
 
-            step do
+            step "" do
               ruby_command { note life_meaning }
             end
           end

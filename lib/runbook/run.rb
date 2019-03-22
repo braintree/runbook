@@ -40,7 +40,8 @@ module Runbook
         toolbox = metadata[:toolbox]
         title = " #{object.title}".rstrip
         toolbox.output("Step #{metadata[:position]}:#{title}\n\n")
-        return if metadata[:auto] || metadata[:noop] || !metadata[:paranoid]
+        return if metadata[:auto] || metadata[:noop] ||
+          !metadata[:paranoid] || object.title.nil?
         continue_result = toolbox.expand("Continue?", _step_choices)
         _handle_continue_result(continue_result, object, metadata)
       end
