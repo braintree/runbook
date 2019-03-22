@@ -34,8 +34,6 @@ This is a simple runbook that does stuff
   end
 end
 
-Runbook.books[:simple_runbook] = runbook
-
 if __FILE__ == $0
   Runbook::Runner.new(runbook).run
 else

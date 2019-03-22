@@ -9,6 +9,14 @@ RSpec.describe Runbook do
   end
 
   describe "self.book" do
+    around(:each) do |example|
+      begin
+        example.run
+      ensure
+        Runbook.books.clear
+      end
+    end
+
     it "returns a book" do
       expect(book).to be_a(Runbook::Entities::Book)
     end
@@ -26,6 +34,10 @@ RSpec.describe Runbook do
     it "loads Runbook's configuration" do
       expect(Runbook::Configuration).to receive(:load_config)
       book
+    end
+
+    it "registers a book" do
+      expect(Runbook.books).to eq([book])
     end
   end
 
@@ -89,10 +101,37 @@ RSpec.describe Runbook do
     end
   end
 
+  describe "self.register" do
+    around(:each) do |example|
+      begin
+        example.run
+      ensure
+        Runbook.books.clear
+      end
+    end
+
+    it "registers a book" do
+      book
+      Runbook.books.clear
+      Runbook.register(book)
+      expect(Runbook.books).to eq([book])
+    end
+  end
+
   describe "self.books" do
-    it "persists a set of books" do
-      Runbook.books[:my_book] = book
-      expect(Runbook.books[:my_book]).to eq(book)
+    around(:each) do |example|
+      begin
+        example.run
+      ensure
+        Runbook.books.clear
+      end
+    end
+
+    it "persists a list of books" do
+      book
+      Runbook.books.clear
+      Runbook.books << book
+      expect(Runbook.books).to eq([book])
     end
   end
 end

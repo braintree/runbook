@@ -19,8 +19,6 @@ This is a runbook for playing with the layout statement
   end
 end
 
-Runbook.books[:layout_runbook] = runbook
-
 if __FILE__ == $0
   Runbook::Runner.new(runbook).run
 else

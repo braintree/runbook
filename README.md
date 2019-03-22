@@ -461,9 +461,6 @@ runbook = Runbook.book "Say hello to world" do
   end
 end
 
-# Register your runbooks with your file's basename to ensure better `ruby_command` rendering
-Runbook.books[:my_runbook] = runbook
-
 if __FILE__ == $0
   Runbook::Runner.new(runbook).run
 else
@@ -479,7 +476,7 @@ $ ./my_runbook.rb
 
 ```ruby
 load "my_runbook.rb"
-runbook = Runbook.books[:my_runbook]
+runbook = Runbook.books.last # Runbooks register themselves to Runbook.books when they are defined
 # (Or alternatively `runbook = eval(File.read("my_runbook.rb"))`)
 Runbook::Runner.new(runbook).run(auto: true)
 ```
@@ -561,7 +558,7 @@ When loading your runbooks from files, you have two options at your disposal:
 
 ```ruby
 load "my_runbook.rb"
-runbook = Runbook.books[:my_runbook] # Requires that the runbook registers itself when it's defined.
+runbook = Runbook.books.last # Runbooks register themselves to Runbook.books when they are defined
 ```
 
 and

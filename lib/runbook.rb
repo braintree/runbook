@@ -78,6 +78,7 @@ module Runbook
     Configuration.load_config
     Entities::Book.new(title).tap do |book|
       book.dsl.instance_eval(&block)
+      register(book)
     end
   end
 
@@ -95,7 +96,11 @@ module Runbook
     end
   end
 
+  def self.register(book)
+    books << book
+  end
+
   def self.books
-    @books ||= {}
+    @books ||= []
   end
 end

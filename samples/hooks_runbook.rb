@@ -65,8 +65,6 @@ This is a runbook for playing with runbook hooks
   end
 end
 
-Runbook.books[:hooks_runbook] = runbook
-
 if __FILE__ == $0
   Runbook::Runner.new(runbook).run
 else

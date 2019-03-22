@@ -71,8 +71,7 @@ module Runbook
         raise Thor::InvocationError, "#{cmd}: cannot access #{runbook}: No such file or directory"
       end
       load(runbook)
-      runbook_key = File.basename(runbook, ".rb").to_sym
-      Runbook.books[runbook_key] || eval(File.read(runbook))
+      Runbook.books.last || eval(File.read(runbook))
     end
   end
 end

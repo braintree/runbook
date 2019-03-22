@@ -10,7 +10,6 @@ RSpec.describe "runbook view", type: :aruba do
     CONFIG
   end
   let(:runbook_file) { "my_runbook.rb" }
-  let(:runbook_registration) {}
   let(:content) do
     <<-RUNBOOK
     runbook = Runbook.book "My Runbook" do
@@ -21,7 +20,6 @@ RSpec.describe "runbook view", type: :aruba do
         end
       end
     end
-    #{runbook_registration}
     RUNBOOK
   end
 
@@ -37,22 +35,8 @@ RSpec.describe "runbook view", type: :aruba do
         expect(last_command_started).to have_output(/echo 'hi'/)
       end
 
-      context "without runbook_registration" do
-        let(:runbook_registration) {}
-
-        it "does not render code blocks" do
-          expect(last_command_started).to have_output(/Unable to retrieve source code/)
-        end
-      end
-
-      context "with runbook_registration" do
-        let(:runbook_registration) do
-          "Runbook.books[:my_runbook] = runbook"
-        end
-
-        it "renders code blocks" do
-          expect(last_command_started).to_not have_output(/Unable to retrieve source code/)
-        end
+      it "renders code blocks" do
+        expect(last_command_started).to_not have_output(/Unable to retrieve source code/)
       end
     end
 
