@@ -20,7 +20,7 @@ module Runbook
         auto: auto,
         paranoid: Util::Glue.new(paranoid),
         start_at: Util::Glue.new(start_at || "0"),
-        toolbox: toolbox,
+        toolbox: Util::Glue.new(toolbox),
         book_title: book.title,
       }).
       merge(Runbook::Entities::Book.initial_run_metadata).

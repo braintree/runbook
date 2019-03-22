@@ -949,4 +949,49 @@ OUTPUT
       end
     end
   end
+
+  context "with dynamic toolbox" do
+    let(:run) { :ssh_kit }
+    let(:output) { StringIO.new }
+    let(:silent_toolbox) do
+      Class.new(Runbook::Toolbox) do
+        def is_new_toolbox; end
+      end
+    end
+    let(:book) do
+      a_silent_toolbox = silent_toolbox
+
+      Runbook.book "My Book" do
+        section "My Section" do
+          step do
+            ruby_command do |rb_cmd, metadata|
+              metadata[:toolbox] = a_silent_toolbox.new
+            end
+          end
+
+          step do
+            ruby_command do |rb_cmd, metadata|
+              if metadata[:toolbox].respond_to?(:is_new_toolbox)
+                note "New toolbox!"
+              else
+                note "No new toolbox!"
+              end
+            end
+          end
+        end
+      end
+    end
+
+    before(:each) do
+      allow_any_instance_of(Runbook::Toolbox).to receive(:output) do |instance, msg|
+        output.puts(msg)
+      end
+    end
+
+    it "allows you to dynamically change toolboxes" do
+      runner.run(run: run, paranoid: false)
+
+      expect(output.string).to include("New toolbox!")
+    end
+  end
 end
