@@ -67,7 +67,9 @@ RSpec.describe Runbook::Runs::SSHKit do
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:test).with(*test_args, {}).and_return(true)
-        expect(subject).to_not receive(:sleep)
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to_not receive(:sleep)
 
         subject.execute(object, metadata)
       end
@@ -136,7 +138,9 @@ RSpec.describe Runbook::Runs::SSHKit do
         expect_any_instance_of(
           SSHKit::Backend::Abstract
         ).to receive(:test).with(*test_args, {}).and_return(false)
-        expect(subject).to_not receive(:sleep)
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to_not receive(:sleep)
 
         error_msg = "Error! Assertion `#{cmd}` failed"
         expect(toolbox).to receive(:error).with(error_msg)
@@ -221,7 +225,6 @@ RSpec.describe Runbook::Runs::SSHKit do
             )
           end
 
-
           it "calls the timeout_cmd with raw command string" do
             timeout_cmd_args = ["echo 'timed out!'"]
             expect(toolbox).to receive(:error)
@@ -233,6 +236,66 @@ RSpec.describe Runbook::Runs::SSHKit do
               subject.execute(object, metadata)
             end.to raise_error Runbook::Runner::ExecutionError
           end
+        end
+      end
+    end
+
+    context "when all attempts fail" do
+      let (:attempts) { 3 }
+      let (:cmd) { "ls does_not_exist" }
+      let (:object) do
+        Runbook::Statements::Assert.new(cmd, attempts: attempts)
+      end
+
+      it "raises an ExecutionError" do
+        test_args = [:ls, "does_not_exist"]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:test).with(*test_args, {}).thrice.and_return(false)
+        expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:sleep).twice
+
+        error_msg = "Error! Assertion `#{cmd}` failed"
+        expect(toolbox).to receive(:error).with(error_msg)
+        expect do
+          subject.execute(object, metadata)
+        end.to raise_error Runbook::Runner::ExecutionError, error_msg
+      end
+
+      context "when timeout_cmd is set" do
+        let (:timeout_cmd) { "echo 'timed out!'" }
+        let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
+        let (:object) do
+          Runbook::Statements::Assert.new(
+            cmd,
+            attempts: attempts,
+            timeout_statement: timeout_statement
+          )
+        end
+
+        before(:each) do
+          test_args = [:ls, "does_not_exist"]
+          expect_any_instance_of(
+            SSHKit::Backend::Abstract
+          ).to receive(:test).with(*test_args, {}).thrice.and_return(false)
+          expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:sleep).twice
+          allow(subject).to receive(:with_ssh_config).and_call_original
+          allow(toolbox).to receive(:output)
+        end
+
+        it "calls the timeout_cmd" do
+          timeout_cmd_args = [:echo, "'timed out!'"]
+          ssh_config = object.parent.ssh_config
+          expect(toolbox).to receive(:error)
+          expect(
+            subject
+          ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+          expect_any_instance_of(
+            SSHKit::Backend::Abstract
+          ).to receive(:execute).with(*timeout_cmd_args, {})
+
+          expect do
+            subject.execute(object, metadata)
+          end.to raise_error Runbook::Runner::ExecutionError
         end
       end
     end
@@ -292,7 +355,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         end
 
         it "outputs the noop text for the timeout" do
-          msg1 = "after #{timeout} second(s), timeout..."
+          msg1 = "after #{timeout} second(s), give up..."
           msg2 = "and exit"
           allow(toolbox).to receive(:output)
           expect(toolbox).to receive(:output).with(msg1)
@@ -314,7 +377,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
           it "outputs the noop text for the timeout_cmd" do
             msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
-            msg2 = "after #{timeout} second(s), timeout..."
+            msg2 = "after #{timeout} second(s), give up..."
             msg3 = "[NOOP] Run: `./notify_everyone`"
             msg4 = "and exit"
             allow(toolbox).to receive(:output)
@@ -325,6 +388,47 @@ RSpec.describe Runbook::Runs::SSHKit do
 
             subject.execute(object, metadata)
           end
+        end
+      end
+
+      context "when attempts > 0" do
+        let (:attempts) { 2 }
+        let (:object) do
+          Runbook::Statements::Assert.new(cmd, attempts: attempts)
+        end
+
+        it "outputs the noop text for the attempts" do
+          msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
+          msg2 = "after #{attempts} attempts, give up..."
+          msg3 = "and exit"
+
+          allow(toolbox).to receive(:output)
+          expect(toolbox).to receive(:output).with(msg1)
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(toolbox).to receive(:output).with(msg3)
+
+          subject.execute(object, metadata)
+        end
+      end
+
+      context "when timeout > 0 and attempts > 0" do
+        let (:timeout) { 1 }
+        let (:attempts) { 2 }
+        let (:object) do
+          Runbook::Statements::Assert.new(cmd, timeout: timeout, attempts: attempts)
+        end
+
+        it "outputs the noop text for the attempts" do
+          msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
+          msg2 = "after #{timeout} second(s) or #{attempts} attempts, give up..."
+          msg3 = "and exit"
+
+          allow(toolbox).to receive(:output)
+          expect(toolbox).to receive(:output).with(msg1)
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(toolbox).to receive(:output).with(msg3)
+
+          subject.execute(object, metadata)
         end
       end
     end

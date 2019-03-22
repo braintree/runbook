@@ -16,8 +16,11 @@ module Runbook::Runs
           metadata[:toolbox].output(ssh_config_output) unless ssh_config_output.empty?
           interval_msg = "(running every #{object.interval} second(s))"
           metadata[:toolbox].output("[NOOP] Assert: `#{object.cmd}` returns 0 #{interval_msg}")
-          if object.timeout > 0
-            metadata[:toolbox].output("after #{object.timeout} second(s), timeout...")
+          if object.timeout > 0 || object.attempts > 0
+            timeout_msg = object.timeout > 0 ? "#{object.timeout} second(s)" : nil
+            attempts_msg = object.attempts > 0 ? "#{object.attempts} attempts" : nil
+            giveup_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, give up..."
+            metadata[:toolbox].output(giveup_msg)
             if object.timeout_statement
               object.timeout_statement.parent = object.parent
               object.timeout_statement.run(self, metadata.dup)
@@ -27,22 +30,29 @@ module Runbook::Runs
           return
         end
 
-        time = Time.now
-        timed_out = false
+        gave_up = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
         test_options = ssh_kit_command_options(cmd_ssh_config)
 
         with_ssh_config(cmd_ssh_config) do
+          time = Time.now
+          count = object.attempts
           while !(test(*test_args, test_options))
-            if (object.timeout > 0 && Time.now - time > object.timeout)
-              timed_out = true
+            if ((count -= 1) == 0)
+              gave_up = true
               break
             end
+
+            if (object.timeout > 0 && Time.now - time > object.timeout)
+              gave_up = true
+              break
+            end
+
             sleep(object.interval)
           end
         end
 
-        if timed_out
+        if gave_up
           error_msg = "Error! Assertion `#{object.cmd}` failed"
           metadata[:toolbox].error(error_msg)
           if object.timeout_statement

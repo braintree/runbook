@@ -33,4 +33,3 @@ RSpec.describe Runbook::Views::Markdown do
     end
   end
 end
-

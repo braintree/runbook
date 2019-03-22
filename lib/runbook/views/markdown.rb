@@ -28,8 +28,11 @@ module Runbook::Views
 
     def self.runbook__statements__assert(object, output, metadata)
       output << "   run: `#{object.cmd}` every #{object.interval} seconds until it returns 0\n\n"
-      if object.timeout > 0
-        output << "   after #{object.timeout} second(s), timeout...\n\n"
+      if object.timeout > 0 || object.attempts > 0
+        timeout_msg = object.timeout > 0 ? "#{object.timeout} second(s)" : nil
+        attempts_msg = object.attempts > 0 ? "#{object.attempts} attempts" : nil
+        giveup_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, give up..."
+        output << "   #{giveup_msg}\n\n"
         if object.timeout_statement
           object.timeout_statement.render(self, output, metadata.dup)
         end
