@@ -38,7 +38,7 @@ module Runbook::Runs
               timed_out = true
               break
             end
-            sleep(interval)
+            sleep(object.interval)
           end
         end
 

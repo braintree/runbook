@@ -40,8 +40,10 @@ RSpec.describe Runbook::Runs::SSHKit do
       ).to receive(:with_ssh_config).with(ssh_config).and_call_original
       expect_any_instance_of(
         SSHKit::Backend::Abstract
-      ).to receive(:test).with(*test_args, {}).and_return(true)
-      expect(subject).to_not receive(:sleep)
+      ).to receive(:test).with(*test_args, {}).and_return(false, true)
+      expect_any_instance_of(
+        SSHKit::Backend::Abstract
+      ).to receive(:sleep).with(interval)
 
       subject.execute(object, metadata)
     end
