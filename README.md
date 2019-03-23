@@ -487,7 +487,7 @@ The following are best practices when developing your own runbooks.
 
 ### Iterative automation
 
-Runbooks allow for a very gradual transition from entirely manual operations to full automation. Runbooks can start out as a simple outline of all steps required to carry out an operation. From there, commands and prompts can be added to the runbook, actually carrying out and replacing the manual processes. 
+Runbooks allow for a very gradual transition from entirely manual operations to full automation. Runbooks can start out as a simple outline of all steps required to carry out an operation. From there, commands and prompts can be added to the runbook, actually carrying out and replacing the manual processes.
 
 Monitoring can transition from a process required by a human into something that can be codified and executed by your runbook. Eventually, the runner's `auto` flag can be used to allow the runbook to run uninterrupted without any human intervention. These runbooks can be triggered automatically in response to detected events. This will allow you to do more important things with your time, like eat ice cream.
 
@@ -505,9 +505,9 @@ customer_list = File.read("/tmp/customer_list.txt")
 
 ### Execution Best Practices
 
-As a best practice, Runbooks should always be nooped before they are run. This will allow you to catch runtime errors such as using the ask statement when running in auto mode, typos in your runbooks, and to visually confirm what will be executed. 
+As a best practice, Runbooks should always be nooped before they are run. This will allow you to catch runtime errors such as using the ask statement when running in auto mode, typos in your runbooks, and to visually confirm what will be executed.
 
-Additionally, it can be nice to have a generated view of the runbook you are executing to have a good high-level overview of the steps in the runbook. 
+Additionally, it can be nice to have a generated view of the runbook you are executing to have a good high-level overview of the steps in the runbook.
 
 ### Composing Runbooks
 
@@ -530,7 +530,7 @@ end
 
 ### Deep Nesting
 
-Because the Runbook DSL is declarative, it is generally discouraged to develop elaborate nested decision trees. For example, it is discouraged to use the `ask` statement to gather user feedback, branch on this information in a `ruby_command`, and follow completely separate sets of steps. This is because deep nesting eliminates the benefits of the declarative DSL. You can no longer noop the deeply nested structure for example. 
+Because the Runbook DSL is declarative, it is generally discouraged to develop elaborate nested decision trees. For example, it is discouraged to use the `ask` statement to gather user feedback, branch on this information in a `ruby_command`, and follow completely separate sets of steps. This is because deep nesting eliminates the benefits of the declarative DSL. You can no longer noop the deeply nested structure for example.
 
 If you are looking to make a complex decision tree, it is recommended that you do this by composing separate runbooks or entities and nooping those entities separately to ensure they work as expected. Below is an example of a few different ways to compose nested runbooks
 
