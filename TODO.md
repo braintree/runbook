@@ -1,9 +1,4 @@
 ## Desired Feature list
-
-* [X] Allow statements to take blocks to specify their arguments
-* [X] Add sanity checks for tmux support
-* [X] Add helper for registering runbooks
-* [X] Don't prompt for steps without titles
 * [] Create a generator for a runbook? Allow for custom generators?
   * Generate runbook templates
   * Generate runbook projects with Runbookfile, Gemfile, etc.
@@ -21,6 +16,7 @@
 * [] Add goto statements for repeating steps (functionality exists in paranoid mode)
 * [] Add test statement
 * [] Feedback on completion of tmux commands (when they complete, return values, outputs)
+* [] capistrano-runbook gem that integrates runbook into capistrano tasks
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
   * Test sshkit-sudo functionality
@@ -35,4 +31,3 @@
 * Be able to serve up markdown docs (web server) for easy viewing
 * Could provide a rake task for compiling and nooping runbooks?
 * Can specify input-format, output-format, input (file), and output (file)
-* background declaration for ssh_config <<- No longer supported by sshkit
