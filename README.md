@@ -842,7 +842,15 @@ env {rails_env: :production}
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
+
+To release a new version:
+
+1. Update the version number in `version.rb`.
+2. Update the changelog in `CHANGELOG.rb`.
+3. Commit changes with commit messsage: "Bump version to X.Y.Z"
+4. Run `bundle exec rake release`, which will create a git tag for the version and push git commits and tags.
+5. Push the `.gem` file in `pkg` to your gem repository
 
 ## Contributing
 
