@@ -81,7 +81,7 @@ A book is broken up into sections. Every section requires a title. Sections can 
 
 ##### Steps
 
-Steps hold state and group together a set of statements. Steps do not require titles or children. This allows runbooks to be very flexible. You can fill out steps as needed, or be terse when the behavior of the step is self-evident.
+Steps hold state and group together a set of statements. Steps do not require titles or children. This allows runbooks to be very flexible. You can fill out steps as needed, or be terse when the behavior of the step is self-evident. Steps without titles will not prompt to continue when running in paranoid mode.
 
 #### Statements
 
@@ -287,7 +287,7 @@ Tmux layouts are persisted between runs of the same runbook. As long as none of 
 
 Setters set state on the parent item, typically the containing step. Runbook comes with the following setters:
 
-**parallelization**: Specifies the SSHKit parallelization parameters for all commands in the entity. The default parallelization strategy is `:parallel`. See SSHKit for more details on these options.
+**parallelization**: Specifies the SSHKit parallelization parameters for all commands in the entity. The default parallelization strategy is `:parallel`. Other strategies include `:sequence` and `:groups`. See [SSHKit](https://github.com/capistrano/sshkit#parallel) for more details on these options.
 
 ```ruby
 parallelization strategy: :parallel, limit: 2, wait: 2
@@ -366,7 +366,7 @@ If the `ssh_kit` configuration looks familiar, that's because it's an SSHKit Con
 
 ### Configuration Files
 
-Runbook automatically loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc. 
+Runbook automatically loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc.
 
 ## Working With Runbooks
 
@@ -445,7 +445,7 @@ the runbook at runtime.
 $ HOSTS="appbox{01..30}.prod" ENV="production" runbook exec --start-at 1.2.1 my_runbook.rb
 ```
 
-### Self executable
+### Self-executable
 
 Runbooks can be written to be self-executable
 
@@ -485,7 +485,7 @@ Runbook::Runner.new(runbook).run(auto: true)
 
 The following are best practices when developing your own runbooks.
 
-### Iterative automation
+### Iterative Automation
 
 Runbooks allow for a very gradual transition from entirely manual operations to full automation. Runbooks can start out as a simple outline of all steps required to carry out an operation. From there, commands and prompts can be added to the runbook, actually carrying out and replacing the manual processes.
 
@@ -569,7 +569,7 @@ runbook = eval(File.read("my_runbook.rb"))
 
 Loading your runbook file is more ideal, but adds slight complexity. This method is prefered because the Ruby mechanism for retrieving source code does not work for code that has been `eval`ed. This means that you will not see `ruby_command` code blocks in view and noop output when using the `eval` method. You will see an "Unable to retrieve source code" message instead.
 
-### Passing State Between Entities and Statements
+### Passing State
 
 Runbook provides a number of different mechanisms for passing state throughout a runbook. For any data that is known at compile time, local variables can be used because Runbooks are lexically scoped.
 
@@ -639,7 +639,7 @@ end
 
 ### DSL Extensions
 
-You can add arbitrary keywords to your entity DSLs. For example, I could add an alias to Runbook's Book DSL as follows:
+You can add arbitrary keywords to your entity DSLs. For example, you could add an alias to Runbook's Book DSL as follows:
 
 ```ruby
 module MyRunbook::Extensions
@@ -692,7 +692,7 @@ end
 
 If you are not modifying existing methods, you can simply re-open the module to add new methods.
 
-### Augmenting Entity and Statement Functionality with Hooks
+### Augmenting Functionality With Hooks
 
 You can add `before`, `after`, or `around` hooks to any statement or entity by defining a hook on a `Run` or `View`.
 
@@ -858,7 +858,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/braint
 
 ## Feature Requests
 
-Any feature requests are always welcome and will be considered in accordance with time and need. Additionally, I have a few feature requests of my own and would appreciate anyone interested in picking them up. They are stored in TODO.md. If you choose to contribute, your contributions will be greatly appreciated.
+Any feature requests are always welcome and will be considered in accordance with time and need. Additionally, existing feature requests are tracked in TODO.md. If you choose to contribute, your contributions will be greatly appreciated.
 
 ## License
 
