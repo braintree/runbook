@@ -1,9 +1,10 @@
 ## Desired Feature list
+* [] Revise README.md
+* [] capistrano-runbook gem that integrates runbook into capistrano tasks
 * [] Create a generator for a runbook? Allow for custom generators?
   * Generate runbook templates
   * Generate runbook projects with Runbookfile, Gemfile, etc.
   * Generate plugins
-* [] Revise README.md
 * [] Add Appraisal to test against multiple versions of Ruby
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Allow for preventing echo when prompting for input
@@ -16,7 +17,7 @@
 * [] Add goto statements for repeating steps (functionality exists in paranoid mode)
 * [] Add test statement
 * [] Feedback on completion of tmux commands (when they complete, return values, outputs)
-* [] capistrano-runbook gem that integrates runbook into capistrano tasks
+* Add a way to execute a series of commands in groups
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
   * Test sshkit-sudo functionality
