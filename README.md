@@ -1,10 +1,29 @@
 # Runbook
 
-Runbook is a tool for defining runbooks using a Ruby DSL. Once your runbook is defined, you can use it to generate a formatted representation of the book or even execute the runbook interactively. You can, for example, export your runbook to markdown or use the same runbook to automatically orchestrate a fleet of servers. Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
+> Runbook is a framework for progressively automating system operations.
 
-Runbook provides two modes for evaluating your runbook once it is defined. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook such as executing commands on remote servers.
+Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to automatically orchestrate a fleet of servers.
 
-Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined to have themselves be executable. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions for handling common issues (especially when solutions cannot be easily automated).
+<div align="center">
+  <img width="600" src="images/runbook_example.gif" alt="example of a runbook" />
+</div>
+<br>
+
+Runbook provides two modes for evaluating your runbook once it is defined. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
+
+Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined to have themselves be executable. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
+
+Lastly, Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
+
+## Features
+
+* **Remote Command Execution** - Runbook lets you execute commands on remote hosts using [SSHKit](https://github.com/capistrano/sshkit)
+* **Dynamic Control Flow** - Runbooks can start execution at any step and can skip steps based on user input.
+* **Resumable** - Runbooks save their state at each step. If your runbook encounters an error, you can resume your runbook at the previous step after addressing the error.
+* **Noop and Auto Modes** - Runbooks can be executed in noop mode. This allows you to see what a runbook will do before it executes. Runbooks can be run in auto mode to eliminate the need for human interaction.
+* **Execution Lifecycle Hooks** - Runbook provides before, after, around hooks to augment its execution behavior.
+* **Tmux Integration** - Runbook integrates with [tmux](https://github.com/tmux/tmux). You can define terminal pane layouts and send commands to terminal panes.
+* **Extendable DSL** - Runbook's DSL is designed to be extendable. You can extend its DSL to add your own behavior.
 
 ## Installation
 
@@ -21,6 +40,61 @@ And then execute:
 Or install it yourself as:
 
     $ gem install runbook
+
+## Contents
+
+* [1. Runbook Anatomy](#runbook-anatomy)
+  * [1.1 Entities, Statements, and Setters](#entities-statements-and-setters)
+    * [1.1.1 Books, Sections, and Steps](#books-sections-and-steps)
+      * [1.1.1.1 Books](#books)
+      * [1.1.1.2 Sections](#sections)
+      * [1.1.1.3 Steps](#steps)
+    * [1.1.2 Statements](#statements)
+      * [1.1.2.1 Ask](#ask)
+      * [1.1.2.2 Assert](#assert)
+      * [1.1.2.3 Capture](#capture)
+      * [1.1.2.4 Command](#command)
+      * [1.1.2.5 Confirum](#confirm)
+      * [1.1.2.6 Description](#description)
+      * [1.1.2.7 Download](#download)
+      * [1.1.2.8 Layout](#layout)
+      * [1.1.2.9 Note](#note)
+      * [1.1.2.10 Notice](#notice)
+      * [1.1.2.11 Ruby Command](#ruby-command)
+      * [1.1.2.12 Tmux Command](#tmux-command)
+      * [1.1.2.13 Upload](#upload)
+      * [1.1.2.14 Wait](#wait)
+      * [1.1.2.15 Tmux Layouts](#tmux-layouts)
+    * [1.1.3 Setters](#setters)
+* [2. Configuration](#configuration)
+  * [2.1 Configuration Files](#configuration-files)
+* [3. Working With Runbooks](#working-with-runbooks)
+  * [3.1 From Within Your Project](#from-within-your-project)
+  * [3.2 Via The Command Line](#via-the-command-line)
+  * [3.3 Self-executable](#self-executable)
+* [4. Best Practices](#best-practices)
+  * [4.1 Iterative Automation](#iterative-automation)
+  * [4.2 Parameterizing Runbooks](#parameterizing-runbooks)
+  * [4.3 Execution Best Practices](#execution-best-practices)
+  * [4.4 Composing Runbooks](#composing-runbooks)
+  * [4.5 Deep Nesting](#deep-nesting)
+  * [4.6 Load Vs. Eval](#load-vs-eval)
+  * [4.7 Passing State](#passing-state)
+* [5. Extending Runbook](#extending-runbook)
+  * [5.1 Adding Runs and Views](#adding-runs-and-views)
+  * [5.2 DSL Extensions](#dsl-extensions)
+  * [5.3 Adding New Statements](#adding-new-statements)
+  * [5.4 Adding Run and View Functionality](#adding-run-and-view-functionality)
+  * [5.5 Augmenting Functionality With Hooks](#augmenting-functionality-with-hooks)
+  * [5.6 Adding New Run Behaviors](#adding-new-run-behaviors)
+  * [5.7 Adding to Runbook's Run Metadata](#adding-to-runbooks-run-metadata)
+  * [5.8 Adding to Runbook's Configuration](#adding-to-runbooks-configuration)
+* [6. Known Issues](#known-issues)
+* [7. Development](#development)
+* [8. Contributing](#contributing)
+* [9. Feature Requests](#feature-requests)
+* [10. License](#license)
+* [11. Code of Conduct](#code-of-conduct)
 
 ## Runbook Anatomy
 
@@ -87,13 +161,17 @@ Steps hold state and group together a set of statements. Steps do not require ti
 
 Statements are the workhorses of runbooks. They comprise all the behavior runbooks execute. Runbook comes with the following statements:
 
-**ask**: Prompts the user for a string and stores its value on the containing step entity. Once this statement is executed, its value is accessed as an instance variable under the `into` parameter. This value can be referenced in later statements such as the `ruby_command` statement.
+##### Ask
+
+Prompts the user for a string and stores its value on the containing step entity. Once this statement is executed, its value is accessed as an instance variable under the `into` parameter. This value can be referenced in later statements such as the `ruby_command` statement.
 
 ```ruby
 ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100"
 ```
 
-**assert**: Runs the provided `cmd` repeatedly until it returns true. A timeout can be set and a command to be run if a timeout occurs. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
+##### Assert
+
+Runs the provided `cmd` repeatedly until it returns true. A timeout can be set and a command to be run if a timeout occurs. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
 
 ```ruby
 assert(
@@ -110,25 +188,33 @@ assert(
 )
 ```
 
-**capture**: Runs the provided `cmd` and captures its output into `into`. An optional `ssh_config` can be specified to configure how the capture command gets run. Capture commands take an optional `strip` parameter that indicates if the returned output should have leading and trailing whitespace removed. Capture commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
+##### Capture
+
+Runs the provided `cmd` and captures its output into `into`. An optional `ssh_config` can be specified to configure how the capture command gets run. Capture commands take an optional `strip` parameter that indicates if the returned output should have leading and trailing whitespace removed. Capture commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
 
 ```ruby
 capture %Q{wc -l file.txt | cut -d " " -f 1}, into: :num_lines, strip: true, ssh_config: {user: "root"}
 ```
 
-**command**: Runs the provided `cmd`. An optional `ssh_config` can be specified to configure how the command gets run. Commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
+##### Command
+
+Runs the provided `cmd`. An optional `ssh_config` can be specified to configure how the command gets run. Commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
 
 ```ruby
 command "service nginx start", ssh_config: {servers: ["host1.prod", "host2.prod"], parallelization: {strategy: :groups}}
 ```
 
-**confirm**: Proposes the prompt to the user and exits if the user does not confirm the prompt.
+##### Confirm
+
+Proposes the prompt to the user and exits if the user does not confirm the prompt.
 
 ```ruby
 confirm "Asset requests have started trickling to the box"
 ```
 
-**description**: Prints the description in an unformatted manner to the user
+##### Description
+
+Prints the description in an unformatted manner to the user
 
 ```ruby
 description <<-DESC
@@ -137,13 +223,17 @@ additional formatting.
 DESC
 ```
 
-**download**: Downloads the specified file to `to`. An optional `ssh_config` can be specified to configure how the download command gets run, for example specifying the remote host and remote directory to download from. Optional `options` can be specified that get passed down to the underlying sshkit implementation
+##### Download
+
+Downloads the specified file to `to`. An optional `ssh_config` can be specified to configure how the download command gets run, for example specifying the remote host and remote directory to download from. Optional `options` can be specified that get passed down to the underlying sshkit implementation
 
 ```ruby
 download /home/pblesi/rad_file.txt, to: my_rad_file.txt, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
 ```
 
-**layout**: Define a tmux layout to be used by your runbook. When executing the runbook, the specified layout will be initialized. This statement can only be specified at the book level. See [Tmux Layouts](#tmux-layouts) for more details.
+##### Layout
+
+Defines a tmux layout to be used by your runbook. When executing the runbook, the specified layout will be initialized. This statement can only be specified at the book level. See [Tmux Layouts](#tmux-layouts) for more details.
 
 ```ruby
 layout [[
@@ -152,19 +242,25 @@ layout [[
 ]]
 ```
 
-**note**: Print a short note to the user.
+##### Note
+
+Prints a short note to the user.
 
 ```ruby
 note "This operation kills all zombie processes"
 ```
 
-**notice**: Print out an important message to the user.
+##### Notice
+
+Prints out an important message to the user.
 
 ```ruby
 notice "There be dragons!"
 ```
 
-**ruby_command**: Executes its block in the context of the parent step. The block is passed the ruby_command statement and the execution metadata as arguments.
+##### Ruby Command
+
+Executes its block in the context of the parent step. The block is passed the ruby_command statement and the execution metadata as arguments.
 
 ```ruby
 ruby_command do |rb_cmd, metadata|
@@ -175,18 +271,6 @@ ruby_command do |rb_cmd, metadata|
   end
   notice "Email sent!"
 end
-```
-
-**tmux_command**: Runs the provided `cmd` in the specified `pane`.
-
-```ruby
-tmux_command "tail -Fn 100 /var/log/nginx.log", :monitor_1
-```
-
-**upload**: Uploads the specified file to `to`. An optional `ssh_config` can be specified to configure how the upload command gets run, for example specifying the remote host and remote directory to upload to. Optional `options` can be specified that get passed down to the underlying sshkit implementation
-
-```ruby
-upload my_secrets.yml, to: secrets.yml, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
 ```
 
 Metadata at execution time is structured as follows:
@@ -217,7 +301,25 @@ Additional methods that the `ruby_command` block has access to are:
  * `metadata[:toolbox].error(msg)`: output error text to the user
  * `metadata[:toolbox].exit(return_value)`: exit the process with the specified response code
 
-**wait**: Sleep for the specified amount of time (in seconds)
+##### Tmux Command
+
+Runs the provided `cmd` in the specified `pane`.
+
+```ruby
+tmux_command "tail -Fn 100 /var/log/nginx.log", :monitor_1
+```
+
+##### Upload
+
+Uploads the specified file to `to`. An optional `ssh_config` can be specified to configure how the upload command gets run, for example specifying the remote host and remote directory to upload to. Optional `options` can be specified that get passed down to the underlying sshkit implementation
+
+```ruby
+upload my_secrets.yml, to: secrets.yml, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
+```
+
+##### Wait
+
+Sleeps for the specified amount of time (in seconds)
 
 ```ruby
 wait 5
