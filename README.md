@@ -54,7 +54,7 @@ Or install it yourself as:
       * [1.1.2.2 Assert](#assert)
       * [1.1.2.3 Capture](#capture)
       * [1.1.2.4 Command](#command)
-      * [1.1.2.5 Confirum](#confirm)
+      * [1.1.2.5 Confirm](#confirm)
       * [1.1.2.6 Description](#description)
       * [1.1.2.7 Download](#download)
       * [1.1.2.8 Layout](#layout)
