@@ -18,6 +18,7 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 * Fix bug in Thor usage
 * Fix config file load ordering to support extending configuration
+* Fix bug preventing assert statement from checking multiple times
 
 ### New Features
 
