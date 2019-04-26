@@ -171,7 +171,7 @@ ask "What percentage of requests are failing?", into: :failing_request_percentag
 
 ##### Assert
 
-Runs the provided `cmd` repeatedly until it returns true. A timeout can be set and a command to be run if a timeout occurs. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
+Runs the provided `cmd` repeatedly until it returns true. A timeout and maximum number of attempts can be set. You can specify a command to be run if a timeout occurs or the maximum number of attempts is hit. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
 
 ```ruby
 assert(
@@ -180,6 +180,7 @@ assert(
   cmd_raw: false,
   interval: 3, # seconds
   timeout: 300, # seconds
+  attempts: 3,
   timeout_statement: Runbook::Statements::Command.new(
     "echo 'help' | mail -s 'need help' page-me@page-me.com",
     ssh_config: {servers: [:local], parallelization: {strategy: :parallel}},
