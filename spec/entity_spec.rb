@@ -43,5 +43,32 @@ RSpec.describe Runbook::Entity do
       expect(other_entity.parent).to eq(entity)
     end
   end
+
+  describe "#dynamic" do
+    it "marks the current entity as dynamic" do
+      entity.dynamic!
+      expect(entity.dynamic?).to be_truthy
+    end
+
+    it "marks the current entity's children as dynamic" do
+      entity.add(Runbook::Entity.new(""))
+      entity.add(Runbook::Entity.new(""))
+      entity.dynamic!
+      entity.items.each do |item|
+        expect(item.dynamic?).to be_truthy
+      end
+    end
+
+    it "marks the current entity's grand children as dynamic" do
+      child = Runbook::Entity.new("")
+      entity.add(child)
+      child.add(Runbook::Entity.new(""))
+      child.add(Runbook::Statements::Note.new("note"))
+      entity.dynamic!
+      child.items.each do |item|
+        expect(item.dynamic?).to be_truthy
+      end
+    end
+  end
 end
 

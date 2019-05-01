@@ -422,6 +422,67 @@ RSpec.describe "runbook run", type: :aruba do
           end
         end
 
+        context "when re-running a step with dynamic statements" do
+          let(:content) do
+            <<-RUNBOOK
+            runbook = Runbook.book "#{book_title}" do
+              n = 1
+              section "First Section" do
+                step "Jump to me" do
+                  ruby_command { note "hi \#{n}"; n += 1 }
+                end
+
+                step "Another step" do
+                  note "jump above"
+                end
+              end
+            end
+            RUNBOOK
+          end
+
+          it "overwrites previously defined dynamic commands that have been run" do
+            type("c\nj\n1.1\nP")
+
+            bad_regex = /Note: hi 1.*Note: hi 1/m
+            expect(last_command_started).to_not have_output(bad_regex)
+            good_regex = /Note: hi 1.*Note: hi 2/m
+            expect(last_command_started).to have_output(good_regex)
+          end
+        end
+
+        context "when re-running a step with dynamic entities" do
+          let(:content) do
+            <<-RUNBOOK
+            dynamic_step = Runbook.step "dynamic step title" do
+              note "dynamic step note"
+            end
+
+            runbook = Runbook.book "#{book_title}" do
+              section "First Section" do
+                step "Jump to me" do
+                  ruby_command { add dynamic_step }
+                end
+
+                step "Another step" do
+                  note "jump above"
+                end
+              end
+            end
+            RUNBOOK
+          end
+
+          it "overwrites previously defined dynamic entities that have been run" do
+            type("c\nc\nj\n1.1\nP")
+
+            bad_regex = /Note: dynamic step note.*Note: dynamic step note/m
+            expect(last_command_started).to_not have_output(bad_regex)
+            bad_regex = /dynamic step title.*dynamic step title/m
+            expect(last_command_started).to_not have_output(bad_regex)
+            good_regex = /Note: dynamic step note.*jump above/m
+            expect(last_command_started).to have_output(good_regex)
+          end
+        end
+
         context "when jumping to the beginning of the book" do
           it "re-execute's the book's description" do
             type("j\n2.2\nj\n0\nP")

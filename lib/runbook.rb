@@ -23,6 +23,8 @@ require "runbook/util/runbook"
 require "runbook/util/sticky_hash"
 require "runbook/util/stored_pose"
 
+require "runbook/node"
+
 require "runbook/entity"
 require "runbook/entities/book"
 require "runbook/entities/section"

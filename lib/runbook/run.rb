@@ -152,6 +152,7 @@ module Runbook
         parent_items = object.parent.items
         remaining_items = parent_items.slice!(next_index..-1)
         object.parent.dsl.instance_exec(object, metadata, &object.block)
+        parent_items[next_index..-1].each { |item| item.dynamic! }
         parent_items.push(*remaining_items)
       end
 

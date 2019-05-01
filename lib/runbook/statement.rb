@@ -1,5 +1,5 @@
 module Runbook
-  class Statement
+  class Statement < Node
     include Runbook::Hooks::Invoker
 
     attr_accessor :parent
@@ -11,9 +11,12 @@ module Runbook
     end
 
     def run(run, metadata)
+      return if dynamic? && visited?
+
       invoke_with_hooks(run, self, metadata) do
         run.execute(self, metadata)
       end
+      self.visited!
     end
   end
 end

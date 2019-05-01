@@ -1,5 +1,5 @@
 module Runbook
-  class Entity
+  class Entity < Node
     include Runbook::Hooks::Invoker
     const_set(:DSL, Runbook::DSL.class)
 
@@ -49,6 +49,7 @@ module Runbook
 
     def run(run, metadata)
       return if _should_reverse?(run, metadata)
+      return if dynamic? && visited?
 
       invoke_with_hooks(run, self, metadata) do
         run.execute(self, metadata)
@@ -68,6 +69,12 @@ module Runbook
           end
         end
       end
+      self.visited!
+    end
+
+    def dynamic!
+      items.each(&:dynamic!)
+      @dynamic = true
     end
 
     def _render_metadata(items, item, metadata, index)
