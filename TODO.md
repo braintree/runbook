@@ -8,7 +8,6 @@
 * [] Add Appraisal to test against multiple versions of Ruby
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Allow for preventing echo when prompting for input
-* [] Render ssh_config for runs
 * [] Add an ability for skipping mutation commands that will have an affect on the system
 * [] Add a revert section that does not get executed, but can be executed by passing a revert flag
 * [] Specify version in runbook to allow for supporting backwards incompatible runbook DSL format changes
@@ -17,6 +16,8 @@
 * [] Add goto statements for repeating steps (functionality exists in paranoid mode)
 * [] Add test statement
 * [] Feedback on completion of tmux commands (when they complete, return values, outputs)
+* [] Add shorter aliases for tmux layout keys
+* [] Add host aliases for ssh_config setters
 * Add a way to execute a series of commands in groups
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
