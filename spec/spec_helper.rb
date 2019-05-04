@@ -16,4 +16,8 @@ RSpec.configure do |config|
   end
 
   config.include Factory
+
+  config.before(:suite) do
+    Runbook.configure
+  end
 end

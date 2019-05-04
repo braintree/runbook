@@ -49,6 +49,15 @@ module Factory
         attrs[:cmd],
         into: attrs[:into],
       )
+    when :capture_all
+      attrs = {
+        cmd: "echo 'hi'",
+        into: :result,
+      }.merge!(overrides)
+      return Runbook::Statements::CaptureAll.new(
+        attrs[:cmd],
+        into: attrs[:into],
+      )
     when :command
       attrs = {
         cmd: "echo 'hi'",

@@ -53,18 +53,19 @@ Or install it yourself as:
       * [1.1.2.1 Ask](#ask)
       * [1.1.2.2 Assert](#assert)
       * [1.1.2.3 Capture](#capture)
-      * [1.1.2.4 Command](#command)
-      * [1.1.2.5 Confirm](#confirm)
-      * [1.1.2.6 Description](#description)
-      * [1.1.2.7 Download](#download)
-      * [1.1.2.8 Layout](#layout)
-      * [1.1.2.9 Note](#note)
-      * [1.1.2.10 Notice](#notice)
-      * [1.1.2.11 Ruby Command](#ruby-command)
-      * [1.1.2.12 Tmux Command](#tmux-command)
-      * [1.1.2.13 Upload](#upload)
-      * [1.1.2.14 Wait](#wait)
-      * [1.1.2.15 Tmux Layouts](#tmux-layouts)
+      * [1.1.2.4 Capture All](#capture-all)
+      * [1.1.2.5 Command](#command)
+      * [1.1.2.6 Confirm](#confirm)
+      * [1.1.2.7 Description](#description)
+      * [1.1.2.8 Download](#download)
+      * [1.1.2.9 Layout](#layout)
+      * [1.1.2.10 Note](#note)
+      * [1.1.2.11 Notice](#notice)
+      * [1.1.2.12 Ruby Command](#ruby-command)
+      * [1.1.2.13 Tmux Command](#tmux-command)
+      * [1.1.2.14 Upload](#upload)
+      * [1.1.2.15 Wait](#wait)
+      * [1.1.2.16 Tmux Layouts](#tmux-layouts)
     * [1.1.3 Setters](#setters)
 * [2. Configuration](#configuration)
   * [2.1 Configuration Files](#configuration-files)
@@ -195,6 +196,14 @@ Runs the provided `cmd` and captures its output into `into`. An optional `ssh_co
 
 ```ruby
 capture %Q{wc -l file.txt | cut -d " " -f 1}, into: :num_lines, strip: true, ssh_config: {user: "root"}
+```
+
+##### Capture All
+
+Accepts the same parameters as `capture`, but returns a hash of server names to capture results. `capture_all` should be used whenever multiple servers are specified because the returned result of `capture` is non-deterministic when specifying multiple servers.
+
+```ruby
+capture_all %Q{wc -l file.txt | cut -d " " -f 1}, into: :num_lines, strip: true, ssh_config: {servers: ["host1.stg", "host2.stg"]}
 ```
 
 ##### Command

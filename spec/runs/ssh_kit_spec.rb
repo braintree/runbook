@@ -776,6 +776,215 @@ RSpec.describe Runbook::Runs::SSHKit do
     end
   end
 
+  describe "runbook__entities__capture_all" do
+    let (:cmd) { "echo 'hi'" }
+    let (:into) { :result }
+    let(:cmd_result) { "hi" }
+    let(:capture_result) { {"localhost" => "hi"} }
+    let (:object) { Runbook::Statements::CaptureAll.new(cmd, into: into) }
+
+    before(:each) do
+      allow(toolbox).to receive(:output)
+    end
+
+    it "captures cmd" do
+      capture_opts = {strip: true, verbosity: Logger::INFO}
+      capture_args = [:echo, "'hi'", capture_opts]
+      ssh_config = object.parent.ssh_config
+      expect(
+        subject
+      ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+      expect_any_instance_of(
+        SSHKit::Backend::Abstract
+      ).to receive(:capture).with(*capture_args).and_return(cmd_result)
+
+      subject.execute(object, metadata)
+      expect(object.parent.send(into)).to eq(capture_result)
+    end
+
+    context "with ssh_config set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}}
+      end
+      let (:object) do
+        Runbook::Statements::CaptureAll.new(
+          cmd,
+          into: into,
+          ssh_config: ssh_config,
+        )
+      end
+
+      it "uses the ssh_config" do
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = [:echo, "'hi'", capture_opts]
+        expect(
+          subject
+        ).to receive(:with_ssh_config).with(ssh_config).and_call_original
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with user and enable_sudo_prompt set" do
+      let(:ssh_config) do
+        {servers: ["host.stg"], parallelization: {}, user: "root"}
+      end
+      let (:object) do
+        Runbook::Statements::CaptureAll.new(
+          cmd,
+          into: into,
+          ssh_config: ssh_config,
+        )
+      end
+
+      before(:each) do
+        allow(
+          Runbook.configuration
+        ).to receive(:enable_sudo_prompt).and_return(true)
+      end
+
+      it "uses the ::SSHKit::Sudo::InteractionHandler" do
+        capture_args = [:echo, "'hi'"]
+        options = subject.ssh_kit_command_options(ssh_config)
+        expect(subject).to receive(:ssh_kit_command_options).with(ssh_config).and_return(options)
+        capture_options = {
+          interaction_handler: options[:interaction_handler],
+          strip: true,
+          verbosity: Logger::INFO,
+        }
+        # Needed for sudo check
+        expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args, capture_options).and_return(true)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with raw true" do
+      let(:raw) { true }
+      let (:object) do
+        Runbook::Statements::CaptureAll.new(cmd, into: into, raw: raw)
+      end
+
+      it "executes the raw command string" do
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = ["echo 'hi'", capture_opts]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+    end
+
+    context "with strip false" do
+      let(:strip) { false }
+      let (:object) do
+        Runbook::Statements::CaptureAll.new(cmd, into: into, strip: strip)
+      end
+
+      it "executes the raw command string" do
+        capture_opts = {strip: false, verbosity: Logger::INFO}
+        capture_args = [:echo, "'hi'", capture_opts]
+        expect_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args)
+
+        subject.execute(object, metadata)
+      end
+
+      context "with user and enable_sudo_prompt set" do
+        let(:ssh_config) do
+          {servers: ["host.stg"], parallelization: {}, user: "root"}
+        end
+        let (:object) do
+          Runbook::Statements::CaptureAll.new(
+            cmd,
+            into: into,
+            strip: strip,
+            ssh_config: ssh_config,
+          )
+        end
+
+        before(:each) do
+          allow(
+            Runbook.configuration
+          ).to receive(:enable_sudo_prompt).and_return(true)
+        end
+
+        it "uses the ::SSHKit::Sudo::InteractionHandler and strip: false" do
+          capture_args = [:echo, "'hi'"]
+          options = subject.ssh_kit_command_options(ssh_config)
+          expect(subject).to receive(:ssh_kit_command_options).with(ssh_config).and_return(options)
+          capture_options = {
+            interaction_handler: options[:interaction_handler],
+            strip: false,
+            verbosity: Logger::INFO,
+          }
+          # Needed for sudo check
+          expect_any_instance_of(SSHKit::Backend::Abstract).to receive(:execute).once
+          expect_any_instance_of(
+            SSHKit::Backend::Abstract
+          ).to receive(:capture).with(*capture_args, capture_options).and_return(true)
+
+          subject.execute(object, metadata)
+        end
+      end
+    end
+
+    context "noop" do
+      let(:metadata_override) { {noop: true} }
+
+      it "outputs the noop text for the capture_all statement" do
+        msg = "[NOOP] Capture: `#{cmd}` into #{into}"
+        expect(toolbox).to receive(:output).with(msg)
+        expect(subject).to_not receive(:with_ssh_config)
+
+        subject.execute(object, metadata)
+      end
+
+      context "when ssh_config is specified" do
+        let(:ssh_config) do
+          {
+            servers: ["host1.stg", "host2.stg"],
+            parallelization: {},
+            user: "root",
+            group: "root",
+            path: "/home",
+            env: {rails_env: :production},
+            umask: "077",
+          }
+        end
+        let (:object) do
+          Runbook::Statements::CaptureAll.new(
+            cmd,
+            into: :destination,
+            ssh_config: ssh_config
+          )
+        end
+
+        it "outputs the noop ssh config for the capture statement" do
+          msg1  = "   on: host1.stg, host2.stg\n"
+          msg1 += "   as: user: root group: root\n"
+          msg1 += "   within: /home\n"
+          msg1 += "   with: RAILS_ENV=production\n"
+          msg1 += "   umask: 077\n"
+          expect(toolbox).to receive(:output).with(msg1)
+          msg2 = "[NOOP] Capture: `#{cmd}` into destination"
+          expect(toolbox).to receive(:output).with(msg2)
+          expect(subject).to_not receive(:with_ssh_config)
+
+          subject.execute(object, metadata)
+        end
+      end
+    end
+  end
+
   describe "runbook__entities__download" do
     let (:from) { "/var/log/auth.log" }
     let (:to) { "auth.log" }

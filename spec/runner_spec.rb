@@ -549,6 +549,9 @@ Killing all opened tmux panes...
       allow_any_instance_of(Runbook::Toolbox).to receive(:output) do |instance, msg|
         output.puts(msg)
       end
+      allow_any_instance_of(Runbook::Toolbox).to receive(:warn) do |instance, msg|
+        output.puts(msg)
+      end
     end
 
     it "exposes ivars between ruby_command blocks" do
@@ -939,11 +942,102 @@ Step 1.1:
 
 Capturing output of `echo 'hi!'`
 
+
 Section 2: Section 2
 
 Step 2.1:
 
 Note: hi!
+
+OUTPUT
+      end
+
+      context "when multiple servers are specified" do
+        let(:book) do
+          Runbook.book "My Book" do
+            section "My Section" do
+              step do
+                servers "host1.prod", "host2.prod"
+                capture "echo 'hi!'", into: :capture_result
+              end
+            end
+          end
+        end
+
+        it "warns that capture only supports one server" do
+          allow_any_instance_of(
+            SSHKit::Backend::Abstract
+          ).to receive(:capture).and_return(result)
+
+          runner.run(run: run, paranoid: false)
+
+          expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Section 1: My Section
+
+Step 1.1:
+
+
+Capturing output of `echo 'hi!'`
+
+Warning: `capture` does not support multiple servers. Use `capture_all` instead.
+
+OUTPUT
+        end
+      end
+    end
+
+    context "capture_all command" do
+      let(:book) do
+        Runbook.book "My Book" do
+          section "My Section" do
+            step do
+              servers "host1.prod", "host2.prod"
+
+              capture_all "echo $HOSTNAME", into: :capture_result
+            end
+          end
+
+          section "Section 2" do
+            step do
+              ruby_command do |_, metadata|
+                note metadata[:repo][:capture_result]["host1.prod"]
+                note metadata[:repo][:capture_result]["host2.prod"]
+              end
+            end
+          end
+        end
+      end
+
+      it "captures cmd on all hosts" do
+        capture_opts = {strip: true, verbosity: Logger::INFO}
+        capture_args = [:echo, "$HOSTNAME", capture_opts]
+        allow_any_instance_of(
+          SSHKit::Backend::Abstract
+        ).to receive(:capture).with(*capture_args).and_wrap_original do |m, args|
+          m.receiver.host.hostname
+        end
+
+        runner.run(run: run, paranoid: false)
+
+        expect(output.string).to eq(<<-OUTPUT)
+Executing My Book...
+
+Section 1: My Section
+
+Step 1.1:
+
+
+Capturing output of `echo $HOSTNAME`
+
+
+Section 2: Section 2
+
+Step 2.1:
+
+Note: host1.prod
+Note: host2.prod
 
 OUTPUT
       end

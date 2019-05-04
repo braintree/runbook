@@ -64,6 +64,34 @@ module Runbook::Runs
       end
 
       def runbook__statements__capture(object, metadata)
+        _handle_capture(object, metadata) do |ssh_config, capture_args, capture_options|
+          if (ssh_config[:servers].size > 1)
+            warn_msg = "Warning: `capture` does not support multiple servers. Use `capture_all` instead.\n"
+            metadata[:toolbox].warn(warn_msg)
+          end
+
+          result = ""
+          with_ssh_config(ssh_config) do
+            result = capture(*capture_args, capture_options)
+          end
+          result
+        end
+      end
+
+      def runbook__statements__capture_all(object, metadata)
+        _handle_capture(object, metadata) do |ssh_config, capture_args, capture_options|
+          result = {}
+          mutex = Mutex.new
+          with_ssh_config(ssh_config) do
+            hostname = self.host.hostname
+            capture_result = capture(*capture_args, capture_options)
+            mutex.synchronize { result[hostname] = capture_result }
+          end
+          result
+        end
+      end
+
+      def _handle_capture(object, metadata, &block)
         ssh_config = find_ssh_config(object)
 
         if metadata[:noop]
@@ -80,12 +108,10 @@ module Runbook::Runs
         capture_options[:strip] = object.strip
         capture_options[:verbosity] = Logger::INFO
 
-        capture_msg = "Capturing output of `#{object.cmd}`"
+        capture_msg = "Capturing output of `#{object.cmd}`\n\n"
         metadata[:toolbox].output(capture_msg)
-        result = ""
-        with_ssh_config(ssh_config) do
-          result = capture(*capture_args, capture_options)
-        end
+
+        result = block.call(ssh_config, capture_args, capture_options)
 
         target = object.parent.dsl
         target.singleton_class.class_eval { attr_accessor object.into }

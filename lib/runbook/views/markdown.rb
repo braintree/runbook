@@ -44,6 +44,10 @@ module Runbook::Views
       output << "   capture: `#{object.cmd}` into #{object.into}\n\n"
     end
 
+    def self.runbook__statements__capture_all(object, output, metadata)
+      output << "   capture_all: `#{object.cmd}` into #{object.into}\n\n"
+    end
+
     def self.runbook__statements__command(object, output, metadata)
       output << "   run: `#{object.cmd}`\n\n"
     end

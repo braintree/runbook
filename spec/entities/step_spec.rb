@@ -12,7 +12,7 @@ RSpec.describe Runbook::Entities::Step do
     expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
   end
 
-  complex_arg_statements = ["ask", "ruby_command", "capture", "tmux_command", "upload"]
+  complex_arg_statements = ["ask", "ruby_command", "capture", "capture_all", "tmux_command", "upload"]
   statements = Runbook.statements.map do |klass|
     klass.to_s.split("::")[-1].underscore
   end
