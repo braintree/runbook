@@ -30,6 +30,12 @@ Lastly, Runbook provides an extendable interface for augmenting the DSL and defi
 * **Tmux Integration** - Runbook integrates with [tmux](https://github.com/tmux/tmux). You can define terminal pane layouts and send commands to terminal panes.
 * **Extendable DSL** - Runbook's DSL is designed to be extendable. You can extend its DSL to add your own behavior.
 
+## Use Cases
+
+Runbook is a very flexible tool. Though it can solve a myriad of problems, Runbook is best used for removing the need for repeated, rote developer operations. Runbook allows developers to execute processes at a higher level than that of individual command-line commands. Additionally, Runbook provides features to simply and safely execute operations in mission-critical environments.
+
+Runbook is not intended to replace more special-purpose automation solutions such as configuration management solutions (Puppet, Chef, Ansible, Salt), deployment solutions (Capistrano, Kubernetes, Docker Swarm), monitoring solutions (Nagios, Datadog), or local command execution (shell scripts, Rake tasks, Make). Instead Runbook is best used as a glue when needing to accomplish a task that cuts across these domains.
+
 ## Installation
 
 Add this line to your application's Gemfile:
