@@ -2,16 +2,16 @@
 
 > Runbook is a framework for progressively automating system operations.
 
-Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to automatically orchestrate a fleet of servers.
+Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to execute commands on remote servers.
 
 <div align="center">
   <img width="600" src="images/runbook_example.gif" alt="example of a runbook" />
 </div>
 <br>
 
-Runbook provides two modes for evaluating your runbook once it is defined. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
+Runbook provides two modes for evaluating your runbook. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
 
-Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined to have themselves be executable. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
+Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined as self-executable scripts. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
 
 Lastly, Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
 
@@ -294,7 +294,7 @@ Metadata at execution time is structured as follows:
   noop: false, # A boolean indicating if you are running in noop mode. ruby_command blocks are never evaluated in noop mode
   auto: false, # A boolean indicating if you are running in auto mode
   paranoid: true, # A boolean indicating if you are running in paranoid mode (prompting before each step)
-  start_at: 0, # A string representing the string where nodes should start being processed
+  start_at: 0, # A string representing the step where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
   layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to
   repo: {}, # A repository for storing data and retrieving it between ruby_commands. Any data stored in the repo is persisted if a runbook is stopped and later resumed.
@@ -666,14 +666,12 @@ The first delegation `add carrots_book` adds the book to the execution tree of t
 
 ### Load vs. Eval
 
-When loading your runbooks from files, you have two options at your disposal:
+Runbooks can be loaded from files using `load` or `eval`:
 
 ```ruby
 load "my_runbook.rb"
 runbook = Runbook.books.last # Runbooks register themselves to Runbook.books when they are defined
 ```
-
-and
 
 ```ruby
 runbook = eval(File.read("my_runbook.rb"))
@@ -725,7 +723,7 @@ Be careful with your naming of instance variables as it is possible to clobber t
 
 ## Extending Runbook
 
-Runbook is built from the ground up to be extendable.
+Runbook can be extended to add custom functionality.
 
 ### Adding Runs and Views
 
@@ -830,7 +828,7 @@ When starting at a certain position in the runbook, hooks for any preceding sect
 
 ### Adding New Run Behaviors
 
-Every Entity and Statement gets access to a Toolbox in `metatada[:toolbox]`. This toolbox is used to provide methods with side effects (such as printing messages) when rendering and running your runbooks. Addtional behaviors can be added to the toolbox by prepending `Runbook::Toolbox`.
+Every Entity and Statement gets access to a Toolbox in `metatada[:toolbox]`. This toolbox is used to provide methods with side effects (such as printing messages) when rendering and running your runbooks. Additional behaviors can be added to the toolbox by prepending `Runbook::Toolbox`.
 
 ```ruby
 module MyRunbook::Extensions
@@ -885,7 +883,7 @@ end
 
 ### Adding to Runbook's Configuration
 
-You can add additional configuration to Runbook's configuration by prepending to Runbook::Configuration.
+You can add additional configuration to Runbook's configuration by prepending Runbook::Configuration.
 
 ```ruby
 module MyRunbook::Extensions
@@ -926,7 +924,7 @@ Alternatively, if you wish to avoid issues with SSHKit command wrapping, you can
 
 ### Specifying env values
 
-When specifying the env for running commands, if you place curly braces `{}` around the env values, it is required to enclose the arguments in parenthesis `()`, otherwise the following syntax error will result:
+When specifying the `env` for running commands, if you place curly braces `{}` around the env values, it is required to enclose the arguments in parenthesis `()`, otherwise the following syntax error will result:
 
 ```
 syntax error, unexpected ':', expecting '}' (SyntaxError)
@@ -938,13 +936,13 @@ Env should be specified as:
 env rails_env: :production
 ```
 
-or:
+or
 
 ```
 env ({rails_env: :production})
 ```
 
-not as:
+not as
 
 ```
 env {rails_env: :production}
@@ -960,7 +958,7 @@ To release a new version:
 
 1. Update the version number in `version.rb`.
 2. Update the changelog in `CHANGELOG.rb`.
-3. Commit changes with commit messsage: "Bump version to X.Y.Z"
+3. Commit changes with commit messsage: "Bump runbook version to X.Y.Z"
 4. Run `bundle exec rake release`, which will create a git tag for the version and push git commits and tags.
 5. Push the `.gem` file in `pkg` to your gem repository
 
