@@ -954,6 +954,8 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
+To execute runbook using this repo, run `bundle exec exe/runbook exec samples/layout_runbook.rb`.
+
 To release a new version:
 
 1. Update the version number in `version.rb`.
