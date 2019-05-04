@@ -11,6 +11,11 @@ Runbook provides a DSL for specifying a series of steps to execute an operation.
 
 Runbook provides two modes for evaluating your runbook. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
 
+<div align="center">
+  <img width="600" src="images/runbook_execution_modes.png" alt="diagram of execution modes" />
+</div>
+<br>
+
 Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined as self-executable scripts. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
 
 Lastly, Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
@@ -130,6 +135,13 @@ it starts successfully
   end
 end
 ```
+
+Hierarchically, a runbook looks like this:
+
+<div align="center">
+  <img width="600" src="images/runbook_anatomy_diagram.png" alt="diagram of a runbook" />
+</div>
+<br>
 
 ### Entities, Statements, and Setters
 
