@@ -4,6 +4,17 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.12.0` (2019-05-16)
+
+### Fixes:
+
+* Fix jump backwards dynamic statement bug
+
+### New Features
+
+* Add attempts counter to assert statement
+* Add capture_all statement
+
 ## `v0.11.0` (2019-03-26)
 
 ### Breaking Changes:
