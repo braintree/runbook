@@ -25,15 +25,23 @@ module Runbook
     long_desc <<-LONGDESC
       Executes the runbook.
 
-      With --noop (-n), Runs the runbook in no-op mode, preventing commands from executing.
+      With --noop (-n),        Runs the runbook in no-op mode, preventing
+                               commands from executing.
 
-      With --auto (-a), Runs the runbook in auto mode. This will prevent the execution from asking for any user input (such as confirmations). Not all runbooks are compatible with auto mode (if they use the ask statement for example).
+      With --auto (-a),        Runs the runbook in auto mode. This
+                               will prevent the execution from asking
+                               for any user input (such as confirmations).
+                               Not all runbooks are compatible with auto
+                               mode (if they use the ask statement without
+                               defaults for example).
 
-      With --run (-r), Runs the runbook with the specified run type
+      With --run (-r),         Runs the runbook with the specified run type
 
-      With --no-paranoid (-P), Runs the runbook without prompting to continue at every step
+      With --no-paranoid (-P), Runs the runbook without prompting to
+                               continue at every step
 
-      With --start-at (-s), Runs the runbook starting at the specified section or step.
+      With --start-at (-s),    Runs the runbook starting at the specified
+                               section or step.
     LONGDESC
     option :run, aliases: :r, type: :string, default: :ssh_kit
     option :noop, aliases: :n, type: :boolean
