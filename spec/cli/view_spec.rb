@@ -85,7 +85,7 @@ RSpec.describe "runbook view", type: :aruba do
       context "when config does not exist" do
         let(:command) { "runbook view --config unknown #{runbook_file}" }
         let(:unknown_file_output) {
-          "view: cannot access unknown: No such file or directory"
+          "cannot access config file unknown: No such file or directory"
         }
 
         it "prints an unknown file message" do

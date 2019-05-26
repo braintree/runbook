@@ -6,6 +6,12 @@ module Runbook
     map "--version" => :__print_version
     class_option :config, aliases: :c, type: :string
 
+    def initialize(args = [], local_options = {}, config = {})
+      super(args, local_options, config)
+
+      _set_cli_config(options[:config]) if options[:config]
+    end
+
     desc "view RUNBOOK", "Prints a formatted version of the runbook"
     long_desc <<-LONGDESC
       Prints the runbook.
@@ -14,7 +20,6 @@ module Runbook
     LONGDESC
     option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
-      _set_cli_config(options[:config], :view) if options[:config]
       runbook = _retrieve_runbook(runbook, :view)
       puts Runbook::Viewer.new(runbook).generate(
         view: options[:view],
@@ -49,7 +54,6 @@ module Runbook
     option :"no-paranoid", aliases: :P, type: :boolean
     option :start_at, aliases: :s, type: :string, default: "0"
     def exec(runbook)
-      _set_cli_config(options[:config], :exec) if options[:config]
       runbook = _retrieve_runbook(runbook, :exec)
       Runbook::Runner.new(runbook).run(
         run: options[:run],
@@ -67,9 +71,9 @@ module Runbook
 
     private
 
-    def _set_cli_config(config, cmd)
+    def _set_cli_config(config)
       unless File.exist?(config)
-        raise Thor::InvocationError, "#{cmd}: cannot access #{config}: No such file or directory"
+        raise Thor::InvocationError, "cannot access config file #{config}: No such file or directory"
       end
       Runbook::Configuration.cli_config_file = config
     end
