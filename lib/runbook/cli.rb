@@ -6,11 +6,11 @@ module Runbook
     map "--version" => :__print_version
     class_option :config, aliases: :c, type: :string
 
-    desc "view RUNBOOK", "Generates a formatted version of the runbook"
+    desc "view RUNBOOK", "Prints a formatted version of the runbook"
     long_desc <<-LONGDESC
-      Executes the runbook.
+      Prints the runbook.
 
-      With --view (-v), Generates the view with the specified view type
+      With --view (-v), Prints the view using the specified view type
     LONGDESC
     option :view, aliases: :v, type: :string, default: :markdown
     def view(runbook)
