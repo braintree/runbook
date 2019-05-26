@@ -1,5 +1,5 @@
-## Desired Feature list
-* [] Revise README.md
+## Desired feature list
+* [X] Revise README.md
 * [] capistrano-runbook gem that integrates runbook into capistrano tasks
 * [] Create a generator for a runbook? Allow for custom generators?
   * Generate runbook templates
@@ -18,6 +18,8 @@
 * [] Feedback on completion of tmux commands (when they complete, return values, outputs)
 * [] Add shorter aliases for tmux layout keys
 * [] Add host aliases for ssh_config setters
+* [] Allow for step dependencies that get executed before the step
+* [] Add periodic flush for sshkit output
 * Add a way to execute a series of commands in groups
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
@@ -26,6 +28,7 @@
 * Pattern for conditionally enabling plugins? Conditional plugins should be implemented as separate gems.
   * Requiring a plugin is the same as enabling it
   * Configuration can be added to toggle aspects of the plugin
+* Add a setup step that always executes even if start_at is defined
 * Yaml specification format (subset of Ruby)
   * Will not contain as much flexibility as Ruby format
   * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
