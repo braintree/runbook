@@ -9,7 +9,8 @@ module Runbook
     def initialize(args = [], local_options = {}, config = {})
       super(args, local_options, config)
 
-      _set_cli_config(options[:config]) if options[:config]
+      cmd_name = config[:current_command].name
+      _set_cli_config(options[:config], cmd_name) if options[:config]
     end
 
     desc "view RUNBOOK", "Prints a formatted version of the runbook"
@@ -71,9 +72,9 @@ module Runbook
 
     private
 
-    def _set_cli_config(config)
+    def _set_cli_config(config, cmd)
       unless File.exist?(config)
-        raise Thor::InvocationError, "cannot access config file #{config}: No such file or directory"
+        raise Thor::InvocationError, "#{cmd}: cannot access #{config}: No such file or directory"
       end
       Runbook::Configuration.cli_config_file = config
     end

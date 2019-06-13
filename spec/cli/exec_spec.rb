@@ -633,7 +633,7 @@ RSpec.describe "runbook run", type: :aruba do
       context "when config does not exist" do
         let(:command) { "runbook exec -P --config unknown #{runbook_file}" }
         let(:unknown_file_output) {
-          "cannot access config file unknown: No such file or directory"
+          "exec: cannot access unknown: No such file or directory"
         }
 
         it "prints an unknown file message" do
