@@ -158,5 +158,44 @@ RSpec.describe "runbook generate", type: :aruba do
         end
       end
     end
+
+    context "runbook generator" do
+      context "when name is not passed" do
+        let(:command) { "runbook generate runbook" }
+
+        it "returns an error" do
+          expect(last_command_started).to have_output(/No value provided for required arguments 'name'/)
+        end
+      end
+
+      context "when name is passed" do
+        let(:name) { "my_runbook" }
+        let(:root_opt) { "--root #{root}" }
+        let(:command) { "runbook generate runbook #{name} #{root_opt}" }
+
+        it "generates a runbook" do
+          last_cmd = last_command_started
+          expect(last_cmd).to have_output(/create  #{root}\/my_runbook.rb/)
+
+          expect(file?("#{root}/my_runbook.rb")).to be_truthy
+
+          gen_file = "#{root}/my_runbook.rb"
+          expect(gen_file).to have_file_content(/runbook = Runbook.book "My Runbook" do/)
+        end
+
+        context "when generated runbook is executed" do
+          let(:command) { "runbook generate runbook #{name} #{root_opt}" }
+
+          it "does not blow up" do
+            last_cmd = last_command_started
+            expect(last_cmd).to have_output(/create  #{root}\/my_runbook.rb/)
+
+            run_command("runbook exec -a #{root}/my_runbook.rb")
+
+            expect(last_command_started).to have_output(/Executing My Runbook.../)
+          end
+        end
+      end
+    end
   end
 end
