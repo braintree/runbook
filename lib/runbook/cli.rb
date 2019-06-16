@@ -14,7 +14,7 @@ module Runbook
 
       With --view (-v), Prints the view using the specified view type
     LONGDESC
-    option :view, aliases: :v, type: :string, default: :markdown
+    option :view, aliases: "-v", type: :string, default: :markdown
     def view(runbook)
       runbook = _retrieve_runbook(runbook, :view)
       puts Runbook::Viewer.new(runbook).generate(
@@ -44,11 +44,11 @@ module Runbook
       With --start-at (-s),    Runs the runbook starting at the specified
                                section or step.
     LONGDESC
-    option :run, aliases: :r, type: :string, default: :ssh_kit
-    option :noop, aliases: :n, type: :boolean
-    option :auto, aliases: :a, type: :boolean
-    option :"no-paranoid", aliases: :P, type: :boolean
-    option :start_at, aliases: :s, type: :string, default: "0"
+    option :run, aliases: "-r", type: :string, default: :ssh_kit
+    option :noop, aliases: "-n", type: :boolean
+    option :auto, aliases: "-a", type: :boolean
+    option :"no-paranoid", aliases: "-P", type: :boolean
+    option :start_at, aliases: "-s", type: :string, default: "0"
     def exec(runbook)
       runbook = _retrieve_runbook(runbook, :exec)
       Runbook::Runner.new(runbook).run(
