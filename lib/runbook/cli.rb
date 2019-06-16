@@ -1,17 +1,12 @@
 require "thor"
 require "runbook"
+require "runbook/cli_base"
 
 module Runbook
   class CLI < Thor
+    include ::Runbook::CLIBase
+
     map "--version" => :__print_version
-    class_option :config, aliases: :c, type: :string
-
-    def initialize(args = [], local_options = {}, config = {})
-      super(args, local_options, config)
-
-      cmd_name = config[:current_command].name
-      _set_cli_config(options[:config], cmd_name) if options[:config]
-    end
 
     desc "view RUNBOOK", "Prints a formatted version of the runbook"
     long_desc <<-LONGDESC
@@ -71,13 +66,6 @@ module Runbook
     end
 
     private
-
-    def _set_cli_config(config, cmd)
-      unless File.exist?(config)
-        raise Thor::InvocationError, "#{cmd}: cannot access #{config}: No such file or directory"
-      end
-      Runbook::Configuration.cli_config_file = config
-    end
 
     def _retrieve_runbook(runbook, cmd)
       unless File.exist?(runbook)
