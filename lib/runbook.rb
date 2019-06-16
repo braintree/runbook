@@ -10,6 +10,7 @@ require "sshkit/sudo"
 require "airbrussh"
 require "tty-progressbar"
 require "tty-prompt"
+require "thor/group"
 
 require "runbook/configuration"
 
@@ -61,6 +62,9 @@ require "runbook/toolbox"
 require "runbook/viewer"
 require "runbook/view"
 require "runbook/views/markdown"
+
+require "runbook/generators/base"
+require "runbook/generators/generator/generator"
 
 require "runbook/extensions/add"
 require "runbook/extensions/description"

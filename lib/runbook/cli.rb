@@ -2,6 +2,10 @@ require "thor"
 require "runbook"
 require "runbook/cli_base"
 
+# Needed to load custom generators
+Runbook::Configuration.load_config
+require "runbook/generator"
+
 module Runbook
   class CLI < Thor
     include ::Runbook::CLIBase
@@ -59,6 +63,12 @@ module Runbook
         start_at: options[:start_at],
       )
     end
+
+    desc "generate GENERATOR", "Generate runbook objects from a template, such as runbooks, projects, or plugins."
+    long_desc <<-LONGDESC
+      Generates a runbook, runbook node, runbook project, or runbook plugin from a template.
+    LONGDESC
+    subcommand "generate", Runbook::Generator
 
     desc "--version", "Print runbook's version"
     def __print_version

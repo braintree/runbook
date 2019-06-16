@@ -1,0 +1,51 @@
+module Runbook::Generators
+  # Remember to require this class in a runbook config file such as your
+  # Runbookfile so it can be used from the command line. Note that you cannot
+  # require this generator from a config file specified on the command line.
+  class <%= name.classify %> < Thor::Group
+    include ::Runbook::Generators::Base
+
+    source_root File.dirname(__FILE__)
+
+    # Uncomment this method to customize the generator's usage
+    # description in runbook's help description.
+    #
+    # def self.usage
+    #   "<%= name.underscore %> NAME [options]"
+    # end
+
+    # Uncomment this method to customize the generator's
+    # description in runbook's help message.
+    #
+    # def self.description
+    #   "Generate a <%= name %>"
+    # end
+
+    # Uncomment this method to customize the generator's
+    # long description in runbook's help message.
+    #
+    # def self.long_description
+    #   <<-LONG_DESC
+    #   Here you can fully describe the options of your generator.
+    #   LONG_DESC
+    # end
+
+    # Argument example
+    # argument :name, desc: "The name of your <%= name.underscore %>, e.x. deploy_nginx"
+
+    # Option example
+    # class_option :include-readme, default: true, type: :boolean
+
+    # Example of a generator step
+    # See: https://github.com/erikhuda/thor/wiki/Generators
+    # for further documentation on using thor generators.
+    #
+    # def create_<%= name.underscore %>
+    #   target = File.join(
+    #     parent_options[:root],
+    #     "#{name.underscore}.rb",
+    #   )
+    #   template('templates/<%= name.underscore %>.tt', target)
+    # end
+  end
+end

@@ -11,6 +11,10 @@ module Runbook
     _child_modules(Runbook::Runs)
   end
 
+  def self.generators
+    _child_classes(Runbook::Generators)
+  end
+
   def self._child_classes(mod)
     mod.constants.map { |const|
       "#{mod.to_s}::#{const}".constantize
