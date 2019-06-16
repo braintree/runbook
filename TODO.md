@@ -15,11 +15,14 @@
 * [] Replace Thor with a solution that is more easily extendable (adding new flags, etc.)
 * [] Add goto statements for repeating steps (functionality exists in paranoid mode)
 * [] Add test statement
+* [] Add ruby_assert statement
 * [] Feedback on completion of tmux commands (when they complete, return values, outputs)
 * [] Add shorter aliases for tmux layout keys
 * [] Add host aliases for ssh_config setters
 * [] Allow for step dependencies that get executed before the step
 * [] Add periodic flush for sshkit output
+* [] Update assert attribute nomenclature (timeout_statement)
+* [] Update ssh_kit to count commands separately between steps
 * Add a way to execute a series of commands in groups
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
