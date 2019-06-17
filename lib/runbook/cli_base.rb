@@ -1,5 +1,7 @@
 module Runbook::CLIBase
   def self.included(base)
+    base.extend(ClassMethods)
+
     base.check_unknown_options!
 
     base.class_option(
@@ -16,6 +18,12 @@ module Runbook::CLIBase
 
     cmd_name = config[:current_command].name
     _set_cli_config(options[:config], cmd_name) if options[:config]
+  end
+
+  module ClassMethods
+    def exit_on_failure?
+      true
+    end
   end
 
   protected

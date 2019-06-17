@@ -19,6 +19,10 @@ RSpec.describe "runbook", type: :aruba do
       expect(last_command_started).to have_output(/Commands:/)
       expect(last_command_started).to have_output(/runbook help \[COMMAND\]/)
     end
+
+    it "reports a zero status code" do
+      expect(last_command_stopped.exit_status).to eq(0)
+    end
   end
 
   describe "help flag" do
@@ -35,6 +39,10 @@ RSpec.describe "runbook", type: :aruba do
 
     it "prints out unknown command message" do
       expect(last_command_started).to have_output(%q{Could not find command "unknown".})
+    end
+
+    it "reports an error status code" do
+      expect(last_command_stopped.exit_status).to eq(1)
     end
   end
 

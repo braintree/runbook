@@ -120,6 +120,10 @@ RSpec.describe "runbook generate", type: :aruba do
           it "returns an error" do
             expect(last_command_stopped).to have_output(/Unknown switches "--unknown"/)
           end
+
+          it "returns a non-zero exit code" do
+            expect(last_command_stopped.exit_status).to_not eq(0)
+          end
         end
 
         context "when generated generator is invoked" do
