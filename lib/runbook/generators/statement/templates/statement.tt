@@ -1,0 +1,32 @@
+module Runbook::Statements
+  class <%= name.classify %> < Runbook::Statement
+    # Add all attributes for your statement
+    attr_reader :attr1, :attr2
+
+    # Define the initialize method signature to
+    # match the method signature of your dsl statement
+    def initialize(attr1, attr2)
+      @attr1 = attr1
+      @attr2 = attr2
+    end
+  end
+end
+
+# scope this module using your project's namespace
+module MyProject::RunbookExtensions
+  module <%= "#{name.underscore}_markdown".classify %>
+    def runbook__statements__<%= name.underscore %>(object, output, metadata)
+      # Format how your statement will be displayed when rendered with markdown
+      output << "#{object.attr1}#{object.attr2}"
+    end
+  end
+  Runbook::Views::Markdown.singleton_class.prepend(<%= "#{name.underscore}_markdown".classify %>)
+
+  module <%= "#{name.underscore}_sshkit".classify %>
+    def runbook__statements__<%= name.underscore %>(object, metadata)
+      # Execute your behavior using object which is your instantiated statement
+      # and the current metadata for this step of the execution
+    end
+  end
+  Runbook::Runs::SSHKit.singleton_class.prepend(<%= "#{name.underscore}_sshkit".classify %>)
+end

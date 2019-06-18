@@ -201,5 +201,79 @@ RSpec.describe "runbook generate", type: :aruba do
         end
       end
     end
+
+    context "statement generator" do
+      context "when name is not passed" do
+        let(:command) { "runbook generate statement" }
+
+        it "returns an error" do
+          expect(last_command_started).to have_output(/No value provided for required arguments 'name'/)
+        end
+      end
+
+      context "when name is passed" do
+        let(:name) { "my_statement" }
+        let(:root_opt) { "--root #{root}" }
+        let(:command) { "runbook generate statement #{name} #{root_opt}" }
+
+        it "generates a statement" do
+          last_cmd = last_command_started
+          expect(last_cmd).to have_output(/create  #{root}\/my_statement.rb/)
+
+          expect(file?("#{root}/my_statement.rb")).to be_truthy
+
+          gen_file = "#{root}/my_statement.rb"
+          expect(gen_file).to have_file_content(/class MyStatement < Runbook::Statement/)
+        end
+
+        context "exercising the generated statement" do
+          let(:runbook_file) { "my_runbook.rb" }
+          let(:content) do
+            <<-RUNBOOK
+            require_relative "#{root}/my_statement"
+
+            runbook = Runbook.book "My Runbook" do
+              section "Section" do
+                step { my_statement "ice", "cream" }
+              end
+            end
+            RUNBOOK
+          end
+
+          before(:each) { write_file(runbook_file, content) }
+
+          context "when generated statement is viewed" do
+            let(:command) { "runbook generate statement #{name} #{root_opt}" }
+
+            it "exercises the statement" do
+              last_cmd = last_command_started
+              expect(last_cmd).to have_output(/create  #{root}\/my_statement.rb/)
+
+              run_command("sed -i 's/MyProject/Runbook/' #{root}/my_statement.rb")
+              run_command("runbook view my_runbook.rb")
+
+              expect(last_command_started).to have_output(/icecream/)
+            end
+          end
+
+          context "when generated statement is executed" do
+            let(:command) { "runbook generate statement #{name} #{root_opt}" }
+
+            it "exercises the statement" do
+              last_cmd = last_command_started
+              expect(last_cmd).to have_output(/create  #{root}\/my_statement.rb/)
+
+              exec_sentinel = "# and the current metadata for this step of the execution"
+              exec_statement = "metadata[:toolbox].output(object.attr1 + object.attr2)"
+              run_command("sed -i 's/MyProject/Runbook/' #{root}/my_statement.rb")
+              run_command("sed -i 's/#{exec_sentinel}/#{exec_statement}/' #{root}/my_statement.rb")
+              run_command("runbook exec -a my_runbook.rb")
+
+              expect(last_command_started).to have_output(/icecream/)
+            end
+          end
+        end
+      end
+    end
   end
 end
