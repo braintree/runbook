@@ -24,7 +24,9 @@ module Runbook::Generators
       end
 
       def usage
-        "#{command} [options]"
+        args = arguments.map(&:banner).join(" ")
+        args += " " unless args.empty?
+        "#{command} #{args}[options]"
       end
 
       def description

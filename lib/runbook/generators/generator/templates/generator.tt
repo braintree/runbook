@@ -11,7 +11,9 @@ module Runbook::Generators
     # description in runbook's help description.
     #
     # def self.usage
-    #   "<%= name.underscore %> NAME [options]"
+    #   args = arguments.map(&:banner).join(" ")
+    #   args += " " unless args.empty?
+    #   "<%= name.underscore %> #{args}[options]"
     # end
 
     # Uncomment this method to customize the generator's
