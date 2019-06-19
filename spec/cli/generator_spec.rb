@@ -275,5 +275,86 @@ RSpec.describe "runbook generate", type: :aruba do
         end
       end
     end
+
+    context "dsl_extension generator" do
+      context "when name is not passed" do
+        let(:command) { "runbook generate dsl_extension" }
+
+        it "returns an error" do
+          expect(last_command_started).to have_output(/No value provided for required arguments 'name'/)
+        end
+      end
+
+      context "when name is passed" do
+        let(:name) { "rollback_section" }
+        let(:root_opt) { "--root #{root}" }
+        let(:command) { "runbook generate dsl_extension #{name} #{root_opt}" }
+
+        it "generates a dsl_extension" do
+          last_cmd = last_command_started
+          expect(last_cmd).to have_output(/create  #{root}\/rollback_section.rb/)
+
+          expect(file?("#{root}/rollback_section.rb")).to be_truthy
+
+          gen_file = "#{root}/rollback_section.rb"
+          expect(gen_file).to have_file_content(/module RollbackSection/)
+        end
+
+        context "exercising the generated dsl_extension" do
+          let(:runbook_file) { "my_runbook.rb" }
+          let(:content) do
+            <<-RUNBOOK
+            require_relative "#{root}/rollback_section"
+
+            runbook = Runbook.book "My Runbook" do
+              rollback_section("Rollback Section") {}
+            end
+            RUNBOOK
+          end
+
+          before(:each) { write_file(runbook_file, content) }
+
+          context "when generated dsl_extension is viewed" do
+            let(:command) { "runbook generate dsl_extension #{name} #{root_opt}" }
+
+            it "exercises the dsl_extension" do
+              last_cmd = last_command_started
+              expect(last_cmd).to have_output(/create  #{root}\/rollback_section.rb/)
+
+              run_command("sed -i 's/MyProject/Runbook/' #{root}/rollback_section.rb")
+              exec_sentinel = "module DSL"
+              exec_statement = "module DSL; def rollback_section(title, \\&block); section(title, \\&block); end"
+              run_command("sed -i 's/#{exec_sentinel}/#{exec_statement}/' #{root}/rollback_section.rb")
+              exec_sentinel = "# Runbook::Entities::Book::DSL"
+              exec_statement = "Runbook::Entities::Book::DSL"
+              run_command("sed -i 's/#{exec_sentinel}/#{exec_statement}/' #{root}/rollback_section.rb")
+              run_command("runbook view my_runbook.rb")
+
+              expect(last_command_started).to have_output(/Rollback Section/)
+            end
+          end
+
+          context "when generated dsl_extension is executed" do
+            let(:command) { "runbook generate dsl_extension #{name} #{root_opt}" }
+
+            it "exercises the dsl_extension" do
+              last_cmd = last_command_started
+              expect(last_cmd).to have_output(/create  #{root}\/rollback_section.rb/)
+
+              run_command("sed -i 's/MyProject/Runbook/' #{root}/rollback_section.rb")
+              exec_sentinel = "module DSL"
+              exec_statement = "module DSL; def rollback_section(title, \\&block); section(title, \\&block); end"
+              run_command("sed -i 's/#{exec_sentinel}/#{exec_statement}/' #{root}/rollback_section.rb")
+              exec_sentinel = "# Runbook::Entities::Book::DSL"
+              exec_statement = "Runbook::Entities::Book::DSL"
+              run_command("sed -i 's/#{exec_sentinel}/#{exec_statement}/' #{root}/rollback_section.rb")
+              run_command("runbook exec my_runbook.rb")
+
+              expect(last_command_started).to have_output(/1. Rollback Section/)
+            end
+          end
+        end
+      end
+    end
   end
 end

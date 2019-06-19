@@ -1,3 +1,5 @@
+# Remember to require this file in a runbook config file
+# or in your project so it is available in your runbooks
 module Runbook::Statements
   class <%= name.classify %> < Runbook::Statement
     # Add all attributes for your statement

@@ -1,0 +1,25 @@
+# Remember to require this file in a runbook config file
+# or in your project so it is available in your runbooks
+# See https://github.com/braintree/runbook/tree/master/lib/runbook/extensions
+# for examples of DSL extensions
+module MyProject::RunbookExtensions
+  module <%= name.classify %>
+    module DSL
+      # def description(msg)
+      #   Runbook::Statements::Description.new(msg).tap do |desc|
+      #     # All DSLs can reference their parent object using
+      #     # the parent method. This allows you to modify the
+      #     # parent book, section, or step of the DSL
+      #     parent.add(desc)
+      #   end
+      # end
+    end
+  end
+
+  # Uncomment the below statements to add the the DSL methods to
+  # Book, Section, and Step DSLs respectively. Now this method can
+  # be called from the corresponding DSL in your runbooks
+  # Runbook::Entities::Book::DSL.prepend(<%= name.classify %>::DSL)
+  # Runbook::Entities::Section::DSL.prepend(<%= name.classify %>::DSL)
+  # Runbook::Entities::Step::DSL.prepend(<%= name.classify %>::DSL)
+end
