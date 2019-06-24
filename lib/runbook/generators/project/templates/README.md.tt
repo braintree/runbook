@@ -1,0 +1,29 @@
+# <%= name.titleize %>
+
+## Deployment
+
+This code is best deployed by cloning this project using git.
+
+## Usage
+
+Set up this repository by running `bin/setup`. This will install all necessary dependencies for your runbooks.
+
+Execute your runbooks using `bundle exec runbook exec <PATH_TO_YOUR_RUNBOOK>`
+
+Get runbook help executing `bundle exec runbook help` or visiting https://github.com/braintree/runbook
+
+## This Repository
+
+Runbook code should live in the following locations:
+
+`runbooks` - Place your runbooks in this directory
+
+`<%= @shared_lib_dir %>` - Place code shared across your runbooks in this directory
+
+`lib/runbook/extensions` - Place code that extends Runbook's functionality here. For example, adding a new statement to Runbook's DSL would live in this directory. Require these files in your `Runbookfile` so Runbook can load them when it is launched. See https://github.com/braintree/runbook#extending-runbook for more details on extending Runbook.
+
+`lib/runbook/generators` - Place Runbook generators in this directory. Require these files in your `Runbookfile` to expose the generators via Runbook's command line interface.
+
+## Development
+
+Run `bin/setup` to install any necessary dependencies for this project. Run `bin/console` to use your code via an interactive prompt.

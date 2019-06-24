@@ -1,0 +1,8 @@
+# Require your runbook shared code here so it can easily be
+# included in your runbooks and accessed from the interactive
+# console using `bin/console`.
+
+require "runbook"
+
+module <%= name.camelize %>
+end

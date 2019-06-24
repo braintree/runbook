@@ -1,0 +1,11 @@
+# Your Runbookfile serves two purposes. Use your Runbookfile to
+# (1) require any runbook plugins, extensions, or generators that
+# you want available to your runbooks and (2) configure Runbook
+# using a `Runbook.configure` block.
+
+# Use this block to configure Runbook. See
+# https://github.com/braintree/runbook#configuration for more
+# details.
+#
+# Runbook.configure do |config|
+# end

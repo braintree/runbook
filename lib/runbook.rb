@@ -66,6 +66,7 @@ require "runbook/views/markdown"
 require "runbook/generators/base"
 require "runbook/generators/dsl_extension/dsl_extension"
 require "runbook/generators/generator/generator"
+require "runbook/generators/project/project"
 require "runbook/generators/runbook/runbook"
 require "runbook/generators/statement/statement"
 
