@@ -417,6 +417,55 @@ RSpec.describe "runbook generate", type: :aruba do
           expect(gemfile).to have_file_content(/gem "rspec"/)
         end
       end
+
+      context "when -p is passed" do
+        let(:name) { "my_runbooks" }
+        let(:root) { "." }
+        let(:root_opt) { "--root #{root}" }
+        let(:test) { "rspec" }
+        let(:test_opt) { "--test #{test}" }
+        let(:shared_lib_dir) { "lib/my_runbooks" }
+        let(:shared_lib_dir_opt) { "--shared-lib-dir #{shared_lib_dir}" }
+        let(:command) { "runbook generate project #{name} #{test_opt} #{shared_lib_dir_opt} #{root_opt} -p" }
+
+        it "does not generate a project" do
+          last_cmd = last_command_started
+          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --no-coc --no-mit from "."}
+          gem_successfully_created = %Q{Gem 'my_runbooks' was successfully created.}
+          project_generation_output = [
+            "remove  my_runbooks/my_runbooks.gemspec",
+            "remove  my_runbooks/README.md",
+            "remove  my_runbooks/Gemfile",
+            "remove  my_runbooks/lib/my_runbooks.rb",
+            "remove  my_runbooks/lib/my_runbooks/version.rb",
+            "create  my_runbooks/README.md",
+            "create  my_runbooks/Gemfile",
+            "create  my_runbooks/lib/my_runbooks.rb",
+            "create  my_runbooks/.ruby-version",
+            "create  my_runbooks/.ruby-gemset",
+            "create  my_runbooks/Runbookfile",
+            "create  my_runbooks/runbooks",
+            "create  my_runbooks/lib/runbook/extensions",
+            "create  my_runbooks/lib/runbook/generators",
+            "create  my_runbooks/lib/my_runbooks",
+            "Your runbook project was successfully created.",
+            "Remember to run `./bin/setup` in your project to install dependencies.",
+            "Add runbooks to the `runbooks` directory.",
+            "Add shared code to `lib/my_runbooks`.",
+            "Execute runbooks using `bundle exec runbook exec <RUNBOOK_PATH>` from your project root.",
+            "See the README.md for more details.",
+          ]
+
+          expect(last_cmd).to have_output(/#{bundle_gem_output}/)
+          expect(last_cmd).to_not have_output(/#{gem_successfully_created}/)
+          project_generation_output.each do |output|
+            expect(last_cmd).to have_output(/#{output}/)
+          end
+
+          gemfile = "#{root}/#{name}/Gemfile"
+          expect(file?(gemfile)).to be_falsey
+        end
+      end
     end
   end
 end

@@ -40,7 +40,9 @@ module Runbook::Generators
       ]
 
       gemspec_file = File.join(*dirs, "#{_name}.gemspec")
-      @gemspec_file_contents = File.readlines(gemspec_file)
+      if File.exist?(gemspec_file)
+        @gemspec_file_contents = File.readlines(gemspec_file)
+      end
       remove_file(gemspec_file)
 
       readme = File.join(*dirs, "README.md")
@@ -96,6 +98,7 @@ module Runbook::Generators
       template("templates/Gemfile.tt", target)
 
       # Add development dependencies from gemspec
+      return unless @gemspec_file_contents
       gems = @gemspec_file_contents.select do |line|
         line =~ /  spec.add_development_dependency/
       end.map do |line|
