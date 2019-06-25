@@ -1,6 +1,7 @@
 require "thor"
 require "runbook"
 require "runbook/cli_base"
+require "runbook/installer"
 
 # Needed to load custom generators
 Runbook::Configuration.load_config
@@ -69,6 +70,17 @@ module Runbook
       Generates a runbook, runbook node, runbook project, or runbook plugin from a template.
     LONGDESC
     subcommand "generate", Runbook::Generator
+
+    desc "install", "Install Runbook into an existing project"
+    long_desc "Set up Runbook directory structure and Runbookfile in an existing project for executing runbooks."
+    Runbook::Installer.class_options.values.each do |co|
+      method_option co.name, desc: co.description, required: co.required,
+        default: co.default, aliases: co.aliases, type: co.type,
+        banner: co.banner, hide: co.hide
+    end
+    def install
+      invoke(Runbook::Installer)
+    end
 
     desc "--version", "Print runbook's version"
     def __print_version
