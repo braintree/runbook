@@ -37,7 +37,9 @@ Runbook is a very flexible tool. Though it can solve a myriad of problems, Runbo
 
 Runbook is not intended to replace more special-purpose automation solutions such as configuration management solutions (Puppet, Chef, Ansible, Salt), deployment solutions (Capistrano, Kubernetes, Docker Swarm), monitoring solutions (Nagios, Datadog), or local command execution (shell scripts, Rake tasks, Make). Instead Runbook is best used as a glue when needing to accomplish a task that cuts across these domains.
 
-## Installation
+## Quick Start
+
+### Installation
 
 Add this line to your application's Gemfile:
 
@@ -52,6 +54,62 @@ And then execute:
 Or install it yourself as:
 
     $ gem install runbook
+
+### Your First Runbook
+
+Generate a runbook using the Runbook Generator:
+
+    $ runbook generate runbook my_first_runbook
+
+Execute the runbook:
+
+    $ runbook exec my_first_runbook.rb
+
+## Slightly Longer Start
+
+When setting up Runbook, you can install it at a system level, create a dedicated runbook project, or incorporate Runbook into an existing project.
+
+### System Level Setup
+
+Install runbook at a system level using `gem`:
+
+    $ gem install runbook
+
+Set any Runbook [configuration](#configuration) in `/etc/runbook.conf`.
+
+Generate runbook files using `runbook generate runbook`. Execute `runbook generate help runbook` for more details.
+
+Installing Runbook at a system level can be useful for executing runbooks on remote hosts or within docker containers. One disadvantage of installing Runbook at a system level is that there is no built-in solution for dependency management.
+
+### New Project Setup
+
+Install runbook using `gem`:
+
+    $ gem install runbook
+
+Generate a new runbook project:
+
+    $ runbook generate project <PROJECT_NAME>
+
+This will generate a new runbook project. Cd into your project directory and initialize its dependencies:
+
+    $ cd <PROJECT_NAME> && bin/setup
+
+### Existing Project Setup
+
+Add this line to your project's Gemfile:
+
+```ruby
+gem 'runbook'
+```
+
+Install the Runbook gem:
+
+    $ bundle install
+
+Install Runbook into your project:
+
+    $ bundle exec runbook install
 
 ## Contents
 
