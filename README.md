@@ -28,6 +28,7 @@ Lastly, Runbook provides an extendable interface for augmenting the DSL and defi
 * **Noop and Auto Modes** - Runbooks can be executed in noop mode. This allows you to see what a runbook will do before it executes. Runbooks can be run in auto mode to eliminate the need for human interaction.
 * **Execution Lifecycle Hooks** - Runbook provides before, after, around hooks to augment its execution behavior.
 * **Tmux Integration** - Runbook integrates with [tmux](https://github.com/tmux/tmux). You can define terminal pane layouts and send commands to terminal panes.
+* **Generators** - Runbook provides commands to generate runbooks, extensions, and runbook projects. You can define your own generators for easy, customized runbook creation.
 * **Extendable DSL** - Runbook's DSL is designed to be extendable. You can extend its DSL to add your own behavior.
 
 ## Use Cases
@@ -92,21 +93,24 @@ Or install it yourself as:
   * [4.5 Deep Nesting](#deep-nesting)
   * [4.6 Load Vs. Eval](#load-vs-eval)
   * [4.7 Passing State](#passing-state)
-* [5. Extending Runbook](#extending-runbook)
-  * [5.1 Adding Runs and Views](#adding-runs-and-views)
-  * [5.2 DSL Extensions](#dsl-extensions)
-  * [5.3 Adding New Statements](#adding-new-statements)
-  * [5.4 Adding Run and View Functionality](#adding-run-and-view-functionality)
-  * [5.5 Augmenting Functionality With Hooks](#augmenting-functionality-with-hooks)
-  * [5.6 Adding New Run Behaviors](#adding-new-run-behaviors)
-  * [5.7 Adding to Runbook's Run Metadata](#adding-to-runbooks-run-metadata)
-  * [5.8 Adding to Runbook's Configuration](#adding-to-runbooks-configuration)
-* [6. Known Issues](#known-issues)
-* [7. Development](#development)
-* [8. Contributing](#contributing)
-* [9. Feature Requests](#feature-requests)
-* [10. License](#license)
-* [11. Code of Conduct](#code-of-conduct)
+* [5. Generators](#generators)
+  * [5.1 Predefined Generators](#predefined-generators)
+  * [5.2 Custom Generators](#custom-generators)
+* [6. Extending Runbook](#extending-runbook)
+  * [6.1 Adding Runs and Views](#adding-runs-and-views)
+  * [6.2 DSL Extensions](#dsl-extensions)
+  * [6.3 Adding New Statements](#adding-new-statements)
+  * [6.4 Adding Run and View Functionality](#adding-run-and-view-functionality)
+  * [6.5 Augmenting Functionality With Hooks](#augmenting-functionality-with-hooks)
+  * [6.6 Adding New Run Behaviors](#adding-new-run-behaviors)
+  * [6.7 Adding to Runbook's Run Metadata](#adding-to-runbooks-run-metadata)
+  * [6.8 Adding to Runbook's Configuration](#adding-to-runbooks-configuration)
+* [7. Known Issues](#known-issues)
+* [8. Development](#development)
+* [9. Contributing](#contributing)
+* [10. Feature Requests](#feature-requests)
+* [11. License](#license)
+* [12. Code of Conduct](#code-of-conduct)
 
 ## Runbook Anatomy
 
@@ -738,6 +742,50 @@ end
 Instance variables are only passed between statements such as `ruby_command`. They should not be set on entities such as steps, sections, or books. Instance variables are persisted using `metadata[:repo]`. They are copied to the repo after each statement finishes executing and copied from the repo before each statement starts executing. Because instance variables utilize the repo, they are persisted if the runbook is stopped and restarted at the same step.
 
 Be careful with your naming of instance variables as it is possible to clobber the step's DSL methods because they share the same namespace.
+
+## Generators
+
+Runbook provides a number of generators accessible via the command line that can be used to generate code for new runbooks, Runbook projects, and Runbook extensions. Additionally, Runbook provides a generator generator so you can define your own custom generators.
+
+### Predefined Generators
+
+Runbook provides a number of predefined generators. You can see the full list using Runbook's command line help.
+
+    $ runbook help generate
+
+    Commands:
+      runbook generate dsl_extension NAME [options]  # Generate a dsl_extension for adding custom runbook DSL functionality
+      runbook generate generator NAME [options]      # Generate a runbook generator named NAME, e.x. acme_runbook
+      runbook generate help [COMMAND]                # Describe subcommands or one specific subcommand
+      runbook generate project NAME [options]        # Generate a project for your runbooks
+      runbook generate runbook NAME [options]        # Generate a runbook named NAME, e.x. deploy_nginx
+      runbook generate statement NAME [options]      # Generate a statement named NAME (e.x. ruby_command) that can be used in your runbooks
+
+    Base options:
+      -c, [--config=CONFIG]  # Path to runbook config file
+          [--root=ROOT]      # The root directory for your generated code
+                             # Default: .
+
+    Runtime options:
+      -f, [--force]                    # Overwrite files that already exist
+      -p, [--pretend], [--no-pretend]  # Run but do not make any changes
+      -q, [--quiet], [--no-quiet]      # Suppress status output
+      -s, [--skip], [--no-skip]        # Skip files that already exist
+
+Unless otherwise specified, all `NAME` arguments should be specified in a snake case format (e.x. `acme_runbook`). The `-p/--pretend` flag can be helpful for seeing what files a generator will create before it creates them.
+
+### Custom Generators
+
+The generator generator is useful for defining your own custom generators. Runbook uses [Thor Generators](https://github.com/erikhuda/thor/wiki/Generators) in the background, so any functionality you can do using Thor Generators can also be done using Runbook generators.
+
+Generate your own generator using the `generate generator` command
+
+    $ runbook generate generator my_new_generator --root lib/runbook/generators
+          create  my_new_generator
+          create  my_new_generator/templates
+          create  my_new_generator/my_new_generator.rb
+
+`my_new_generator/my_new_generator.rb` contains all the logic for generating your new code including arguments, options, and new files. ERB-templated files live in `my_new_generator/templates`. Remember to require your generator file in a runbook config file such as your `Runbookfile` so it can be loaded by the CLI. Generators cannot be required in config files specified at the command line due to the order with which the command line code is loaded. Once loaded, any child classes of `Runbook::Generators` will be included in Runbook's generator CLI.
 
 ## Extending Runbook
 
