@@ -9,14 +9,14 @@ Runbook provides a DSL for specifying a series of steps to execute an operation.
 </div>
 <br>
 
-Runbook provides two modes for evaluating your runbook. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
+Runbook has two modes for evaluating your runbook. The first mode, view mode, allows you to export your runbook into various formats such as markdown. The second mode, run mode, allows you to execute behavior based on the statements in your runbook.
 
 <div align="center">
   <img width="600" src="images/runbook_execution_modes.png" alt="diagram of execution modes" />
 </div>
 <br>
 
-Runbook provides a very flexible interface. It can be integrated into your existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined as self-executable scripts. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
+Runbook can be integrated into existing infrastructure in many different ways. It can be integrated into existing projects to add orchestration functionality, installed on systems as a stand-alone executable, or runbooks can be defined as self-executable scripts. In addition to being useful for automating common tasks, runbooks are a perfect bridge for providing operations teams with step-by-step instructions to handle common issues (especially when solutions cannot be easily automated).
 
 Lastly, Runbook provides an extendable interface for augmenting the DSL and defining your own behavior.
 
@@ -33,7 +33,7 @@ Lastly, Runbook provides an extendable interface for augmenting the DSL and defi
 
 ## Use Cases
 
-Runbook is a very flexible tool. Though it can solve a myriad of problems, Runbook is best used for removing the need for repeated, rote developer operations. Runbook allows developers to execute processes at a higher level than that of individual command-line commands. Additionally, Runbook provides features to simply and safely execute operations in mission-critical environments.
+Though Runbook can solve a myriad of problems, it is best used for removing the need for repeated, rote developer operations. Runbook allows developers to execute processes at a higher level than that of individual command-line commands. Additionally, Runbook provides features to simply and safely execute operations in mission-critical environments.
 
 Runbook is not intended to replace more special-purpose automation solutions such as configuration management solutions (Puppet, Chef, Ansible, Salt), deployment solutions (Capistrano, Kubernetes, Docker Swarm), monitoring solutions (Nagios, Datadog), or local command execution (shell scripts, Rake tasks, Make). Instead Runbook is best used as a glue when needing to accomplish a task that cuts across these domains.
 
@@ -558,7 +558,7 @@ If the `ssh_kit` configuration looks familiar, that's because it's an SSHKit Con
 
 ### Configuration Files
 
-Runbook automatically loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc.
+Runbook loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc.
 
 ## Working With Runbooks
 
@@ -679,7 +679,7 @@ The following are best practices when developing your own runbooks.
 
 ### Iterative Automation
 
-Runbooks allow for a very gradual transition from entirely manual operations to full automation. Runbooks can start out as a simple outline of all steps required to carry out an operation. From there, commands and prompts can be added to the runbook, actually carrying out and replacing the manual processes.
+Runbooks allow for a gradual transition from entirely manual operations to full automation. Runbooks can start out as a simple outline of all steps required to carry out an operation. From there, commands and prompts can be added to the runbook, actually carrying out and replacing the manual processes.
 
 Monitoring can transition from a process required by a human into something that can be codified and executed by your runbook. Eventually, the runner's `auto` flag can be used to allow the runbook to run uninterrupted without any human intervention. These runbooks can be triggered automatically in response to detected events. This will allow you to do more important things with your time, like eat ice cream.
 
@@ -906,7 +906,7 @@ module Runbook::Statements
 end
 ```
 
-In the above example a keyword `diagram` will be automatically added to the step dsl and its arguments will be used to initialize the Diagram object.
+In the above example a keyword `diagram` will be added to the step dsl and its arguments will be used to initialize the Diagram object.
 
 ### Adding Run and View Functionality
 
