@@ -1,10 +1,10 @@
 ## Desired feature list
 * [X] Revise README.md
-* [] capistrano-runbook gem that integrates runbook into capistrano tasks
-* [] Create a generator for a runbook? Allow for custom generators?
+* [X] Create a generator for a runbook? Allow for custom generators?
   * Generate runbook templates
   * Generate runbook projects with Runbookfile, Gemfile, etc.
   * Generate plugins
+* [] capistrano-runbook gem that integrates runbook into capistrano tasks
 * [] Add Appraisal to test against multiple versions of Ruby
 * [] Update output to be more log friendly, including timestamps for operations
 * [] Allow for preventing echo when prompting for input
@@ -23,6 +23,10 @@
 * [] Add periodic flush for sshkit output
 * [] Update assert attribute nomenclature (timeout_statement)
 * [] Update ssh_kit to count commands separately between steps
+* [] Create a plugin generator
+* [] Create generator for a new run (sshkit, etc.)
+* [] Create generator for a new view (markdown, yaml, html, etc.)
+* Add rake tasks to generators for viewing and executing runbooks
 * Add a way to execute a series of commands in groups
 * Docker testing story for more full-stack integration tests
   * Test integration with sshkit
@@ -37,5 +41,6 @@
   * Can convert from Ruby format to yaml (depending on compatibility) and yaml to Ruby
 * Guard for view updates (How to handle arguments?)
 * Be able to serve up markdown docs (web server) for easy viewing
+* Add interactive executable for all runbooks in a project
 * Could provide a rake task for compiling and nooping runbooks?
 * Can specify input-format, output-format, input (file), and output (file)
