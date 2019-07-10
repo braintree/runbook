@@ -4,6 +4,21 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.13.0` (2019-07-10)
+
+### Potentially Breaking Changes:
+
+* Uses of Runbook that expect the CLI to return a zero exit code may exhibit different behavior if their runbook encounters an error.
+
+### Fixes:
+
+* Return non-zero exit code on CLI error
+
+### New Features
+
+* Add runbook "generate" command, including generator, runbook, statement, dsl_extension, and project generators
+* Add "install" CLI command
+
 ## `v0.12.1` (2019-06-12)
 
 ### Fixes:
