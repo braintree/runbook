@@ -137,28 +137,28 @@ Install Runbook into your project:
       * [1.1.2.15 Wait](#wait)
       * [1.1.2.16 Tmux Layouts](#tmux-layouts)
     * [1.1.3 Setters](#setters)
-* [2. Configuration](#configuration)
-  * [2.1 Configuration Files](#configuration-files)
-* [3. Working With Runbooks](#working-with-runbooks)
-  * [3.1 From Within Your Project](#from-within-your-project)
-  * [3.2 Via The Command Line](#via-the-command-line)
-  * [3.3 Self-executable](#self-executable)
+* [2. Working With Runbooks](#working-with-runbooks)
+  * [2.1 Via The Command Line](#via-the-command-line)
+  * [2.2 From Within Your Project](#from-within-your-project)
+  * [2.3 Self-executable](#self-executable)
+* [3. Configuration](#configuration)
+  * [3.1 Configuration Files](#configuration-files)
 * [4. Best Practices](#best-practices)
   * [4.1 Iterative Automation](#iterative-automation)
   * [4.2 Parameterizing Runbooks](#parameterizing-runbooks)
-  * [4.3 Execution Best Practices](#execution-best-practices)
-  * [4.4 Composing Runbooks](#composing-runbooks)
-  * [4.5 Deep Nesting](#deep-nesting)
-  * [4.6 Load Vs. Eval](#load-vs-eval)
-  * [4.7 Passing State](#passing-state)
+  * [4.3 Passing State](#passing-state)
+  * [4.4 Execution Best Practices](#execution-best-practices)
+  * [4.5 Composing Runbooks](#composing-runbooks)
+  * [4.6 Deep Nesting](#deep-nesting)
+  * [4.7 Load Vs. Eval](#load-vs-eval)
 * [5. Generators](#generators)
   * [5.1 Predefined Generators](#predefined-generators)
   * [5.2 Custom Generators](#custom-generators)
 * [6. Extending Runbook](#extending-runbook)
-  * [6.1 Adding Runs and Views](#adding-runs-and-views)
-  * [6.2 DSL Extensions](#dsl-extensions)
-  * [6.3 Adding New Statements](#adding-new-statements)
-  * [6.4 Adding Run and View Functionality](#adding-run-and-view-functionality)
+  * [6.1 Adding New Statements](#adding-new-statements)
+  * [6.2 Adding Run and View Functionality](#adding-run-and-view-functionality)
+  * [6.3 DSL Extensions](#dsl-extensions)
+  * [6.4 Adding Runs and Views](#adding-runs-and-views)
   * [6.5 Augmenting Functionality With Hooks](#augmenting-functionality-with-hooks)
   * [6.6 Adding New Run Behaviors](#adding-new-run-behaviors)
   * [6.7 Adding to Runbook's Run Metadata](#adding-to-runbooks-run-metadata)
@@ -539,50 +539,9 @@ step do
 end
 ```
 
-## Configuration
-
-Runbook is configured using its configuration object. Below is an example of how to configure Runbook.
-
-```ruby
-Runbook.configure do |config|
-  config.ssh_kit.umask = "077"
-  config.ssh_kit.default_runner_config = {in: :groups, limit: 5}
-  config.ssh_kit.default_env = {rails_env: :staging}
-
-  config.enable_sudo_prompt = true
-  config.use_same_sudo_password = true
-end
-```
-
-If the `ssh_kit` configuration looks familiar, that's because it's an SSHKit Configuration object. Any configuration options set on `SSHKit.config` can be set on `config.ssh_kit`.
-
-### Configuration Files
-
-Runbook loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc.
-
 ## Working With Runbooks
 
 You can integrate with Runbook in several different ways. You can create your own project or incorporate Runbook into your existing projects. You can use Runbook via the command line. And you can even create self-executing runbooks.
-
-### From Within Your Project
-
-Runbooks can be executed using the `Runbook::Viewer` and `Runbook::Runner` classes.
-
-#### Executing a runbook using `Runbook::Viewer`
-
-```ruby
-Runbook::Viewer.new(book).generate(view: :markdown)
-```
-
-In this case book is a `Runbook::Entities::Book` and `:markdown` refers to the specific view type (`Runbook::Views::Markdown`).
-
-#### Executing a runbook using `Runbook::Runner`
-
-```ruby
-Runbook::Runner.new(book).run(run: :ssh_kit, noop: false, auto: false, paranoid: true, start_at: "0")
-```
-
-This will execute `book` using the `Runbook::Runs::SSHKit` run type. It will not run the book in `noop` mode. It will not run the book in `auto` mode. It will run the book in `paranoid` mode. And it will start at the beginning of the book. Noop mode runs the book without side-effects outside of printing what it will execute. Auto mode will skip any prompts in the runbook. If there are any required prompts in the runbook (such as the `ask` statement), then the run will fail. Paranoid mode will prompt the user for whether they should continue at every step. Finally `start_at` can be used to skip parts of the runbook or to restart at a certain point in the event of failures, stopping and starting the runbook, etc.
 
 ### Via The Command Line
 
@@ -637,6 +596,26 @@ the runbook at runtime.
 $ HOSTS="appbox{01..30}.prod" ENV="production" runbook exec --start-at 1.2.1 my_runbook.rb
 ```
 
+### From Within Your Project
+
+Runbooks can be executed using the `Runbook::Viewer` and `Runbook::Runner` classes.
+
+#### Executing a runbook using `Runbook::Viewer`
+
+```ruby
+Runbook::Viewer.new(book).generate(view: :markdown)
+```
+
+In this case book is a `Runbook::Entities::Book` and `:markdown` refers to the specific view type (`Runbook::Views::Markdown`).
+
+#### Executing a runbook using `Runbook::Runner`
+
+```ruby
+Runbook::Runner.new(book).run(run: :ssh_kit, noop: false, auto: false, paranoid: true, start_at: "0")
+```
+
+This will execute `book` using the `Runbook::Runs::SSHKit` run type. It will not run the book in `noop` mode. It will not run the book in `auto` mode. It will run the book in `paranoid` mode. And it will start at the beginning of the book. Noop mode runs the book without side-effects outside of printing what it will execute. Auto mode will skip any prompts in the runbook. If there are any required prompts in the runbook (such as the `ask` statement), then the run will fail. Paranoid mode will prompt the user for whether they should continue at every step. Finally `start_at` can be used to skip parts of the runbook or to restart at a certain point in the event of failures, stopping and starting the runbook, etc.
+
 ### Self-executable
 
 Runbooks can be written to be self-executable
@@ -673,6 +652,27 @@ runbook = Runbook.books.last # Runbooks register themselves to Runbook.books whe
 Runbook::Runner.new(runbook).run(auto: true)
 ```
 
+## Configuration
+
+Runbook is configured using its configuration object. Below is an example of how to configure Runbook.
+
+```ruby
+Runbook.configure do |config|
+  config.ssh_kit.umask = "077"
+  config.ssh_kit.default_runner_config = {in: :groups, limit: 5}
+  config.ssh_kit.default_env = {rails_env: :staging}
+
+  config.enable_sudo_prompt = true
+  config.use_same_sudo_password = true
+end
+```
+
+If the `ssh_kit` configuration looks familiar, that's because it's an SSHKit Configuration object. Any configuration options set on `SSHKit.config` can be set on `config.ssh_kit`.
+
+### Configuration Files
+
+Runbook loads configuration from a number of predefined files. Runbook will attempt to load configuration from the following locations on startup: `/etc/runbook.conf`, a `Runbookfile` in a parent directory from the current directory, a `.runbook.conf` file in the current user's home directory, a file specified with `--config` on the command line, any configuration specified in a runbook. Runbook will also load configuration from these files in this order of preference, respectively. That is, configuration values specified at the project level (`Runbookfile`) will override configuration values set at the global level (`/etc/runbook.conf`), etc.
+
 ## Best Practices
 
 The following are best practices when developing your own runbooks.
@@ -694,6 +694,48 @@ env = `facter environment`
 rails_env = `facter rails_env`
 customer_list = File.read("/tmp/customer_list.txt")
 ```
+
+### Passing State
+
+Runbook provides a number of different mechanisms for passing state throughout a runbook. For any data that is known at compile time, local variables can be used because Runbooks are lexically scoped.
+
+```ruby
+home_planet = "Krypton"
+Runbook.book "Book Using Local Variables" do
+  hometown = "Smallville"
+
+  section "My Biography" do
+    step do
+      note "Home Planet: #{home_planet}"
+      note "Home Town: #{hometown}"
+    end
+  end
+end
+```
+
+When looking to pass data generated at runtime, for example data from `ruby_command`, `ask`, or `capture` statements, Runbook persists and synchronizes instance variables for these commands.
+
+```ruby
+Runbook.book "Book Using Instance Variables" do
+  section "The Transported Man" do
+    step do
+      ask "Who's the greatest magician?", into: :greatest, default: "Alfred Borden"
+      ruby_command { @magician = "Robert Angier" }
+    end
+
+    step do
+      ruby_command {
+        note "Magician: #{@magician}"
+        note "Greatest Magician: #{@greatest}"
+      }
+    end
+  end
+end
+```
+
+Instance variables are only passed between statements such as `ruby_command`. They should not be set on entities such as steps, sections, or books. Instance variables are persisted using `metadata[:repo]`. They are copied to the repo after each statement finishes executing and copied from the repo before each statement starts executing. Because instance variables utilize the repo, they are persisted if the runbook is stopped and restarted at the same step.
+
+Be careful with your naming of instance variables as it is possible to clobber the step's DSL methods because they share the same namespace.
 
 ### Execution Best Practices
 
@@ -759,48 +801,6 @@ runbook = eval(File.read("my_runbook.rb"))
 
 Loading your runbook file is more ideal, but adds slight complexity. This method is prefered because the Ruby mechanism for retrieving source code does not work for code that has been `eval`ed. This means that you will not see `ruby_command` code blocks in view and noop output when using the `eval` method. You will see an "Unable to retrieve source code" message instead.
 
-### Passing State
-
-Runbook provides a number of different mechanisms for passing state throughout a runbook. For any data that is known at compile time, local variables can be used because Runbooks are lexically scoped.
-
-```ruby
-home_planet = "Krypton"
-Runbook.book "Book Using Local Variables" do
-  hometown = "Smallville"
-
-  section "My Biography" do
-    step do
-      note "Home Planet: #{home_planet}"
-      note "Home Town: #{hometown}"
-    end
-  end
-end
-```
-
-When looking to pass data generated at runtime, for example data from `ruby_command`, `ask`, or `capture` statements, Runbook persists and synchronizes instance variables for these commands.
-
-```ruby
-Runbook.book "Book Using Instance Variables" do
-  section "The Transported Man" do
-    step do
-      ask "Who's the greatest magician?", into: :greatest, default: "Alfred Borden"
-      ruby_command { @magician = "Robert Angier" }
-    end
-
-    step do
-      ruby_command {
-        note "Magician: #{@magician}"
-        note "Greatest Magician: #{@greatest}"
-      }
-    end
-  end
-end
-```
-
-Instance variables are only passed between statements such as `ruby_command`. They should not be set on entities such as steps, sections, or books. Instance variables are persisted using `metadata[:repo]`. They are copied to the repo after each statement finishes executing and copied from the repo before each statement starts executing. Because instance variables utilize the repo, they are persisted if the runbook is stopped and restarted at the same step.
-
-Be careful with your naming of instance variables as it is possible to clobber the step's DSL methods because they share the same namespace.
-
 ## Generators
 
 Runbook provides a number of generators accessible via the command line that can be used to generate code for new runbooks, Runbook projects, and Runbook extensions. Additionally, Runbook provides a generator generator so you can define your own custom generators.
@@ -849,46 +849,6 @@ Generate your own generator using the `generate generator` command
 
 Runbook can be extended to add custom functionality.
 
-### Adding Runs and Views
-
-You can add new run and view types by defining modules under `Runbook:::Runs` and `Runbook::Views` respectively. They will automatically be accessible from the command line or via the `Runner` and `Viewer` classes. See `lib/runbook/runs/ssh_kit.rb` or `lib/runbook/views/markdown.rb` for examples of how to implement runs and views.
-
-```ruby
-module Runbook::Views
-  module Yaml
-    include Runbook::View
-
-    # handler names correspond to the entity or statement class name
-    # Everything is underscored and "::" is replaced by "__"
-    def self.runbook__entities__book(object, output, metadata)
-      output << "---\n"
-      output << "book:\n"
-      output << "  title: #{object.title}\n"
-    end
-
-    # Add other handlers here
-  end
-end
-```
-
-### DSL Extensions
-
-You can add arbitrary keywords to your entity DSLs. For example, you could add an alias to Runbook's Book DSL as follows:
-
-```ruby
-module MyRunbook::Extensions
-  module Aliases
-    module DSL
-      def s(title, &block)
-        section(title, &block)
-      end
-    end
-  end
-
-  Runbook::Entities::Book::DSL.prepend(Aliases::DSL)
-end
-```
-
 ### Adding New Statements
 
 In order to add a new statement to your DSL, create a class under `Runbook::Statements` that inherits from `Runbook::Statement`. This statement will be initialized with all arguments passed to the corresponding keyword in the DSL. Remember to also add a corresponding method to runs and views so your new statement can be interpretted in each context.
@@ -925,6 +885,46 @@ end
 ```
 
 If you are not modifying existing methods, you can simply re-open the module to add new methods.
+
+### DSL Extensions
+
+You can add arbitrary keywords to your entity DSLs. For example, you could add an alias to Runbook's Book DSL as follows:
+
+```ruby
+module MyRunbook::Extensions
+  module Aliases
+    module DSL
+      def s(title, &block)
+        section(title, &block)
+      end
+    end
+  end
+
+  Runbook::Entities::Book::DSL.prepend(Aliases::DSL)
+end
+```
+
+### Adding Runs and Views
+
+You can add new run and view types by defining modules under `Runbook:::Runs` and `Runbook::Views` respectively. They will automatically be accessible from the command line or via the `Runner` and `Viewer` classes. See `lib/runbook/runs/ssh_kit.rb` or `lib/runbook/views/markdown.rb` for examples of how to implement runs and views.
+
+```ruby
+module Runbook::Views
+  module Yaml
+    include Runbook::View
+
+    # handler names correspond to the entity or statement class name
+    # Everything is underscored and "::" is replaced by "__"
+    def self.runbook__entities__book(object, output, metadata)
+      output << "---\n"
+      output << "book:\n"
+      output << "  title: #{object.title}\n"
+    end
+
+    # Add other handlers here
+  end
+end
+```
 
 ### Augmenting Functionality With Hooks
 
