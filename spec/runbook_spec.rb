@@ -134,4 +134,22 @@ RSpec.describe Runbook do
       expect(Runbook.books).to eq([book])
     end
   end
+
+  describe "self.deprecator" do
+    it "returns an ActiveSupport::Deprecation object" do
+      expect(Runbook.deprecator).to be_a(ActiveSupport::Deprecation)
+    end
+
+    it "is memoized" do
+      deprecator1 = Runbook.deprecator
+      deprecator2 = Runbook.deprecator
+      expect(deprecator2.object_id).to eq(deprecator1.object_id)
+    end
+
+    it "states the function will be replaced in the next major version" do
+      nmv = Runbook::VERSION.split(".").first.to_i + 1
+      expect(STDERR).to receive(:puts).with(/DEPRECATION WARNING:.*Runbook #{nmv}.0.*/)
+      Runbook.deprecator.deprecation_warning(:deprecated_method, :new_method)
+    end
+  end
 end

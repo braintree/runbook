@@ -15,6 +15,16 @@ module Runbook
     _child_classes(Runbook::Generators)
   end
 
+  def self.deprecator
+    return @deprecator if @deprecator
+    major_version = Gem::Version.new(Runbook::VERSION).segments[0]
+    next_major_version = major_version + 1
+    @deprecator = ActiveSupport::Deprecation.new(
+      "#{next_major_version}.0",
+      "Runbook"
+    )
+  end
+
   def self._child_classes(mod)
     mod.constants.map { |const|
       "#{mod.to_s}::#{const}".constantize
