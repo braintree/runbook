@@ -148,9 +148,10 @@ Install Runbook into your project:
   * [4.2 Parameterizing Runbooks](#parameterizing-runbooks)
   * [4.3 Passing State](#passing-state)
   * [4.4 Execution Best Practices](#execution-best-practices)
-  * [4.5 Composing Runbooks](#composing-runbooks)
-  * [4.6 Deep Nesting](#deep-nesting)
-  * [4.7 Load Vs. Eval](#load-vs-eval)
+  * [4.5 Remote Command Execution](#remote-command-execution)
+  * [4.6 Composing Runbooks](#composing-runbooks)
+  * [4.7 Deep Nesting](#deep-nesting)
+  * [4.8 Load Vs. Eval](#load-vs-eval)
 * [5. Generators](#generators)
   * [5.1 Predefined Generators](#predefined-generators)
   * [5.2 Custom Generators](#custom-generators)
@@ -742,6 +743,12 @@ Be careful with your naming of instance variables as it is possible to clobber t
 As a best practice, Runbooks should always be nooped before they are run. This will allow you to catch runtime errors such as using the ask statement when running in auto mode, typos in your runbooks, and to visually confirm what will be executed.
 
 Additionally, it can be nice to have a generated view of the runbook you are executing to have a good high-level overview of the steps in the runbook.
+
+### Remote Command Execution
+
+Runbook uses [SSHKit](https://github.com/capistrano/sshkit) for remote command execution. When specifying `servers`, you are specifying the target host to execute the command. If you want to use a non-standard port or login using a different user than your current user, then you can specify the `server` as `lucy@host1.prod:2345`. Alternatively, you can use an ssh config file such as `~/.ssh/config` to specify the user and port used to ssh to a given host. See [Capistrano's SSH setup instructions](https://capistranorb.com/documentation/getting-started/installation/#ssh) for further support on setting up SSH to execute commands on remote hosts.
+
+The `user` setter designates the user you will sudo as once sshed to the remote host. Runbook supports password-protected sudo execution. That is, if your server requires a password to execute commands as another user, Runbook will allow you to enter your password when prompted. The `enable_sudo_prompt` configuration value controls this behavior. Enabling the sudo password prompt requires that your commands execute using a tty, which can lead to unexpected behavior when executing certain commands. Enabling `use_same_sudo_password` will use the same password accross different hosts and users instead of re-prompting for each unique user/host combo.
 
 ### Composing Runbooks
 
