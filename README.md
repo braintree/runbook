@@ -107,9 +107,9 @@ Install the Runbook gem:
 
     $ bundle install
 
-Install Runbook into your project:
+Initialize Runbook in your project:
 
-    $ bundle exec runbook install
+    $ bundle exec runbook init
 
 ## Contents
 

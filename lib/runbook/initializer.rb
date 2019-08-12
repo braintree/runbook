@@ -1,5 +1,5 @@
 module Runbook
-  class Installer < Thor::Group
+  class Initializer < Thor::Group
     include Thor::Actions
 
     source_root File.join(
@@ -59,10 +59,10 @@ module Runbook
       _keep_dir(target)
     end
 
-    def runbook_installation_overview
+    def runbook_initialization_overview
       msg = [
         "",
-        "Runbook was successfully installed",
+        "Runbook was successfully initialized.",
         "Add runbooks to the `runbooks` directory.",
         "Add shared code to `lib/runbook`.",
         "Execute runbooks using `bundle exec runbook exec <RUNBOOK_PATH>`",

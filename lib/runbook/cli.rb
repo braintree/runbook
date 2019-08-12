@@ -1,7 +1,7 @@
 require "thor"
 require "runbook"
 require "runbook/cli_base"
-require "runbook/installer"
+require "runbook/initializer"
 
 # Needed to load custom generators
 Runbook::Configuration.load_config
@@ -71,15 +71,26 @@ module Runbook
     LONGDESC
     subcommand "generate", Runbook::Generator
 
-    desc "install", "Install Runbook into an existing project"
+    desc "init", "Initialize Runbook in an existing project"
     long_desc "Set up Runbook directory structure and Runbookfile in an existing project for executing runbooks."
-    Runbook::Installer.class_options.values.each do |co|
+    Runbook::Initializer.class_options.values.each do |co|
+      method_option co.name, desc: co.description, required: co.required,
+        default: co.default, aliases: co.aliases, type: co.type,
+        banner: co.banner, hide: co.hide
+    end
+    def init
+      invoke(Runbook::Initializer)
+    end
+
+    desc "install", "Install Runbook in an existing project", hide: true
+    Runbook::Initializer.class_options.values.each do |co|
       method_option co.name, desc: co.description, required: co.required,
         default: co.default, aliases: co.aliases, type: co.type,
         banner: co.banner, hide: co.hide
     end
     def install
-      invoke(Runbook::Installer)
+      Runbook.deprecator.deprecation_warning(:install, :init)
+      invoke(Runbook::Initializer)
     end
 
     desc "--version", "Print runbook's version"
