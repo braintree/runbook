@@ -26,7 +26,7 @@ Lastly, Runbook provides an extendable interface for augmenting the DSL and defi
 * **Dynamic Control Flow** - Runbooks can start execution at any step and can skip steps based on user input.
 * **Resumable** - Runbooks save their state at each step. If your runbook encounters an error, you can resume your runbook at the previous step after addressing the error.
 * **Noop and Auto Modes** - Runbooks can be executed in noop mode. This allows you to see what a runbook will do before it executes. Runbooks can be run in auto mode to eliminate the need for human interaction.
-* **Execution Lifecycle Hooks** - Runbook provides before, after, around hooks to augment its execution behavior.
+* **Execution Lifecycle Hooks** - Runbook provides before, after, and around hooks to augment its execution behavior.
 * **Tmux Integration** - Runbook integrates with [tmux](https://github.com/tmux/tmux). You can define terminal pane layouts and send commands to terminal panes.
 * **Generators** - Runbook provides commands to generate runbooks, extensions, and runbook projects. You can define your own generators for easy, customized runbook creation.
 * **Extendable DSL** - Runbook's DSL is designed to be extendable. You can extend its DSL to add your own behavior.
@@ -600,7 +600,7 @@ $ HOSTS="appbox{01..30}.prod" ENV="production" runbook exec --start-at 1.2.1 my_
 
 ### From Within Your Project
 
-Runbooks can be executed using the `Runbook::Viewer` and `Runbook::Runner` classes.
+Runbooks can be executed using the `Runbook::Viewer` and `Runbook::Runner` classes. Using these classes, you can invoke runbooks from within your existing codebase. This could be ideal for several reasons. It allows you to maintain a consistent interface with other system tasks such as rake tasks or cap tasks. It allows you to perform setup or sanity check functionality before executing your runbooks. And it allows you to load an environment to be accessed within your runbooks, such as providing access to a canonical list of servers or shared business logic.
 
 #### Executing a runbook using `Runbook::Viewer`
 
@@ -770,6 +770,8 @@ Runbook.book "Update configuration" do
 end
 ```
 
+If you want to parameterize these runbook snippets, you can place them in a ruby function that takes arguments and generates the desired entity or statement. If these snippets set information that is used by the runbook, such as with `capture` statements, it is a good practice to parameterize where the result is stored. This lets the snippet fit different contexts and makes clear what data is being returned from the snippet.
+
 ### Deep Nesting
 
 Because the Runbook DSL is declarative, it is generally discouraged to develop elaborate nested decision trees. For example, it is discouraged to use the `ask` statement to gather user feedback, branch on this information in a `ruby_command`, and follow completely separate sets of steps. This is because deep nesting eliminates the benefits of the declarative DSL. You can no longer noop the deeply nested structure for example.
@@ -876,6 +878,10 @@ end
 
 In the above example a keyword `diagram` will be added to the step dsl and its arguments will be used to initialize the Diagram object.
 
+New statements can be generated using the statement generator.
+
+    $ runbook generate statement diagram --root lib/runbook/extensions
+
 ### Adding Run and View Functionality
 
 You can add handlers for new statements and entities to your runs and views by prepending the modules with the new desired functionality.
@@ -911,6 +917,10 @@ module MyRunbook::Extensions
   Runbook::Entities::Book::DSL.prepend(Aliases::DSL)
 end
 ```
+
+DSL extensions can be generated using the dsl_extension generator.
+
+    $ runbook generate dsl_extension aliases --root lib/runbook/extensions
 
 ### Adding Runs and Views
 
@@ -1032,7 +1042,7 @@ module MyRunbook::Extensions
 end
 ```
 
-This will add a `log_level` attribute to Runbook's configuration with a default value of `:info`.
+This will add a `log_level` attribute to Runbook's configuration with a default value of `:info`. This configuration value can be accessed via `Runbook.configuration.log_level`.
 
 ## Testing
 
