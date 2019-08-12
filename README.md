@@ -1125,7 +1125,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/braint
 
 ## Feature Requests
 
-Any feature requests are always welcome and will be considered in accordance with time and need. Additionally, existing feature requests are tracked in TODO.md. If you choose to contribute, your contributions will be greatly appreciated.
+Any feature requests are always welcome and will be considered in accordance with time and need. Additionally, existing feature requests are tracked in TODO.md. If you choose to contribute, your contributions will be greatly appreciated. Please reach out before creating any substantial pull requests. A bit of discussion can save a lot of time and increase the chances that your pull request will be accepted.
 
 ## License
 
