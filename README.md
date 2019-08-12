@@ -164,12 +164,13 @@ Install Runbook into your project:
   * [6.6 Adding New Run Behaviors](#adding-new-run-behaviors)
   * [6.7 Adding to Runbook's Run Metadata](#adding-to-runbooks-run-metadata)
   * [6.8 Adding to Runbook's Configuration](#adding-to-runbooks-configuration)
-* [7. Known Issues](#known-issues)
-* [8. Development](#development)
-* [9. Contributing](#contributing)
-* [10. Feature Requests](#feature-requests)
-* [11. License](#license)
-* [12. Code of Conduct](#code-of-conduct)
+* [7. Testing](#testing)
+* [8. Known Issues](#known-issues)
+* [9. Development](#development)
+* [10. Contributing](#contributing)
+* [11. Feature Requests](#feature-requests)
+* [12. License](#license)
+* [13. Code of Conduct](#code-of-conduct)
 
 ## Runbook Anatomy
 
@@ -1032,6 +1033,19 @@ end
 ```
 
 This will add a `log_level` attribute to Runbook's configuration with a default value of `:info`.
+
+## Testing
+
+Runbooks are inherently difficult to test because they are primarily composed of side-effects. That being said, there are a number of strategies you can employ to test your runbooks.
+
+1. Push complex logic to stand-alone Ruby objects that can be tested in isolation
+2. Use `TEST` or `DEBUG` environment variables to conditionally disable side-effects during execution
+3. Execute your runbooks in staging environments
+4. Noop your runbooks to understand what they will be executing before executing them
+
+See Runbook's test suite for more ideas on how to test your runbooks. For example, Runbook uses [aruba](https://github.com/cucumber/aruba) for testing Runbooks at the CLI level.
+
+Additionally, runbooks should contain their own assertions, sanity checks, monitoring, and alerting to mitigate errors and alert you if intervention is required.
 
 ## Known Issues
 
