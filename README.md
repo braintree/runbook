@@ -1042,7 +1042,7 @@ module MyRunbook::Extensions
 end
 ```
 
-This will add a `log_level` attribute to Runbook's configuration with a default value of `:info`. This configuration value can be accessed via `Runbook.configuration.log_level`.
+This will add a `log_level` attribute to Runbook's configuration with a default value of `:info`. This configuration value can be accessed via `Runbook.config.log_level`.
 
 ## Testing
 

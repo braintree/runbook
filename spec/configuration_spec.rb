@@ -18,6 +18,16 @@ RSpec.describe "Runbook Configuration" do
     end
   end
 
+  describe "config" do
+    it "returns a Runbook::Configuration object" do
+      expect(Runbook.config).to be_a(Runbook::Configuration)
+    end
+
+    it "is an alias for Runbook.configuration" do
+      expect(Runbook.config.object_id).to eq(Runbook.configuration.object_id)
+    end
+  end
+
   describe "default values" do
     it "sets ssh_kit to SSHKit's config" do
       expect(config.ssh_kit).to be_a(SSHKit::Configuration)

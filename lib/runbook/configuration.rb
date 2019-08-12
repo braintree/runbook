@@ -1,6 +1,10 @@
 module Runbook
   class << self
     attr_accessor :configuration
+
+    def config
+      @configuration
+    end
   end
 
   def self.configure
