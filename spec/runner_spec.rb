@@ -401,6 +401,13 @@ Note: Run me last
       end
     end
 
+    before(:each) do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[])
+        .with("TMUX")
+        .and_return("/var/local/tmux-sockets/pblesi,1234,0")
+    end
+
     context "without layout_panes" do
       let(:book) do
         Runbook.book(title) { }
