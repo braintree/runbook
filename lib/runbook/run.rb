@@ -42,7 +42,8 @@ module Runbook
         toolbox.output("Step #{metadata[:position]}:#{title}\n\n")
         return if metadata[:auto] || metadata[:noop] ||
           !metadata[:paranoid] || object.title.nil?
-        continue_result = toolbox.expand("Continue?", _step_choices)
+        step_choices = _step_choices(object, metadata)
+        continue_result = toolbox.expand("Continue?", step_choices)
         _handle_continue_result(continue_result, object, metadata)
       end
 
@@ -210,7 +211,7 @@ module Runbook
         object.class.to_s.underscore.gsub("/", "__")
       end
 
-      def _step_choices
+      def _step_choices(object, metadata)
         [
           {key: "c", name: "Continue to execute this step", value: :continue},
           {key: "s", name: "Skip this step", value: :skip},
