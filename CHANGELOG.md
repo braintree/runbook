@@ -4,6 +4,17 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.14.0` (2019-08-15)
+
+### Fixes:
+
+* Relax gem dependencies to be compatible with gems up to the next major version
+
+### New Features
+
+* Alias `install` cli command to `init`
+* Add `Runbook.config` alias for `Runbook.configuration`
+
 ## `v0.13.0` (2019-07-10)
 
 ### Potentially Breaking Changes:
