@@ -3,6 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/runbook.svg)](https://badge.fury.io/rb/runbook)
 [![Build Status](https://travis-ci.org/braintree/runbook.svg?branch=master)](https://travis-ci.org/braintree/runbook)
 
+_See [our blog post](https://medium.com/braintree-product-technology/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
+
 Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to execute commands on remote servers.
 
 <div align="center">
