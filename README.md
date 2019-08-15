@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/runbook.svg)](https://badge.fury.io/rb/runbook)
 [![Build Status](https://travis-ci.org/braintree/runbook.svg?branch=master)](https://travis-ci.org/braintree/runbook)
 
-_See [our blog post](https://medium.com/braintree-product-technology/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
+_See our [blog post](https://medium.com/braintree-product-technology/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
 
 Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to execute commands on remote servers.
 
@@ -1056,7 +1056,7 @@ Runbooks are inherently difficult to test because they are primarily composed of
 3. Execute your runbooks in staging environments
 4. Noop your runbooks to understand what they will be executing before executing them
 
-See Runbook's test suite for more ideas on how to test your runbooks. For example, Runbook uses [aruba](https://github.com/cucumber/aruba) for testing Runbooks at the CLI level.
+See Runbook's test suite for more ideas on how to test your runbooks. For example, Runbook uses [aruba](https://github.com/cucumber/aruba) to test Runbook at the CLI level.
 
 Additionally, runbooks should contain their own assertions, sanity checks, monitoring, and alerting to mitigate errors and alert you if intervention is required.
 
