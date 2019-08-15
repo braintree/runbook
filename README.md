@@ -1119,8 +1119,8 @@ To release a new version:
 1. Update the version number in `version.rb`.
 2. Update the changelog in `CHANGELOG.rb`.
 3. Commit changes with commit messsage: "Bump runbook version to X.Y.Z"
-4. Run `bundle exec rake release`, which will create a git tag for the version and push git commits and tags.
-5. Push the `.gem` file in `pkg` to your gem repository
+4. Run `gem signin` to ensure you can push the new version to rubygems.org
+5. Run `bundle exec rake release`, which will create a git tag for the version and push git commits and tags.
 
 ## Contributing
 
