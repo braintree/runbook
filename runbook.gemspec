@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'activesupport', '~> 5.0', '>= 5.0.0.1'
+  spec.add_runtime_dependency 'activesupport', '>= 5.0.1.x'
   spec.add_runtime_dependency "method_source", "~> 0.9"
   spec.add_runtime_dependency "sshkit", "1.16"
   spec.add_runtime_dependency "sshkit-sudo", "~> 0.1"
