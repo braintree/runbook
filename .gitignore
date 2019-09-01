@@ -10,3 +10,7 @@
 
 # rspec failure tracking
 .rspec_status
+
+# recommended:
+# https://github.com/thoughtbot/appraisal#version-control
+gemfiles/*.gemfile.lock

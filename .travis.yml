@@ -6,4 +6,16 @@ rvm:
   - 2.4.6
   - 2.5.5
   - 2.6.3
+gemfile:
+  - gemfiles/activesupport_5.gemfile
+  - gemfiles/activesupport_6.gemfile
+matrix:
+  exclude:
+    - rvm: 2.2.3
+      gemfile: gemfiles/activesupport_6.gemfile
+    - rvm: 2.2.10
+      gemfile: gemfiles/activesupport_6.gemfile
+    - rvm: 2.4.6
+      gemfile: gemfiles/activesupport_6.gemfile
+
 before_install: gem install bundler -v 1.15.4
