@@ -3,6 +3,7 @@ language: ruby
 rvm:
   - 2.2.3
   - 2.2.10
+  - 2.3.8
   - 2.4.6
   - 2.5.5
   - 2.6.3
@@ -14,6 +15,8 @@ matrix:
     - rvm: 2.2.3
       gemfile: gemfiles/activesupport_6.gemfile
     - rvm: 2.2.10
+      gemfile: gemfiles/activesupport_6.gemfile
+    - rvm: 2.3.8
       gemfile: gemfiles/activesupport_6.gemfile
     - rvm: 2.4.6
       gemfile: gemfiles/activesupport_6.gemfile
