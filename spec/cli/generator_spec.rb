@@ -516,6 +516,7 @@ RSpec.describe "runbook generate", type: :aruba do
           expect(gemfile).to_not have_file_content(/gem "bundler"/)
           expect(gemfile).to_not have_file_content(/gem "rake"/)
           expect(gemfile).to_not have_file_content(/gem "rspec"/)
+          expect(last_command_stopped.exit_status).to_not eq(0)
         end
       end
     end
