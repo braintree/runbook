@@ -29,11 +29,16 @@ module Runbook::Generators
 
       inside(parent_options[:root]) do
         test = "--test #{options[:test]}"
-        run("bundle gem #{_name} #{test} --no-coc --no-mit")
+        @exit = ! (
+          run("bundle gem #{_name} #{test} --no-coc --no-mit") ||
+          options[:pretend]
+        )
       end
     end
 
     def remove_unneeded_files
+      return if @exit
+
       dirs = [
         parent_options[:root],
         _name,
@@ -64,6 +69,8 @@ module Runbook::Generators
     end
 
     def shared_lib_dir
+      return if @exit
+
       msg = [
         "Where should shared runbook code live?",
         "Use `lib/#{_name}` for runbook-only projects",
@@ -79,6 +86,8 @@ module Runbook::Generators
     end
 
     def create_readme
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -89,6 +98,8 @@ module Runbook::Generators
     end
 
     def create_gemfile
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -109,6 +120,8 @@ module Runbook::Generators
     end
 
     def create_base_file
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -120,6 +133,8 @@ module Runbook::Generators
     end
 
     def modify_rakefile
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -130,6 +145,8 @@ module Runbook::Generators
     end
 
     def create_ruby_version
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -140,6 +157,8 @@ module Runbook::Generators
     end
 
     def create_ruby_gemset
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -150,6 +169,8 @@ module Runbook::Generators
     end
 
     def create_runbookfile
+      return if @exit
+
       target = File.join(
         parent_options[:root],
         _name,
@@ -160,6 +181,8 @@ module Runbook::Generators
     end
 
     def create_runbooks_directory
+      return if @exit
+
       dirs = [
         parent_options[:root],
         _name,
@@ -172,6 +195,8 @@ module Runbook::Generators
     end
 
     def create_extensions_directory
+      return if @exit
+
       dirs = [
         parent_options[:root],
         _name,
@@ -186,6 +211,8 @@ module Runbook::Generators
     end
 
     def create_generators_directory
+      return if @exit
+
       dirs = [
         parent_options[:root],
         _name,
@@ -200,6 +227,8 @@ module Runbook::Generators
     end
 
     def create_lib_directory
+      return if @exit
+
       dirs = [
         parent_options[:root],
         _name,
@@ -212,6 +241,8 @@ module Runbook::Generators
     end
 
     def update_bin_console
+      return if @exit
+
       path = [
         parent_options[:root],
         _name,
@@ -231,6 +262,8 @@ module Runbook::Generators
     end
 
     def remove_bad_test
+      return if @exit
+
       path = [
         parent_options[:root],
         _name,
@@ -251,6 +284,8 @@ module Runbook::Generators
     end
 
     def runbook_project_overview
+      return if @exit
+
       msg = [
         "",
         "Your runbook project was successfully created.",
