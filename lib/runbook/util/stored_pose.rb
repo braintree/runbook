@@ -26,7 +26,7 @@ module Runbook::Util
     end
 
     def self._slug(title)
-      title.titleize.gsub(/\s+/, "").underscore.dasherize
+      title.titleize.gsub(/[\/\s]+/, "").underscore.dasherize
     end
 
     def self.register_save_pose_hook(base)
