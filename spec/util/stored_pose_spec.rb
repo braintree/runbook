@@ -57,6 +57,17 @@ RSpec.describe Runbook::Util::StoredPose, type: :aruba do
       pose = Runbook::Util::StoredPose.load(metadata)
       expect(pose).to eq(current_pose)
     end
+
+    context "when the title has invalid characters" do
+      let(:book_title) { "My/Amazing/Runbook" }
+
+      it "saves the current position" do
+        Runbook::Util::StoredPose.save(current_pose, book_title: book_title)
+
+        pose = Runbook::Util::StoredPose.load(metadata)
+        expect(pose).to eq(current_pose)
+      end
+    end
   end
 
   describe "self.delete" do
