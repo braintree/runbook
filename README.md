@@ -233,7 +233,7 @@ Runbook.book "Unbalance node" do
 end
 ```
 
-Every book requires a title. Books can have description, layout, and section children. Descriptions describe the book and are declared with the `description` keyword.
+Every book requires a title. Books can have description, layout, section, and step children. Descriptions describe the book and are declared with the `description` keyword.
 
 ##### Sections
 
