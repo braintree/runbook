@@ -66,6 +66,18 @@ RSpec.describe Runbook::Util::Repo, type: :aruba do
       Runbook::Util::Repo.load(metadata)
       expect(metadata[:repo]).to eq(repo)
     end
+
+    context "when the title has invalid characters" do
+      let(:book_title) { "My/Amazing/Runbook" }
+
+      it "saves the repo" do
+        Runbook::Util::Repo.save(repo, book_title: book_title)
+        metadata[:repo] = {}
+
+        Runbook::Util::Repo.load(metadata)
+        expect(metadata[:repo]).to eq(repo)
+      end
+    end
   end
 
   describe "self.delete" do
