@@ -1,13 +1,14 @@
 module Runbook::Runs
   module SSHKit
     include Runbook::Run
-    extend Runbook::Helpers::SSHKitHelper
 
     def self.included(base)
       base.extend(ClassMethods)
     end
 
     module ClassMethods
+      include Runbook::Helpers::SSHKitHelper
+
       def runbook__statements__assert(object, metadata)
         cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
 
