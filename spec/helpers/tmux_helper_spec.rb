@@ -106,6 +106,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     let(:inputs) { [
       "My Runbook Title",
       "my Runbook title",
+      "my/Runbook/title",
       "OTHER Runbook TITLE",
       "some      Runbook TITLE",
     ] }
@@ -113,7 +114,9 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
     let(:outputs) { [
       "my-runbook-title",
       "my-runbook-title",
+      "my-runbook-title",
       "other-runbook-title",
+      "some-runbook-title",
       "some-runbook-title",
     ] }
 
