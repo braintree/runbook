@@ -267,7 +267,7 @@ assert(
   interval: 3, # seconds
   timeout: 300, # seconds
   attempts: 3,
-  timeout_statement: Runbook::Statements::Command.new(
+  abort_statement: Runbook::Statements::Command.new(
     "echo 'help' | mail -s 'need help' page-me@page-me.com",
     ssh_config: {servers: [:local], parallelization: {strategy: :parallel}},
     raw: false

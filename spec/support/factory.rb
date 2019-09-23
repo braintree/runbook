@@ -31,14 +31,14 @@ module Factory
         interval: 1,
         timeout: 5,
         attempts: 3,
-        timeout_statement: nil,
+        abort_statement: nil,
       }.merge!(overrides)
       return Runbook::Statements::Assert.new(
         attrs[:cmd],
         interval: attrs[:interval],
         timeout: attrs[:timeout],
         attempts: attrs[:attempts],
-        timeout_statement: attrs[:timeout_statement],
+        abort_statement: attrs[:abort_statement],
       )
     when :capture
       attrs = {

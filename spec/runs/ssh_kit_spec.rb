@@ -150,13 +150,13 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       context "when timeout_cmd is set" do
-        let (:timeout_cmd) { "echo 'timed out!'" }
-        let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
+        let (:abort_cmd) { "echo 'timed out!'" }
+        let (:abort_statement) { Runbook::Statements::Command.new(abort_cmd) }
         let (:object) do
           Runbook::Statements::Assert.new(
             cmd,
             timeout: timeout,
-            timeout_statement: timeout_statement
+            abort_statement: abort_statement
           )
         end
 
@@ -186,15 +186,15 @@ RSpec.describe Runbook::Runs::SSHKit do
         end
 
         context "when timeout_cmd_ssh_config is set" do
-          let (:timeout_cmd_ssh_config) do
+          let (:abort_cmd_ssh_config) do
             {servers: ["server01.stg"], parallelization: {}}
           end
-          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd, ssh_config: timeout_cmd_ssh_config) }
+          let (:abort_statement) { Runbook::Statements::Command.new(abort_cmd, ssh_config: abort_cmd_ssh_config) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_statement: timeout_statement,
+              abort_statement: abort_statement,
             )
           end
 
@@ -202,7 +202,7 @@ RSpec.describe Runbook::Runs::SSHKit do
             timeout_cmd_args = [:echo, "'timed out!'"]
             expect(toolbox).to receive(:error)
             expect(subject).to receive(:with_ssh_config).
-              with(timeout_cmd_ssh_config).
+              with(abort_cmd_ssh_config).
               and_call_original
             expect_any_instance_of(
               SSHKit::Backend::Abstract
@@ -216,12 +216,12 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         context "when timeout_cmd_raw is set to true" do
           let(:raw) { true }
-          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd, raw: raw) }
+          let (:abort_statement) { Runbook::Statements::Command.new(abort_cmd, raw: raw) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_statement: timeout_statement,
+              abort_statement: abort_statement,
             )
           end
 
@@ -262,13 +262,13 @@ RSpec.describe Runbook::Runs::SSHKit do
       end
 
       context "when timeout_cmd is set" do
-        let (:timeout_cmd) { "echo 'timed out!'" }
-        let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
+        let (:abort_cmd) { "echo 'timed out!'" }
+        let (:abort_statement) { Runbook::Statements::Command.new(abort_cmd) }
         let (:object) do
           Runbook::Statements::Assert.new(
             cmd,
             attempts: attempts,
-            timeout_statement: timeout_statement
+            abort_statement: abort_statement
           )
         end
 
@@ -355,7 +355,7 @@ RSpec.describe Runbook::Runs::SSHKit do
         end
 
         it "outputs the noop text for the timeout" do
-          msg1 = "after #{timeout} second(s), give up..."
+          msg1 = "after #{timeout} second(s), abort..."
           msg2 = "and exit"
           allow(toolbox).to receive(:output)
           expect(toolbox).to receive(:output).with(msg1)
@@ -365,19 +365,19 @@ RSpec.describe Runbook::Runs::SSHKit do
         end
 
         context "when timeout_cmd is specified" do
-          let (:timeout_cmd) { "./notify_everyone" }
-          let (:timeout_statement) { Runbook::Statements::Command.new(timeout_cmd) }
+          let (:abort_cmd) { "./notify_everyone" }
+          let (:abort_statement) { Runbook::Statements::Command.new(abort_cmd) }
           let (:object) do
             Runbook::Statements::Assert.new(
               cmd,
               timeout: timeout,
-              timeout_statement: timeout_statement,
+              abort_statement: abort_statement,
             )
           end
 
           it "outputs the noop text for the timeout_cmd" do
             msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
-            msg2 = "after #{timeout} second(s), give up..."
+            msg2 = "after #{timeout} second(s), abort..."
             msg3 = "[NOOP] Run: `./notify_everyone`"
             msg4 = "and exit"
             allow(toolbox).to receive(:output)
@@ -399,7 +399,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         it "outputs the noop text for the attempts" do
           msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
-          msg2 = "after #{attempts} attempts, give up..."
+          msg2 = "after #{attempts} attempts, abort..."
           msg3 = "and exit"
 
           allow(toolbox).to receive(:output)
@@ -420,7 +420,7 @@ RSpec.describe Runbook::Runs::SSHKit do
 
         it "outputs the noop text for the attempts" do
           msg1 = "[NOOP] Assert: `echo 'hi'` returns 0 (running every 1 second(s))"
-          msg2 = "after #{timeout} second(s) or #{attempts} attempts, give up..."
+          msg2 = "after #{timeout} second(s) or #{attempts} attempts, abort..."
           msg3 = "and exit"
 
           allow(toolbox).to receive(:output)

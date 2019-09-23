@@ -30,7 +30,6 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 
 ## Features Outline
 
-* [Update Assert Attribute](#update-assert-attribute): `timeout_statement` should be a `giveup_statement`
 * [Non-echoed Input](#non-echoed-input): Add option to not echo output for the ask statement
 * [Sudo Raw Command Support](#sudo-raw-command-support): Add support for sudo interaction handler for raw commands
 * [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
@@ -62,12 +61,6 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [Interactive Runbook Launcher](#interactive-runbook-launcher): A CLI launcher to review and execute runbooks
 
 ### Feature Details
-
-#### Update Assert Attribute
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-When `count`s were added to `assert`, `timeout_statement` no longer made contextual sense. It should be updated to `giveup_statement` and the former deprecated to improve clarity.
 
 #### Non-echoed Input
 

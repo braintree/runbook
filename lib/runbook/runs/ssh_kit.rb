@@ -19,18 +19,18 @@ module Runbook::Runs
           if object.timeout > 0 || object.attempts > 0
             timeout_msg = object.timeout > 0 ? "#{object.timeout} second(s)" : nil
             attempts_msg = object.attempts > 0 ? "#{object.attempts} attempts" : nil
-            giveup_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, give up..."
-            metadata[:toolbox].output(giveup_msg)
-            if object.timeout_statement
-              object.timeout_statement.parent = object.parent
-              object.timeout_statement.run(self, metadata.dup)
+            abort_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, abort..."
+            metadata[:toolbox].output(abort_msg)
+            if object.abort_statement
+              object.abort_statement.parent = object.parent
+              object.abort_statement.run(self, metadata.dup)
             end
             metadata[:toolbox].output("and exit")
           end
           return
         end
 
-        gave_up = false
+        should_abort = false
         test_args = ssh_kit_command(object.cmd, raw: object.cmd_raw)
         test_options = ssh_kit_command_options(cmd_ssh_config)
 
@@ -39,12 +39,12 @@ module Runbook::Runs
           count = object.attempts
           while !(test(*test_args, test_options))
             if ((count -= 1) == 0)
-              gave_up = true
+              should_abort = true
               break
             end
 
             if (object.timeout > 0 && Time.now - time > object.timeout)
-              gave_up = true
+              should_abort = true
               break
             end
 
@@ -52,12 +52,12 @@ module Runbook::Runs
           end
         end
 
-        if gave_up
+        if should_abort
           error_msg = "Error! Assertion `#{object.cmd}` failed"
           metadata[:toolbox].error(error_msg)
-          if object.timeout_statement
-            object.timeout_statement.parent = object.parent
-            object.timeout_statement.run(self, metadata.dup)
+          if object.abort_statement
+            object.abort_statement.parent = object.parent
+            object.abort_statement.run(self, metadata.dup)
           end
           raise Runbook::Runner::ExecutionError, error_msg
         end

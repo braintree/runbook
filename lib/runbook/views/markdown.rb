@@ -31,10 +31,10 @@ module Runbook::Views
       if object.timeout > 0 || object.attempts > 0
         timeout_msg = object.timeout > 0 ? "#{object.timeout} second(s)" : nil
         attempts_msg = object.attempts > 0 ? "#{object.attempts} attempts" : nil
-        giveup_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, give up..."
-        output << "   #{giveup_msg}\n\n"
-        if object.timeout_statement
-          object.timeout_statement.render(self, output, metadata.dup)
+        abort_msg = "after #{[timeout_msg, attempts_msg].compact.join(" or ")}, abort..."
+        output << "   #{abort_msg}\n\n"
+        if object.abort_statement
+          object.abort_statement.render(self, output, metadata.dup)
         end
         output << "   and exit\n\n"
       end
