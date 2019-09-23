@@ -21,13 +21,18 @@ RSpec.describe Runbook::Toolbox do
 
   describe "ask" do
     it "passes its argument to prompt.ask" do
-      expect(prompt).to receive(:ask).with(msg, default: nil)
+      expect(prompt).to receive(:ask).with(msg, default: nil, echo: true)
       toolbox.ask(msg)
     end
 
     it "passes its default to prompt.ask" do
-      expect(prompt).to receive(:ask).with(msg, default: default)
+      expect(prompt).to receive(:ask).with(msg, default: default, echo: true)
       toolbox.ask(msg, default: default)
+    end
+
+    it "passes its echo to prompt.ask" do
+      expect(prompt).to receive(:ask).with(msg, default: nil, echo: false)
+      toolbox.ask(msg, echo: false)
     end
   end
 

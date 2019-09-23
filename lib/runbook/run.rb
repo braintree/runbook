@@ -66,11 +66,12 @@ module Runbook
 
         if metadata[:noop]
           default_msg = default ? " (default: #{default})" : ""
-          metadata[:toolbox].output("[NOOP] Ask: #{object.prompt} (store in: #{object.into})#{default_msg}")
+          echo_msg = object.echo ? "" : " (echo: false)"
+          metadata[:toolbox].output("[NOOP] Ask: #{object.prompt} (store in: #{object.into})#{default_msg}#{echo_msg}")
           return
         end
 
-        result = metadata[:toolbox].ask(object.prompt, default: default)
+        result = metadata[:toolbox].ask(object.prompt, default: default, echo: object.echo)
 
         target = object.parent.dsl
         target.singleton_class.class_eval { attr_accessor object.into }

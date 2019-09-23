@@ -249,10 +249,10 @@ Statements are the workhorses of runbooks. They comprise all the behavior runboo
 
 ##### Ask
 
-Prompts the user for a string and stores its value on the containing step entity. Once this statement is executed, its value is accessed as an instance variable under the `into` parameter. This value can be referenced in later statements such as the `ruby_command` statement.
+Prompts the user for a string and stores its value on the containing step entity. Once this statement is executed, its value is accessed as an instance variable under the `into` parameter. This value can be referenced in later statements such as the `ruby_command` statement. An optional `default` value can be specified. An optional `echo` parameter can be specified to indicate whether typed input should be echoed to the screen.
 
 ```ruby
-ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100"
+ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100", echo: true
 ```
 
 ##### Assert

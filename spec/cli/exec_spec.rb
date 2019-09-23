@@ -750,5 +750,42 @@ RSpec.describe "runbook run", type: :aruba do
         end
       end
     end
+
+    context "echoing input" do
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "#{book_title}" do
+          step do
+            ask "What's the meaning of life?", into: :life_meaning, echo: #{echo}
+          end
+        end
+        RUNBOOK
+      end
+      let(:command) { "runbook exec #{runbook_file}" }
+
+      context "when asked for echoed input" do
+        let(:echo) { "true" }
+
+        it "does not echo the input" do
+          type("candy\n")
+
+          expect(
+            last_command_started
+          ).to have_output(/candy/)
+        end
+      end
+
+      context "when asked for un-echoed input" do
+        let(:echo) { "false" }
+
+        it "does not echo the input" do
+          type("candy\n")
+
+          expect(
+            last_command_started
+          ).to_not have_output(/candy/)
+        end
+      end
+    end
   end
 end

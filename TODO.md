@@ -30,7 +30,6 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 
 ## Features Outline
 
-* [Non-echoed Input](#non-echoed-input): Add option to not echo output for the ask statement
 * [Sudo Raw Command Support](#sudo-raw-command-support): Add support for sudo interaction handler for raw commands
 * [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
 * [Shortened Tmux Layout Keys](#shortened-tmux-layout-keys): Make tmux layout keys easier
@@ -61,18 +60,6 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [Interactive Runbook Launcher](#interactive-runbook-launcher): A CLI launcher to review and execute runbooks
 
 ### Feature Details
-
-#### Non-echoed Input
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-When collecting certain input such as api tokens, it is a best practice to not echo these values to the screen. Runbook should support this behavior as part of its [ask statement](https://github.com/braintree/runbook/blob/0c0a028dffe88f0bb45ab2afcffe202ae3baa58b/lib/runbook/run.rb#L50-L78). TTY::Prompt already supports this behavior, so it will not be too difficult to add an option to not echo output to the statement.
-
-Helpful links:
-
-* https://github.com/piotrmurach/tty-prompt/tree/90b3f9029a00cf32c84c6a7f5af91160a35673dc#214-echo
-* https://github.com/braintree/runbook/commit/2ab93a58
-* https://github.com/braintree/runbook/commit/075d95c214c44db2c2803c211fbd40e1fbc89ae9#diff-a4bf760ce531af31e88293aecd750138
 
 #### Sudo Raw Command Support
 

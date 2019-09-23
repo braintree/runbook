@@ -6,8 +6,8 @@ module Runbook
       @prompt = TTY::Prompt.new
     end
 
-    def ask(msg, default: nil)
-      prompt.ask(msg, default: default)
+    def ask(msg, default: nil, echo: true)
+      prompt.ask(msg, default: default, echo: echo)
     end
 
     def expand(msg, choices)

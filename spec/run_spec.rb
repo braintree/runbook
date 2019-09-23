@@ -254,6 +254,19 @@ RSpec.describe "Runbook::Run" do
           subject.execute(object, metadata)
         end
       end
+
+      context "when echo: false specified" do
+        let (:object) {
+          Runbook::Statements::Ask.new(prompt, into: into, echo: false)
+        }
+
+        it "outputs that echo is set to false" do
+          msg = "[NOOP] Ask: #{prompt} (store in: #{into}) (echo: false)"
+          expect(toolbox).to receive(:output).with(msg)
+
+          subject.execute(object, metadata)
+        end
+      end
     end
 
     context "auto" do
@@ -302,7 +315,7 @@ RSpec.describe "Runbook::Run" do
 
     it "prompts the user and stores the result on the parent object" do
       result = "result"
-      expect(toolbox).to receive(:ask).with(prompt, default: nil).and_return(result)
+      expect(toolbox).to receive(:ask).with(prompt, default: nil, echo: true).and_return(result)
 
       subject.execute(object, metadata)
 
@@ -317,7 +330,7 @@ RSpec.describe "Runbook::Run" do
 
       it "passes the default value to the ask statement" do
         result = "result"
-        expect(toolbox).to receive(:ask).with(prompt, default: default).and_return(result)
+        expect(toolbox).to receive(:ask).with(prompt, default: default, echo: true).and_return(result)
 
         subject.execute(object, metadata)
 
@@ -339,12 +352,29 @@ RSpec.describe "Runbook::Run" do
           result = "result"
           expect(toolbox).to receive(
             :ask
-          ).with(prompt, default: existing_val).and_return(result)
+          ).with(prompt, default: existing_val, echo: true).and_return(result)
 
           subject.execute(object, metadata)
 
           expect(object.parent.sky_color).to eq(result)
         end
+      end
+    end
+
+    context "when echo: false specified" do
+      let (:object) {
+        Runbook::Statements::Ask.new(prompt, into: into, echo: false)
+      }
+
+      it "tells ask to not echo user input" do
+        result = "result"
+        expect(toolbox).to receive(
+          :ask
+        ).with(prompt, default: nil, echo: false).and_return(result)
+
+        subject.execute(object, metadata)
+
+        expect(object.parent.sky_color).to eq(result)
       end
     end
   end
