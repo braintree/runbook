@@ -30,37 +30,76 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 
 ## Features Outline
 
-* [Capistrano-runbook Gem](#capistrano-runbook-gem): A gem for integrating runbook directly into capistrano
+* [Update Assert Attribute](#update-assert-attribute): `timeout_statement` should be a `giveup_statement`
 * [Non-echoed Input](#non-echoed-input): Add option to not echo output for the ask statement
 * [Sudo Raw Command Support](#sudo-raw-command-support): Add support for sudo interaction handler for raw commands
+* [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
+* [Capistrano-runbook Gem](#capistrano-runbook-gem): A gem for integrating runbook directly into capistrano
+* [Blocking Tmux Commands](#blocking-tmux-commands): Don't continue execution until the tmux_command completes
 * [Runbook Logger](#runbook-logger): A logger for Runbook
 * [Mutation Command Skipping](#mutation-command-skipping): Allow skipping mutation commands
 * [Revert Section](#revert-section): A section that can be triggered which will revert the changes of the runbook
 * [Runbook Versioning](#runbook-versioning): Specify a version in a runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [Replace Thor CLI](#replace-thor-cli): Replace Thor for Runbook's CLI with something that can be more easily extended and customized
+* [Goto Statement](#goto-statement): A statement for jumping to a specific step
 * [Test Statement](#test-statement): A statement for executing a remote command and conditioning on its success
 * [RubyAssert Statement](#rubyassert-statement): A statement analogous to assert, but executing a block instead of a command
-* [Blocking Tmux Commands](#blocking-tmux-commands): Don't continue execution until the tmux_command completes
+* [Docker Testing](#docker-testing): Add tests that execute against docker containers
 * [Tmux Command Results](#tmux-command-results): Capture outputs and status codes for tmux commands
 * [Shortened Tmux Layout Keys](#shortened-tmux-layout-keys): Make tmux layout keys easier
 * [Add Host Aliases for SSH Config](#add-host-aliases-for-ssh-config): Use `host` and `hosts` instead of `server` and `servers`
-* [Update Assert Attribute](#update-assert-attribute): `timeout_statement` should be a `giveup_statement`
 * [Step Dependencies](#step-dependencies): Like rake, allow a step to invoke another step if it has not been executed
 * [Update Command Counts](#update-command-counts): Use step titles for counting commands executed in a step
 * [Create Plugin Generator](#create-plugin-generator): A generator for creating boilerplate for a new Runbook plugin
 * [Create Run Generator](#create-run-generator): A generator for creating boilerplate for a new run such as sshkit
 * [Create View Generator](#create-view-generator): A generator for creating boilerplate for a new view such as markdown, yaml, html
 * [Outline View Option](#outline-view-option): A command-line option to only execute entity nodes
+* [Guard Runbook](#guard-runbook): Automatically update Runbook views when a runbook is saved
 * [Rake Task Interface](#rake-task-interface): Execute and view runbooks with rake tasks
 * [Multiple Commands In Groups](#multiple-commands-in-groups): Execute multiple sshkit commands for a group of servers before moving on to a new group of servers
-* [Docker Testing](#docker-testing): Add tests that execute against docker containers
-* [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
 * [Yaml Specification](#yaml-specification): Define your runbook using yaml instead of Ruby
-* [Guard Runbook](#guard-runbook): Automatically update Runbook views when a runbook is saved
 * [Runbook Web Server](#runbook-web-server): Automatically serve up Runbook views via the web
 * [Interactive Runbook Launcher](#interactive-runbook-launcher): A CLI launcher to review and execute runbooks
 
 ### Feature Details
+
+#### Update Assert Attribute
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+When `count`s were added to `assert`, `timeout_statement` no longer made contextual sense. It should be updated to `giveup_statement` and the former deprecated to improve clarity.
+
+#### Non-echoed Input
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+When collecting certain input such as api tokens, it is a best practice to not echo these values to the screen. Runbook should support this behavior as part of its [ask statement](https://github.com/braintree/runbook/blob/0c0a028dffe88f0bb45ab2afcffe202ae3baa58b/lib/runbook/run.rb#L50-L78). TTY::Prompt already supports this behavior, so it will not be too difficult to add an option to not echo output to the statement.
+
+Helpful links:
+
+* https://github.com/piotrmurach/tty-prompt/tree/90b3f9029a00cf32c84c6a7f5af91160a35673dc#214-echo
+* https://github.com/braintree/runbook/commit/2ab93a58
+* https://github.com/braintree/runbook/commit/075d95c214c44db2c2803c211fbd40e1fbc89ae9#diff-a4bf760ce531af31e88293aecd750138
+
+#### Sudo Raw Command Support
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+Runbook supports a password prompt when executing commands using sudo. The typical way to execute sudo commands is to specify the `user` setter. This will do three things. It will (1) set the interaction handler when performing the initial [sudo check](https://github.com/braintree/runbook/blob/54e90f2a9c93704857bc31b0e03769b6e959d879/lib/hacks/ssh_kit.rb#L40-L49) and the pty for the execution of the command. It will (2) wrap the command to be executed with [a call to sudo](https://github.com/braintree/runbook#command-quoting). And it will (3) set the [interaction handler for commands](https://github.com/braintree/runbook/blob/54e90f2a9c93704857bc31b0e03769b6e959d879/lib/runbook/helpers/ssh_kit_helper.rb#L11-L13) that are executing which are wrapped in sudo.
+
+Raw commands remove all the [command wrapping](https://github.com/braintree/runbook/commit/075d95c214c44db2c2803c211fbd40e1fbc89ae9#diff-a4bf760ce531af31e88293aecd750138https://github.braintreeps.com/braintree/runbook#command-quoting) that is performed when specifying commands. This is nice when you want to avoid the helper functionality when it complicates or obfuscates the command you are trying to execute (for example trying to escape nested quotes).
+
+when raw is specified, number (!) above is not executed. Thus pty is not set to true. (2) can be assumed to manually be performed by the user (they will have to type their own sudo command). (3) Is currently toggled by the user setter and the `enable_sudo_prompt` config.
+
+An ideal solution for this would allow the user to set pty true for the command to be executed via ssh_config. Additionally, it would be beneficial to set their own interaction handler. It seems safe to assume that if a user specifies that a command be executed with a pty, then we can set the sudo interaction handler by default if `enable_sudo_prompt` is set, but still allow for the interaction_handler to be overridden.
+
+#### Always-executed Setup Section
+
+**Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 2**
+
+It is often a best practice to provide a setup section at the beginning of your runbook which gathers all required info for the runbook so the rest of the runbook can execute with minimal interruption. Under certain circumstances it can be ideal to ensure this section is always run, so that if you want to jump to the middle of a runbook, you can have confidence that any necessary initial configuration is executed.
+
+This can additionally be used if you want to dynamically define your runbook based on some initial input, then you can ensure that this is executed and you can step to the middle of a runbook, but know that the step has been defined by the initial setup. This, however, would not aid in generating a proper view for the runbook.
 
 #### Capistrano-runbook Gem
 
@@ -76,23 +115,17 @@ Helpful links:
 * https://github.com/braintree/runbook/blob/0c0a028dffe88f0bb45ab2afcffe202ae3baa58b/lib/runbook/cli.rb#L22-L28
 * https://github.com/braintree/runbook/blob/master/README.md#from-within-your-project
 
+#### Blocking Tmux Commands
+
+**Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 2**
+
+Right now tmux commands are started and then immediately return control to the runbook. It would be ideal if a flag could be passed to not return control to the runbook until the tmux command has completed. Additionally, it may be nice to have a block command that waits for one of multiple tmux commands to finish executing. One potential implementation for this is to use `ps`. Another may be to use the `proc` file system. I am not aware of anything built into tmux for this purpose.
+
 #### Runbook Logger
 
 **Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 2**
 
 Include a dedicated logger for Runbook that is incorporated into the execution. This can be off by default, but enabled by setting a log file. Additionally, a log-level can be set. Log output should include what is being executed, and what the result is. The log should be compatible with sshkit's log output. Additionally, this should be implemented in a way that all normal output is suppressed and log output is written to stdout. It would be nice if adding logging did not require additional code for each entity and statement execution.
-
-#### Non-echoed Input
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-When collecting certain input such as api tokens, it is a best practice to not echo these values to the screen. Runbook should support this behavior as part of its [ask statement](https://github.com/braintree/runbook/blob/0c0a028dffe88f0bb45ab2afcffe202ae3baa58b/lib/runbook/run.rb#L50-L78). TTY::Prompt already supports this behavior, so it will not be too difficult to add an option to not echo output to the statement.
-
-Helpful links:
-
-* https://github.com/piotrmurach/tty-prompt/tree/90b3f9029a00cf32c84c6a7f5af91160a35673dc#214-echo
-* https://github.com/braintree/runbook/commit/2ab93a58
-* https://github.com/braintree/runbook/commit/075d95c214c44db2c2803c211fbd40e1fbc89ae9#diff-a4bf760ce531af31e88293aecd750138
 
 #### Mutation Command Skipping
 
@@ -126,18 +159,6 @@ An alternative to including a version declaration would be to only change backwa
 
 A version flag can always be added at a later date, and Runbooks without the flag can be considered to be the older version. This could be set to be required for new Runbooks.
 
-#### Sudo Raw Command Support
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-Runbook supports a password prompt when executing commands using sudo. The typical way to execute sudo commands is to specify the `user` setter. This will do three things. It will (1) set the interaction handler when performing the initial [sudo check](https://github.com/braintree/runbook/blob/54e90f2a9c93704857bc31b0e03769b6e959d879/lib/hacks/ssh_kit.rb#L40-L49) and the pty for the execution of the command. It will (2) wrap the command to be executed with [a call to sudo](https://github.com/braintree/runbook#command-quoting). And it will (3) set the [interaction handler for commands](https://github.com/braintree/runbook/blob/54e90f2a9c93704857bc31b0e03769b6e959d879/lib/runbook/helpers/ssh_kit_helper.rb#L11-L13) that are executing which are wrapped in sudo.
-
-Raw commands remove all the [command wrapping](https://github.com/braintree/runbook/commit/075d95c214c44db2c2803c211fbd40e1fbc89ae9#diff-a4bf760ce531af31e88293aecd750138https://github.braintreeps.com/braintree/runbook#command-quoting) that is performed when specifying commands. This is nice when you want to avoid the helper functionality when it complicates or obfuscates the command you are trying to execute (for example trying to escape nested quotes).
-
-when raw is specified, number (!) above is not executed. Thus pty is not set to true. (2) can be assumed to manually be performed by the user (they will have to type their own sudo command). (3) Is currently toggled by the user setter and the `enable_sudo_prompt` config.
-
-An ideal solution for this would allow the user to set pty true for the command to be executed via ssh_config. Additionally, it would be beneficial to set their own interaction handler. It seems safe to assume that if a user specifies that a command be executed with a pty, then we can set the sudo interaction handler by default if `enable_sudo_prompt` is set, but still allow for the interaction_handler to be overridden.
-
 #### Replace Thor CLI
 
 **Difficulty: 3**, **Desireability: 2**, **Conceptual Completeness: 2**
@@ -164,11 +185,13 @@ This statement would take a command, execute it using SSHKit's test command, and
 
 This statement would duplicate all of the logic of the current `assert`, but instead of conditioning on whether a command executes successfully, it would condition on whether the block executes successfully. This behavior can currently be accomplished with a `ruby_command`, but it takes a deal of effort to copy the same logic.
 
-#### Blocking Tmux Commands
+#### Docker Testing
 
 **Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 2**
 
-Right now tmux commands are started and then immediately return control to the runbook. It would be ideal if a flag could be passed to not return control to the runbook until the tmux command has completed. Additionally, it may be nice to have a block command that waits for one of multiple tmux commands to finish executing. One potential implementation for this is to use `ps`. Another may be to use the `proc` file system. I am not aware of anything built into tmux for this purpose.
+Providing integration-level tests that execute features of runbook against docker containers would give us additional test coverage to test features of runbook that use sshkit against remote hosts. Additionally, we could increase our test coverage for our sshkit-sudo functionality.
+
+Additionally, it is worth thinking about if any changes to Runbook can help support testing runbooks created by end-users. What is needed to be able to spin up a test environment, execute a runbook, and ensure that the runbook executed successfully?
 
 #### Tmux Command Results
 
@@ -187,12 +210,6 @@ It would be nice to capture output or status codes from an executed tmux command
 **Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
 
 `server` should become `host` because it is shorter. `servers` should become `hosts` because it is shorter and just as intuitive. Usage of old values should be marked as deprecated.
-
-#### Update Assert Attribute
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-When `count`s were added to `assert`, `timeout_statement` no longer made contextual sense. It should be updated to `giveup_statement` and the former deprecated to improve clarity.
 
 #### Step Dependencies
 
@@ -239,6 +256,12 @@ This would make creating new views easier. As creating new views is a pretty rar
 
 When this option is supplied only entity nodes (book, section, step) would be rendered. This could be nice if you just want an overview of what a runbook does. I have not seen too much demand for this feature, so have not implemented it. It would add an additional option to the view CLI command.
 
+#### Guard Runbook
+
+**Difficulty: 2**, **Desireability: 2**, **Conceptual Completeness: 2**
+
+It could be nice to automatically update Runbook views when a runbook file is modified. This can help identify syntax errors and keep persisted views up to date. It could be helpful to see how your changes are displayed within a Runbook view. This is the main use case I can think of for guard, but perhaps there are others?
+
 #### Rake Task Interface
 
 **Difficulty: 1**, **Desireability: 3**, **Conceptual Completeness: 1**
@@ -253,22 +276,6 @@ When specifying to execute a command against multiple servers in groups using th
 
 I do not have an idea of how to cleanly accomplish this.
 
-#### Docker Testing
-
-**Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 2**
-
-Providing integration-level tests that execute features of runbook against docker containers would give us additional test coverage to test features of runbook that use sshkit against remote hosts. Additionally, we could increase our test coverage for our sshkit-sudo functionality. 
-
-Additionally, it is worth thinking about if any changes to Runbook can help support testing runbooks created by end-users. What is needed to be able to spin up a test environment, execute a runbook, and ensure that the runbook executed successfully?
-
-#### Always-executed Setup Section
-
-**Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 2**
-
-It is often a best practice to provide a setup section at the beginning of your runbook which gathers all required info for the runbook so the rest of the runbook can execute with minimal interruption. Under certain circumstances it can be ideal to ensure this section is always run, so that if you want to jump to the middle of a runbook, you can have confidence that any necessary initial configuration is executed. 
-
-This can additionally be used if you want to dynamically define your runbook based on some initial input, then you can ensure that this is executed and you can step to the middle of a runbook, but know that the step has been defined by the initial setup. This, however, would not aid in generating a proper view for the runbook.
-
 #### Yaml Specification
 
 **Difficulty: 2**, **Desireability: 2**, **Conceptual Completeness: 1**
@@ -278,12 +285,6 @@ Right now the only way to define your Runbook is using Ruby. When the book is ev
 Actually writing a runbook in Yaml, would likely limit the ease of use and feature set for writing a runbook. Specifically, it would require a separate templating language for the yaml (instead of pure Ruby), and ruby_command blocks would need to be eval'ed, there would be no syntax highlighting or other Ruby compilation errors. It may make stack traces more difficult to read or debugging harder.
 
 Having a yaml representation of your runbook could aid in additional analysis such as more easily detecting compatibility errors, if all required plugins are present, if there is a semantic vs. syntactic change to the runbook.
-
-#### Guard Runbook
-
-**Difficulty: 2**, **Desireability: 2**, **Conceptual Completeness: 2**
-
-It could be nice to automatically update Runbook views when a runbook file is modified. This can help identify syntax errors and keep persisted views up to date. It could be helpful to see how your changes are displayed within a Runbook view. This is the main use case I can think of for guard, but perhaps there are others?
 
 #### Runbook Web Server
 
@@ -296,6 +297,3 @@ It might be nice to be able to serve up a local copy of Runbook views so they co
 **Difficulty: 2**, **Desireability: 3**, **Conceptual Completeness: 3**
 
 It might be nice to provide a cool CLI for listing and navigating the set of runbooks for a project. It could display titles and descriptions and the runbooks could be interactively launched in separate panes. This may be helpful for someone first familiarizing themselves with the runbooks associated with a project. This may depend on a great deal of customization to suite people's workflows so it may not be that valuable. It could be similar to `rake -T` on steroids.
-
-
-
