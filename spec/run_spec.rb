@@ -541,11 +541,12 @@ RSpec.describe "Runbook::Run" do
   end
 
   describe "runbook__statements__ruby_command" do
-    let (:block) { ->(object, metadata) { raise "This happened" } }
+    let (:block) { ->(object, metadata, run) { raise "This happened" } }
     let (:object) { Runbook::Statements::RubyCommand.new(&block) }
 
     before(:each) do
-      object.parent = Runbook::Entities::Step.new("step")
+      step = Runbook::Entities::Step.new("step")
+      step.add(object)
     end
 
     it "runs the block" do
@@ -554,13 +555,23 @@ RSpec.describe "Runbook::Run" do
       end.to raise_error("This happened")
     end
 
+    context "arguments" do
+      let (:block) { ->(object, metadata, run) { raise unless run < Runbook::Run } }
+
+      it "receives the run as an argument" do
+        expect do
+          subject.execute(object, metadata)
+        end.to_not raise_error
+      end
+    end
+
     context "noop" do
       let(:metadata_override) { {noop: true} }
 
       it "outputs the noop text for the ruby command statement" do
         msg1 = "[NOOP] Run the following Ruby block:\n"
         expect(toolbox).to receive(:output).with(msg1)
-        msg2 = "```ruby\nlet (:block) { ->(object, metadata) { raise \"This happened\" } }\n```\n"
+        msg2 = "```ruby\nlet (:block) { ->(object, metadata, run) { raise \"This happened\" } }\n```\n"
         expect(toolbox).to receive(:output).with(msg2)
         expect(subject).to_not receive(:instance_exec)
 

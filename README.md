@@ -355,10 +355,10 @@ notice "There be dragons!"
 
 ##### Ruby Command
 
-Executes its block in the context of the parent step. The block is passed the ruby_command statement and the execution metadata as arguments.
+Executes its block in the context of the parent step. The block is passed the ruby_command statement, the execution metadata, and the run as arguments.
 
 ```ruby
-ruby_command do |rb_cmd, metadata|
+ruby_command do |rb_cmd, metadata, run|
   if (failure_rate = rb_cmd.parent.failing_request_percentage) > 25
     `echo 'Help! failure rate at #{failure_rate}' | mail -s 'High failure rate!' page-me@page-me.com`
   else
