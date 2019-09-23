@@ -33,6 +33,8 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [Non-echoed Input](#non-echoed-input): Add option to not echo output for the ask statement
 * [Sudo Raw Command Support](#sudo-raw-command-support): Add support for sudo interaction handler for raw commands
 * [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
+* [Shortened Tmux Layout Keys](#shortened-tmux-layout-keys): Make tmux layout keys easier
+* [Add Host Aliases for SSH Config](#add-host-aliases-for-ssh-config): Use `host` and `hosts` instead of `server` and `servers`
 * [Capistrano-runbook Gem](#capistrano-runbook-gem): A gem for integrating runbook directly into capistrano
 * [Blocking Tmux Commands](#blocking-tmux-commands): Don't continue execution until the tmux_command completes
 * [Runbook Logger](#runbook-logger): A logger for Runbook
@@ -45,8 +47,6 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [RubyAssert Statement](#rubyassert-statement): A statement analogous to assert, but executing a block instead of a command
 * [Docker Testing](#docker-testing): Add tests that execute against docker containers
 * [Tmux Command Results](#tmux-command-results): Capture outputs and status codes for tmux commands
-* [Shortened Tmux Layout Keys](#shortened-tmux-layout-keys): Make tmux layout keys easier
-* [Add Host Aliases for SSH Config](#add-host-aliases-for-ssh-config): Use `host` and `hosts` instead of `server` and `servers`
 * [Step Dependencies](#step-dependencies): Like rake, allow a step to invoke another step if it has not been executed
 * [Update Command Counts](#update-command-counts): Use step titles for counting commands executed in a step
 * [Create Plugin Generator](#create-plugin-generator): A generator for creating boilerplate for a new Runbook plugin
@@ -93,6 +93,18 @@ An ideal solution for this would allow the user to set pty true for the command 
 It is often a best practice to provide a setup section at the beginning of your runbook which gathers all required info for the runbook so the rest of the runbook can execute with minimal interruption. Under certain circumstances it can be ideal to ensure this section is always run, so that if you want to jump to the middle of a runbook, you can have confidence that any necessary initial configuration is executed.
 
 This can additionally be used if you want to dynamically define your runbook based on some initial input, then you can ensure that this is executed and you can step to the middle of a runbook, but know that the step has been defined by the initial setup. This, however, would not aid in generating a proper view for the runbook.
+
+#### Shortened Tmux Layout Keys
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+`directory` should become `path` because it is shorter and consistent with the DSL. `runbook_pane` should become `runbook` because it is shorter and just as intuitive. Usage of old values should be marked as deprecated.
+
+#### Add Host Aliases for SSH Config
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+`server` should become `host` because it is shorter. `servers` should become `hosts` because it is shorter and just as intuitive. Usage of old values should be marked as deprecated.
 
 #### Capistrano-runbook Gem
 
@@ -191,18 +203,6 @@ Additionally, it is worth thinking about if any changes to Runbook can help supp
 **Difficulty: 2**, **Desireability: 2**, **Conceptual Completeness: 2**
 
 It would be nice to capture output or status codes from an executed tmux command. This could be accomplished by writing the values to a file and then reading them, but it may be nice to have a more streamlined solution.
-
-#### Shortened Tmux Layout Keys
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-`directory` should become `path` because it is shorter and consistent with the DSL. `runbook_pane` should become `runbook` because it is shorter and just as intuitive. Usage of old values should be marked as deprecated.
-
-#### Add Host Aliases for SSH Config
-
-**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
-
-`server` should become `host` because it is shorter. `servers` should become `hosts` because it is shorter and just as intuitive. Usage of old values should be marked as deprecated.
 
 #### Step Dependencies
 
