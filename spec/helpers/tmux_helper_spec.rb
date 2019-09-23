@@ -71,7 +71,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
       end
 
       it "writes layout_panes to layout_file" do
-        expect(File).to receive(:open).with(layout_file, 'w')
+        expect(File).to receive(:open).with(layout_file, 'w', 0600)
 
         subject.setup_layout(structure, runbook_title: title)
       end

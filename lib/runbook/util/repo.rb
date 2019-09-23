@@ -1,6 +1,7 @@
 module Runbook::Util
   module Repo
     FILE_ID = "data"
+    FILE_PERMISSIONS = 0600
 
     def self.load(metadata)
       title = metadata[:book_title]
@@ -13,7 +14,7 @@ module Runbook::Util
     end
 
     def self.save(repo, book_title:)
-      File.open(_file(book_title), 'w') do |f|
+      File.open(_file(book_title), 'w', FILE_PERMISSIONS) do |f|
         f.write(repo.to_yaml)
       end
     end

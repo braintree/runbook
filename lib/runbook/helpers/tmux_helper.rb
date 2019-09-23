@@ -1,5 +1,7 @@
 module Runbook::Helpers
   module TmuxHelper
+    FILE_PERMISSIONS = 0600
+
     def setup_layout(structure, runbook_title:)
       _remove_stale_layouts
       layout_file = _layout_file(_slug(runbook_title))
@@ -11,7 +13,7 @@ module Runbook::Helpers
       end
 
       _setup_layout(structure).tap do |layout_panes|
-        File.open(layout_file, 'w') do |f|
+        File.open(layout_file, 'w', FILE_PERMISSIONS) do |f|
           f.write(layout_panes.to_yaml)
         end
       end
