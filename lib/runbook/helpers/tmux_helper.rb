@@ -41,7 +41,7 @@ module Runbook::Helpers
     end
 
     def _slug(title)
-      title.titleize.gsub(/\s+/, "").underscore.dasherize
+      title.titleize.gsub(/[\/\s]+/, "").underscore.dasherize
     end
 
     def _all_panes_exist?(stored_layout)
