@@ -117,7 +117,6 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
       "my-runbook-title",
       "other-runbook-title",
       "some-runbook-title",
-      "some-runbook-title",
     ] }
 
     it "returns a slugified version of its argument" do
