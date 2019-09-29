@@ -4,6 +4,21 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.15.0` (2019-09-29)
+
+### Fixes:
+
+* Halt the project generator if gem generation fails
+* Replace timeout_statement with abort_statement for assert statements
+* Make runbook state files only readable by the current user
+* Allow / characters in the title of a runbook (Thanks brafales)
+
+### New Features
+
+* Allow books to have steps as children
+* Allow "echo: false" for ask statements
+* Expose "run" as an argument to ruby_commands
+
 ## `v0.14.0` (2019-08-15)
 
 ### Fixes:
