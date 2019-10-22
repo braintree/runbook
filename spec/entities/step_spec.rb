@@ -9,13 +9,17 @@ RSpec.describe Runbook::Entities::Step do
     expect(step.title).to eq(title)
   end
 
-  it "does not require arguments" do
-    expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
+  context "with tags" do
+    let(:tags) { [:suse] }
+    let(:step) { Runbook::Entities::Step.new(title, tags: tags) }
+
+    it "has tags" do
+      expect(step.tags).to eq(tags)
+    end
   end
 
-  complex_arg_statements = ["ask", "ruby_command", "capture", "capture_all", "tmux_command", "upload"]
-  statements = Runbook.statements.map do |klass|
-    klass.to_s.split("::")[-1].underscore
+  it "does not require arguments" do
+    expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
   end
 
   include_examples "has add behavior", Runbook::Entities::Step

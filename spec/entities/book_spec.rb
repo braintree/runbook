@@ -8,6 +8,15 @@ RSpec.describe Runbook::Entities::Book do
     expect(book.title).to eq(title)
   end
 
+  context "with tags" do
+    let(:tags) { [:suse] }
+    let(:book) { Runbook::Entities::Book.new(title, tags: tags) }
+
+    it "has tags" do
+      expect(book.tags).to eq(tags)
+    end
+  end
+
   describe "#section" do
     it "adds a section to the book's items" do
       section = book.section("My Section") {}

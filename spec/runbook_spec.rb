@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Runbook do
   let(:title) { "Some Title" }
+  let(:tags) { [:mutator, :redhat] }
   let(:book) { Runbook.book(title) {} }
 
   it "has a version number" do
@@ -23,6 +24,14 @@ RSpec.describe Runbook do
 
     it "sets the books title" do
       expect(book.title).to eq(title)
+    end
+
+    context "with tags" do
+      let(:book) { Runbook.book(title, *tags) {} }
+
+      it "sets the books tags" do
+        expect(book.tags).to eq(tags)
+      end
     end
 
     it "evaluates the block in the context of the book's dsl" do
@@ -52,6 +61,14 @@ RSpec.describe Runbook do
       expect(section.title).to eq(title)
     end
 
+    context "with tags" do
+      let(:section) { Runbook.section(title, *tags) {} }
+
+      it "sets the sections tags" do
+        expect(section.tags).to eq(tags)
+      end
+    end
+
     it "evaluates the block in the context of the section's dsl" do
       in_section = nil
       out_section = Runbook.section(title) { in_section = self }
@@ -75,6 +92,14 @@ RSpec.describe Runbook do
       expect(setup.title).to eq("Setup")
     end
 
+    context "with tags" do
+      let(:setup) { Runbook.setup(*tags) {} }
+
+      it "sets the setup's tags" do
+        expect(setup.tags).to eq(tags)
+      end
+    end
+
     it "evaluates the block in the context of the setup's dsl" do
       in_setup = nil
       out_setup = Runbook.setup { in_setup = self }
@@ -96,6 +121,24 @@ RSpec.describe Runbook do
 
     it "sets the step's title" do
       expect(step.title).to eq(title)
+    end
+
+    context "with title and tags" do
+      let(:step) { Runbook.step(title, *tags) {} }
+
+      it "sets the steps tags" do
+        expect(step.title).to eq(title)
+        expect(step.tags).to eq(tags)
+      end
+    end
+
+    context "with only tags" do
+      let(:step) { Runbook.step(*tags) {} }
+
+      it "sets the steps tags" do
+        expect(step.title).to be_nil
+        expect(step.tags).to eq(tags)
+      end
     end
 
     it "evaluates the block in the context of the step's dsl" do

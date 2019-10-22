@@ -123,6 +123,7 @@ Initialize Runbook in your project:
       * [1.1.1.2 Sections](#sections)
       * [1.1.1.3 Steps](#steps)
       * [1.1.1.4 Setup](#setup)
+      * [1.1.1.5 Tags](#tags)
     * [1.1.2 Statements](#statements)
       * [1.1.2.1 Ask](#ask)
       * [1.1.2.2 Assert](#assert)
@@ -269,6 +270,32 @@ end
 ```
 
 The above example will set `@toppings` from a passed-in environment variable if present, otherwise it will ask the user to set `@toppings`. If toppings have already has been defined from a previous execution, it will not prompt the user for the value again. Because this logic references a value that is defined at runtime (`@toppings`), it must be wrapped in a `ruby_command`.
+
+##### Tags
+
+Any entity can be tagged with arbitrary metadata. Once tagged, entity behavior can be modified using [hooks](#augmenting-functionality-with-hooks).
+
+```ruby
+Runbook.book "Bounce Nodes", :untested do
+  step "Disable monitoring", :skip do
+    confirm "Have you disabled health monitoring?"
+  end
+
+  step "Restart nodes", :prod_only, :aws_only, :mutator do
+    confirm "Have you restarted the nodes?"
+  end
+end
+```
+
+```ruby
+Runbook::Runs::SSHKit.register_hook(:warn_for_untested_runbook, :before, Runbook::Entities::Book) do |object, metadata|
+  metadata[:toolbox].warn("This runbook has not yet been tested. Beware of bugs!") if object.tags.include?(:untested)
+end
+
+Runbook::Runs::SSHKit.register_hook(:skip_entities_with_skip_tag, :around, Runbook::Entity) do |object, metadata, block|
+  block.call unless object.tags.include?(:skip)
+end
+```
 
 #### Statements
 

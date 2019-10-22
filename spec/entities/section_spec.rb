@@ -8,6 +8,15 @@ RSpec.describe Runbook::Entities::Section do
     expect(section.title).to eq(title)
   end
 
+  context "with tags" do
+    let(:tags) { [:suse] }
+    let(:section) { Runbook::Entities::Section.new(title, tags: tags) }
+
+    it "has tags" do
+      expect(section.tags).to eq(tags)
+    end
+  end
+
   describe "#section" do
     it "adds a section to the section's items" do
       section2 = section.section("My Nested Section") {}

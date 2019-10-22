@@ -1126,4 +1126,68 @@ OUTPUT
       expect(output.string).to include("New toolbox!")
     end
   end
+
+  context "with tags" do
+    let(:run) { :ssh_kit }
+    let(:output) { StringIO.new }
+    let(:book) do
+      Runbook.book "My Book", :redhat do
+        setup :test do
+          note "Test me"
+        end
+
+        section "My Section", :test do
+          step "Skip me", :skip do
+            note "I'm skipped"
+          end
+
+          step :test, :skip do
+            note "hi"
+          end
+        end
+      end
+    end
+    let(:tag_output) do
+      [
+        "Runbook::Entities::Book: My Book [:redhat]",
+        "Runbook::Entities::Setup: Setup [:test]",
+        "Runbook::Entities::Section: My Section [:test]",
+        "Runbook::Entities::Step: Skip me [:skip]",
+        "Runbook::Entities::Step:  [:test, :skip]",
+      ]
+    end
+
+    before(:each) do
+      allow_any_instance_of(Runbook::Toolbox).to receive(:output) do |instance, msg|
+        output.puts(msg)
+      end
+    end
+
+    around(:each) do |example|
+      run_module = "Runbook::Runs::#{run.to_s.camelize}".constantize
+      hook_name = :print_tags
+
+      begin
+        run_module.register_hook(
+          hook_name,
+          :before,
+          Runbook::Entity,
+        ) do |object, metadata|
+          metadata[:toolbox].output("#{object.class}: #{object.title} #{object.tags}")
+        end
+
+        example.run
+      ensure
+        run_module.hooks.reject! { |hook| hook[:name] == hook_name }
+      end
+    end
+
+    it "allows you to modify hook behavior based on tags" do
+      runner.run(run: run, paranoid: false)
+
+      tag_output.each do |tagline|
+        expect(output.string).to include(tagline)
+      end
+    end
+  end
 end

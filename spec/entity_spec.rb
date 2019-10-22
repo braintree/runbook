@@ -3,6 +3,7 @@ require "spec_helper"
 RSpec.describe Runbook::Entity do
   let(:title) { "Some Title" }
   let(:parent) { Runbook::Entity.new("Parent") }
+  let(:tags) { [:skip, :mutator] }
   let(:entity) { Runbook::Entity.new(title) }
 
   it "has a title" do
@@ -16,6 +17,11 @@ RSpec.describe Runbook::Entity do
   it "takes a parent as an argument" do
     entity = Runbook::Entity.new(title, parent: parent)
     expect(entity.parent).to eq(parent)
+  end
+
+  it "takes a list of tags as an argument" do
+    entity = Runbook::Entity.new(title, tags: tags)
+    expect(entity.tags).to eq(tags)
   end
 
   describe "#items" do

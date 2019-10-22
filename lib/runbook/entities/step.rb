@@ -1,7 +1,7 @@
 module Runbook::Entities
   class Step < Runbook::Entity
-    def initialize(title=nil)
-      super(title)
+    def initialize(title=nil, tags: [])
+      super(title, tags: tags)
     end
   end
 end

@@ -1,8 +1,13 @@
 module Runbook::Extensions
   module Steps
     module DSL
-      def step(title=nil, &block)
-        Runbook::Entities::Step.new(title).tap do |step|
+      def step(title=nil, *tags, &block)
+        if title.is_a?(Symbol)
+          tags.unshift(title)
+          title = nil
+        end
+
+        Runbook::Entities::Step.new(title, tags: tags).tap do |step|
           parent.add(step)
           step.dsl.instance_eval(&block) if block
         end
