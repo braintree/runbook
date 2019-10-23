@@ -18,6 +18,15 @@ RSpec.describe Runbook::Entities::Step do
     end
   end
 
+  context "with labels" do
+    let(:labels) { {env: :staging} }
+    let(:step) { Runbook::Entities::Step.new(title, labels: labels) }
+
+    it "has labels" do
+      expect(step.labels).to eq(labels)
+    end
+  end
+
   it "does not require arguments" do
     expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
   end

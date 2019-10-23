@@ -90,36 +90,36 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
 end
 
 module Runbook
-  def self.book(title, *tags, &block)
+  def self.book(title, *tags, labels: {}, &block)
     Configuration.load_config
-    Entities::Book.new(title, tags: tags).tap do |book|
+    Entities::Book.new(title, tags: tags, labels: labels).tap do |book|
       book.dsl.instance_eval(&block)
       register(book)
     end
   end
 
-  def self.section(title, *tags, &block)
+  def self.section(title, *tags, labels: {}, &block)
     Configuration.load_config
-    Entities::Section.new(title, tags: tags).tap do |section|
+    Entities::Section.new(title, tags: tags, labels: labels).tap do |section|
       section.dsl.instance_eval(&block)
     end
   end
 
-  def self.setup(*tags, &block)
+  def self.setup(*tags, labels: {}, &block)
     Configuration.load_config
-    Entities::Setup.new(tags: tags).tap do |setup|
+    Entities::Setup.new(tags: tags, labels: labels).tap do |setup|
       setup.dsl.instance_eval(&block)
     end
   end
 
-  def self.step(title=nil, *tags, &block)
+  def self.step(title=nil, *tags, labels: {}, &block)
     if title.is_a?(Symbol)
       tags.unshift(title)
       title = nil
     end
 
     Configuration.load_config
-    Entities::Step.new(title, tags: tags).tap do |step|
+    Entities::Step.new(title, tags: tags, labels: labels).tap do |step|
       step.dsl.instance_eval(&block) if block
     end
   end

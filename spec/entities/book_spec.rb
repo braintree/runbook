@@ -17,6 +17,15 @@ RSpec.describe Runbook::Entities::Book do
     end
   end
 
+  context "with labels" do
+    let(:labels) { {env: :staging} }
+    let(:book) { Runbook::Entities::Book.new(title, labels: labels) }
+
+    it "has labels" do
+      expect(book.labels).to eq(labels)
+    end
+  end
+
   describe "#section" do
     it "adds a section to the book's items" do
       section = book.section("My Section") {}

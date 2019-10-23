@@ -1,7 +1,7 @@
 module Runbook::Entities
   class Book < Runbook::Entity
-    def initialize(title, tags: [])
-      super(title, tags: tags)
+    def initialize(title, tags: [], labels: {})
+      super(title, tags: tags, labels: labels)
     end
 
     # Seed data for 'render' tree traversal method

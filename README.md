@@ -123,7 +123,7 @@ Initialize Runbook in your project:
       * [1.1.1.2 Sections](#sections)
       * [1.1.1.3 Steps](#steps)
       * [1.1.1.4 Setup](#setup)
-      * [1.1.1.5 Tags](#tags)
+      * [1.1.1.5 Tags and Labels](#tags-and-labels)
     * [1.1.2 Statements](#statements)
       * [1.1.2.1 Ask](#ask)
       * [1.1.2.2 Assert](#assert)
@@ -271,9 +271,9 @@ end
 
 The above example will set `@toppings` from a passed-in environment variable if present, otherwise it will ask the user to set `@toppings`. If toppings have already has been defined from a previous execution, it will not prompt the user for the value again. Because this logic references a value that is defined at runtime (`@toppings`), it must be wrapped in a `ruby_command`.
 
-##### Tags
+##### Tags and Labels
 
-Any entity can be tagged with arbitrary metadata. Once tagged, entity behavior can be modified using [hooks](#augmenting-functionality-with-hooks).
+Any entity can be associated with arbitrary tags or labels. Once tags or labels are assigned, entity behavior can be modified using [hooks](#augmenting-functionality-with-hooks).
 
 ```ruby
 Runbook.book "Bounce Nodes", :untested do
@@ -281,7 +281,7 @@ Runbook.book "Bounce Nodes", :untested do
     confirm "Have you disabled health monitoring?"
   end
 
-  step "Restart nodes", :prod_only, :aws_only, :mutator do
+  step "Restart nodes", :aws_only, :mutator, labels: {rails_env: :production} do
     confirm "Have you restarted the nodes?"
   end
 end
@@ -289,11 +289,14 @@ end
 
 ```ruby
 Runbook::Runs::SSHKit.register_hook(:warn_for_untested_runbook, :before, Runbook::Entities::Book) do |object, metadata|
-  metadata[:toolbox].warn("This runbook has not yet been tested. Beware of bugs!") if object.tags.include?(:untested)
+  warning = "This runbook has not yet been tested. Beware of bugs!"
+  metadata[:toolbox].warn(warning) if object.tags.include?(:untested)
 end
 
-Runbook::Runs::SSHKit.register_hook(:skip_entities_with_skip_tag, :around, Runbook::Entity) do |object, metadata, block|
-  block.call unless object.tags.include?(:skip)
+Runbook::Runs::SSHKit.register_hook(:skip_skippable_entities, :around, Runbook::Entity) do |object, metadata, block|
+  next if object.tags.include?(:skip)
+  next if object.labels[:rails_env] && object.labels[:rails_env] != ENV["RAILS_ENV"]
+  block.call
 end
 ```
 

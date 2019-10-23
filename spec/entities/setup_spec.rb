@@ -13,6 +13,15 @@ RSpec.describe Runbook::Entities::Setup do
     end
   end
 
+  context "with labels" do
+    let(:labels) { {env: :staging} }
+    let(:setup) { Runbook::Entities::Setup.new(labels: labels) }
+
+    it "has labels" do
+      expect(setup.labels).to eq(labels)
+    end
+  end
+
   it "does not require arguments" do
     expect(Runbook::Entities::Setup.new).to be_a(Runbook::Entities::Setup)
   end

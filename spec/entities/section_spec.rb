@@ -17,6 +17,15 @@ RSpec.describe Runbook::Entities::Section do
     end
   end
 
+  context "with labels" do
+    let(:labels) { {env: :staging} }
+    let(:section) { Runbook::Entities::Section.new(title, labels: labels) }
+
+    it "has labels" do
+      expect(section.labels).to eq(labels)
+    end
+  end
+
   describe "#section" do
     it "adds a section to the section's items" do
       section2 = section.section("My Nested Section") {}

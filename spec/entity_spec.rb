@@ -4,6 +4,7 @@ RSpec.describe Runbook::Entity do
   let(:title) { "Some Title" }
   let(:parent) { Runbook::Entity.new("Parent") }
   let(:tags) { [:skip, :mutator] }
+  let(:labels) { {env: :prod, cloud_provider: :aws} }
   let(:entity) { Runbook::Entity.new(title) }
 
   it "has a title" do
@@ -22,6 +23,11 @@ RSpec.describe Runbook::Entity do
   it "takes a list of tags as an argument" do
     entity = Runbook::Entity.new(title, tags: tags)
     expect(entity.tags).to eq(tags)
+  end
+
+  it "takes a set of labels as an argument" do
+    entity = Runbook::Entity.new(title, labels: labels)
+    expect(entity.labels).to eq(labels)
   end
 
   describe "#items" do

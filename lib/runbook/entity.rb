@@ -8,11 +8,12 @@ module Runbook
     end
 
     attr_accessor :parent
-    attr_reader :title, :tags, :dsl
+    attr_reader :title, :tags, :labels, :dsl
 
-    def initialize(title, tags: [], parent: nil)
+    def initialize(title, tags: [], labels: {}, parent: nil)
       @title = title
       @tags = tags
+      @labels = labels
       @parent = parent
       @dsl = "#{self.class}::DSL".constantize.new(self)
     end
