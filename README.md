@@ -969,6 +969,22 @@ end
 
 When registering a hook, you specify the name of the hook, the type, and the statement or entity to add the hook to. `before` and `after` hooks execute the block before and after executing the entity or statement, respectively. `around` hooks take a block which executes the specified entity or statement. When specifying the class that the hook applies to, you can have the hook apply to all entities by specifying `Runbook::Entity`, all statements by specifying `Runbook::Statement`, or all items by specifying `Object`. Additionally, you can specify any specific entity or statement you would like the hook to apply to.
 
+Hooks are defined on the run or view objects themselves. For example, you would register a hook with `Runbook::Runs::SSHKit` to have the hook be applied to the `SSHKit` run. You would register a hook with the `Runbook::Views::Markdown` view to have hooks apply to this view. If you want to apply a hook to all runs or views, you can use the `Runbook.runs` method or `Runbook.views` method to iterate through the runs or views respectively.
+
+```ruby
+Runbook.runs.each do |run|
+  run.register_hook(
+    :give_words_of_encouragement,
+    :before,
+    Runbook::Entities::Book
+  ) do |object, metadata|
+    metadata[:toolbox].output("You've got this!")
+  end
+end
+```
+
+Hooks can be defined anywhere prior to runbook execution. If defining a hook for only a single runbook, it makes sense to define the hook immediately prior to the runbook definition. If you  want a hook to apply to all runbooks in your project, it can be defined in a config file such as the `Runbookfile`. If you want to selectively apply the hook to certain runbooks, it may make sense to define it in a file that can be required by runbooks when it is needed.
+
 When starting at a certain position in the runbook, hooks for any preceding sections and steps will be skipped. After hooks will be run for a parent when starting at a child entity of a parent.
 
 ### Adding New Run Behaviors
