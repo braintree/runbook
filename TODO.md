@@ -127,7 +127,7 @@ It would be nice to be able to skip commands that you know will have an effect o
 
 One way to accomplish this is through a tags implementation where entities and statements have a set of tags, and their behavior is controlled based on these tags. I have implemented a spike of adding tags to entities. One complication of skipping mutation commands is that it is not easy to determine if future commands rely on that command executing. This could reduce the overall benefit of flagging and skipping mutation commands. The skipping logic could be implemented using Runbook's hooks feature.
 
-Skipping mutation commands for the sake of testing may also be accomplished through the use of mocks. This could a testing library or perhapsa mocking solution built out for Runbook. Implementing a mocking pattern could resolve the downstream dependency issue of skipping mutation commands. A mocking solution could also be implemented using Runbook hooks.
+Skipping mutation commands for the sake of testing may also be accomplished through the use of mocks. This could be a testing library or perhaps a mocking solution built out for Runbook. Implementing a mocking pattern could resolve the downstream dependency issue of skipping mutation commands. A mocking solution could also be implemented using Runbook hooks.
 
 The mutation command skipping behavior could be controlled via an environment variable. It may be controlled via config or other flag, but this feels too specific to be included in the more general config or run options.  
 
@@ -195,7 +195,7 @@ It would be nice to capture output or status codes from an executed tmux command
 
 **Difficulty: 3**, **Desireability: 2**, **Conceptual Completeness: 2**
 
-In some instances a step may require that a previous step be executed before it can safely execute. It would be nice if these dependencies could be codified, so when a step is skipped, you can still ensure it is executed when executing a step that depends on it. Tracking which steps have been executed would probably want to exist for the life of the execution of the runbook, so surving restarts. In an extreme case, executing a runbook may boil down to a rake-like execution. Perhaps it would be possible to make steps independently executable, and then they could be weaved into rake.
+In some instances a step may require that a previous step be executed before it can safely execute. It would be nice if these dependencies could be codified, so when a step is skipped, you can still ensure it is executed when executing a step that depends on it. Tracking which steps have been executed would probably want to exist for the life of the execution of the runbook, so surviving restarts. In an extreme case, executing a runbook may boil down to a rake-like execution. Perhaps it would be possible to make steps independently executable, and then they could be weaved into rake.
 
 #### Update Command Counts
 
