@@ -11,6 +11,10 @@ module Runbook
     _child_modules(Runbook::Runs)
   end
 
+  def self.views
+    _child_modules(Runbook::Views)
+  end
+
   def self.generators
     _child_classes(Runbook::Generators)
   end
