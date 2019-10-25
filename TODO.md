@@ -57,6 +57,7 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [Guard Runbook](#guard-runbook): Automatically update Runbook views when a runbook is saved
 * [Rake Task Interface](#rake-task-interface): Execute and view runbooks with rake tasks
 * [Multiple Commands In Groups](#multiple-commands-in-groups): Execute multiple sshkit commands for a group of servers before moving on to a new group of servers
+* [Command Line Variables](#command-line-variables): Pass arbitrary variables via the command line
 * [Yaml Specification](#yaml-specification): Define your runbook using yaml instead of Ruby
 * [Runbook Web Server](#runbook-web-server): Automatically serve up Runbook views via the web
 * [Interactive Runbook Launcher](#interactive-runbook-launcher): A CLI launcher to review and execute runbooks
@@ -285,6 +286,12 @@ Provide a rake task interface to Runbook in addition to the ruby invocation inte
 When specifying to execute a command against multiple servers in groups using the `parallelization` setter, commands are executed in groups for each command, so a single command runs to completion before the next command is executed in groups. It would be nice if there was a way to group a set of commands such that all commands for the first group were executed before commands for the second group were executed. The current workaround for this is to use Ruby to define multiple steps each of which completes against its full set of servers. 
 
 I do not have an idea of how to cleanly accomplish this.
+
+#### Command Line Variables
+
+**Difficulty: 1**, **Desireability: 3**, **Conceptual Completeness: 2**
+
+Add a `vars` command-line option for runtime variables passed through the command line. These arbitrary command-line vars would be stored in the metadata and accessible at runtime (for example in a `ruby_command` block). These can be useful for modifying the runbook's behavior within hooks in conjunction with tags and labels.  This functionality already exists however with the use of environment variables. Environment variables are also available at compile time, where as these command line variables are not. In order to make the command line variables available at compile time, they would have to be set in a global context.  It is not clear if these values would persist between runs. It may be best practice to save them and overwrite them if re-defined on the command line, but it is not clear if this is intuitive.
 
 #### Yaml Specification
 
