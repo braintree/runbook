@@ -13,6 +13,14 @@ module Runbook::Views
       output << "#{heading} #{metadata[:index]+1}. #{object.title}\n\n"
     end
 
+    def self.runbook__entities__setup(object, output, metadata)
+      output << "[] #{object.title}\n\n"
+
+      ssh_config = find_ssh_config(object)
+      ssh_config_output = render_ssh_config_output(ssh_config)
+      output << "#{ssh_config_output}\n" unless ssh_config_output.empty?
+    end
+
     def self.runbook__entities__step(object, output, metadata)
       output << "#{metadata[:index]+1}. [] #{object.title}\n\n"
 

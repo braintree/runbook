@@ -118,10 +118,11 @@ Initialize Runbook in your project:
 
 * [1. Runbook Anatomy](#runbook-anatomy)
   * [1.1 Entities, Statements, and Setters](#entities-statements-and-setters)
-    * [1.1.1 Books, Sections, and Steps](#books-sections-and-steps)
+    * [1.1.1 Books, Sections, Steps, and Setup](#books-sections-steps-and-setup)
       * [1.1.1.1 Books](#books)
       * [1.1.1.2 Sections](#sections)
       * [1.1.1.3 Steps](#steps)
+      * [1.1.1.4 Setup](#setup)
     * [1.1.2 Statements](#statements)
       * [1.1.2.1 Ask](#ask)
       * [1.1.2.2 Assert](#assert)
@@ -221,7 +222,7 @@ Hierarchically, a runbook looks like this:
 
 A runbook is composed of entities, statements, and setters. Runbook entities contain either other entities or statements. Examples of entities include Books, Sections, and Steps. They define the structure of the runbook and can be considered the "nodes" of the tree structure. As entities are the nodes of the tree structure, statements are the "leaves" of the structure and comprise the various behaviors or commands of the runbook. Setters, typically referenced from within steps, associate state with the node, which can be accessed by its children.
 
-#### Books, Sections, and Steps
+#### Books, Sections, Steps, and Setup
 
 Entities are composed of a title and a list of items which are their children. Each entity can be rendered with a specific view or executed with a specific run.
 
@@ -243,6 +244,31 @@ A book is broken up into sections. Every section requires a title. Sections can 
 ##### Steps
 
 Steps hold state and group together a set of statements. Steps do not require titles or children. This allows runbooks to be very flexible. You can fill out steps as needed, or be terse when the behavior of the step is self-evident. Steps without titles will not prompt to continue when running in paranoid mode.
+
+##### Setup
+
+Setup is a special entity that is always executed. It is not skipped when starting or resuming execution in the middle of a runbook. A prompt is never presented to determine if you should or should not execute the setup section. The setup section is similar to the step entity in that it shares the same DSL. In other words, any keywords available within steps are also available within the setup section.
+
+The setup section provides two important use cases. First, it allows you ensure any dependent values are defined when executing your runbook. If skipping the initial steps of your runbook and starting in the middle, you can be sure that any initialization steps have been executed. For example, presume you have a runbook that prompts for a list of servers, stops the servers, and then starts them. It would be advantageous to define the prompting server logic in a setup section, so you can start the runbook at the start server step and know that the list of servers is defined.
+
+Second, if you dynamically define the sections and steps in your runbook based on user input, then doing this in the setup section allows you start the runbook in the middle of the dynamically defined steps.
+
+Because the setup section is always executed, it's execution should be idempotent. In other words, the setup section should be able to be executed multiple times in a row and produce the same result.
+
+It may be ideal to ensure user input is only asked for once when executing a setup section.
+
+```ruby
+Runbook.book "Make Pizza" do
+  setup do
+    ruby_command do
+      @toppings ||= ENV["TOPPINGS"]
+      ask "What toppings would you like?", into: :toppings, default: "cheese" unless @toppings
+    end
+  end
+end
+```
+
+The above example will set `@toppings` from a passed-in environment variable if present, otherwise it will ask the user to set `@toppings`. If toppings have already has been defined from a previous execution, it will not prompt the user for the value again. Because this logic references a value that is defined at runtime (`@toppings`), it must be wrapped in a `ruby_command`.
 
 #### Statements
 

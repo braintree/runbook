@@ -11,6 +11,8 @@ module Factory
         title: "My Title",
       }.merge!(overrides)
       return Runbook::Entities::Section.new(attrs[:title])
+    when :setup
+      return Runbook::Entities::Setup.new
     when :step
       attrs = {
         title: "My Title",

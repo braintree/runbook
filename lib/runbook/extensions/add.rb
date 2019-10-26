@@ -9,5 +9,6 @@ module Runbook::Extensions
 
   Runbook::Entities::Book::DSL.prepend(Add::DSL)
   Runbook::Entities::Section::DSL.prepend(Add::DSL)
+  Runbook::Entities::Setup::DSL.prepend(Add::DSL)
   Runbook::Entities::Step::DSL.prepend(Add::DSL)
 end

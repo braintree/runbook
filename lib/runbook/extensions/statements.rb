@@ -22,5 +22,6 @@ module Runbook::Extensions
     end
   end
 
+  Runbook::Entities::Setup::DSL.prepend(Statements::DSL)
   Runbook::Entities::Step::DSL.prepend(Statements::DSL)
 end

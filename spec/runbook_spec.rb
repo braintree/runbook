@@ -64,6 +64,29 @@ RSpec.describe Runbook do
     end
   end
 
+  describe "self.setup" do
+    let(:setup) { Runbook.setup {} }
+
+    it "returns a setup" do
+      expect(setup).to be_a(Runbook::Entities::Setup)
+    end
+
+    it "sets the setup's title" do
+      expect(setup.title).to eq("Setup")
+    end
+
+    it "evaluates the block in the context of the setup's dsl" do
+      in_setup = nil
+      out_setup = Runbook.setup { in_setup = self }
+      expect(in_setup).to eq(out_setup.dsl)
+    end
+
+    it "loads Runbook's configuration" do
+      expect(Runbook::Configuration).to receive(:load_config)
+      setup
+    end
+  end
+
   describe "self.step" do
     let(:step) { Runbook.step(title) {} }
 

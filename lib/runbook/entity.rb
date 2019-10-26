@@ -92,7 +92,8 @@ module Runbook
 
     def _run_metadata(items, item, metadata, index)
       pos_index = items.select do |item|
-        item.is_a?(Entity)
+        item.is_a?(Entity) &&
+          !item.is_a?(Runbook::Entities::Setup)
       end.index(item)
 
       if pos_index

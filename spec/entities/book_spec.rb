@@ -56,6 +56,30 @@ RSpec.describe Runbook::Entities::Book do
     end
   end
 
+  describe "#setup" do
+    it "adds a setup to the book's items" do
+      setup = book.setup {}
+      expect(book.items).to include(setup)
+    end
+
+    it "adds itself as the new setup's parent" do
+      setup = book.setup {}
+      expect(setup.parent).to eq(book)
+    end
+
+    it "adds to the book's existing items" do
+      setup = book.setup {}
+      step = book.step("My Step") {}
+      expect(book.items).to eq([setup, step])
+    end
+
+    it "evaluates the block in the context of the setup's dsl" do
+      in_setup = nil
+      setup = book.setup { in_setup = self }
+      expect(in_setup).to eq(setup.dsl)
+    end
+  end
+
   describe "#description" do
     it "adds a description to the book's items" do
       desc = book.description("My Description")

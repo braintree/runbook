@@ -30,6 +30,7 @@ require "runbook/node"
 require "runbook/entity"
 require "runbook/entities/book"
 require "runbook/entities/section"
+require "runbook/entities/setup"
 require "runbook/entities/step"
 
 require "runbook/statement"
@@ -74,6 +75,7 @@ require "runbook/extensions/add"
 require "runbook/extensions/description"
 require "runbook/extensions/shared_variables"
 require "runbook/extensions/sections"
+require "runbook/extensions/setup"
 require "runbook/extensions/ssh_config"
 require "runbook/extensions/statements"
 require "runbook/extensions/steps"
@@ -98,6 +100,13 @@ module Runbook
     Configuration.load_config
     Entities::Section.new(title).tap do |section|
       section.dsl.instance_eval(&block)
+    end
+  end
+
+  def self.setup(&block)
+    Configuration.load_config
+    Entities::Setup.new.tap do |setup|
+      setup.dsl.instance_eval(&block)
     end
   end
 

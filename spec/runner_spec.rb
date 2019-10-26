@@ -279,7 +279,34 @@ Step 1.3: Profit
     end
 
     context "with start_at > 0" do
-      it "skips parts less than start_at" do
+      let(:book) do
+        Runbook.book book_title do
+          description <<-DESC
+This is a very elaborate runbook that does stuff
+          DESC
+
+          setup do
+            note "This section is never skipped"
+          end
+
+          section "Parent Section" do
+            section "First Section" do
+              step "Step 1"
+            end
+
+            section "Second Section" do
+              step "Step 1" do
+                notice "Some cheese is actually yellow plastic"
+                ruby_command do |rb_cmd, metadata|
+                  metadata[:toolbox].output("I like cheese whiz!")
+                end
+              end
+            end
+          end
+        end
+      end
+
+      it "skips parts less than start_at (except setup)" do
         runner.run(run: run, paranoid: false, start_at: "1.2.1")
 
         expect(output.string).to eq(<<-OUTPUT)
@@ -287,6 +314,10 @@ Executing My Book...
 
 Description:
 This is a very elaborate runbook that does stuff
+
+Setup:
+
+Note: This section is never skipped
 
 Step 1.2.1: Step 1
 

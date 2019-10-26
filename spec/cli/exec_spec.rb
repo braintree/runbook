@@ -531,6 +531,10 @@ RSpec.describe "runbook run", type: :aruba do
       let(:content) do
         <<-RUNBOOK
         Runbook.book "My Runbook" do
+          setup do
+            note "rice pudding"
+          end
+
           section "First Section" do
             step "Skip me!" do
               note "fish"
@@ -550,6 +554,7 @@ RSpec.describe "runbook run", type: :aruba do
       let(:output_lines) {
         [
           /Executing My Runbook\.\.\./,
+          /rice pudding/,
           /Step 1\.2: Run me/,
           /carrots/,
           /Step 1\.3: Run me/,

@@ -88,6 +88,18 @@ RSpec.describe "Runbook::Run" do
     end
   end
 
+  describe "runbook__entities__section" do
+    let (:object) { Runbook::Entities::Setup.new }
+    let(:metadata_override) { {position: "5"} }
+
+    it "outputs Setup" do
+      msg = "Setup:\n\n"
+      expect(toolbox).to receive(:output).with(msg)
+
+      subject.execute(object, metadata)
+    end
+  end
+
   describe "runbook__entities__step" do
     let (:object) { Runbook::Entities::Step.new("My Step") }
     let(:metadata_override) { {position: "1.1"} }

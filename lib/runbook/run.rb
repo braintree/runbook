@@ -36,6 +36,10 @@ module Runbook
         metadata[:toolbox].output("Section #{metadata[:position]}: #{object.title}\n\n")
       end
 
+      def runbook__entities__setup(object, metadata)
+        metadata[:toolbox].output("Setup:\n\n")
+      end
+
       def runbook__entities__step(object, metadata)
         toolbox = metadata[:toolbox]
         title = " #{object.title}".rstrip
@@ -274,7 +278,8 @@ module Runbook
         :after,
         Runbook::Statement,
       ) do |object, metadata|
-        if object.parent.is_a?(Runbook::Entities::Step)
+        if object.parent.is_a?(Runbook::Entities::Step) ||
+            object.parent.is_a?(Runbook::Entities::Setup)
           if object.parent.items.last == object
             metadata[:toolbox].output("\n")
           end

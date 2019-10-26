@@ -71,6 +71,8 @@ module Runbook::Extensions
   Runbook::Entities::Step::DSL.prepend(SSHConfig::DSL)
   Runbook::Entities::Section.prepend(SSHConfig)
   Runbook::Entities::Section::DSL.prepend(SSHConfig::DSL)
+  Runbook::Entities::Setup.prepend(SSHConfig)
+  Runbook::Entities::Setup::DSL.prepend(SSHConfig::DSL)
   Runbook::Entities::Book.prepend(SSHConfig)
   Runbook::Entities::Book::DSL.prepend(SSHConfig::DSL)
 end
