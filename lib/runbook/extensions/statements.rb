@@ -5,6 +5,10 @@ module Runbook::Extensions
         if (klass = Statements::DSL._statement_class(name))
           klass.new(*args, &block).tap do |statement|
             parent.add(statement)
+
+            if statement.respond_to?(:into)
+              Runbook.runtime_methods << statement.into
+            end
           end
         else
           super

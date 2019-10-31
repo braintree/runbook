@@ -39,6 +39,34 @@ RSpec.describe "runbook run", type: :aruba do
 
   before(:each) { run_command(command) }
 
+  describe "error handling" do
+    let(:command) { "runbook exec -P #{runbook_file}" }
+
+    context "calling a runtime method at compile time" do
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "#{book_title}" do
+          step do
+            ask "What is your quest?", into: :quest
+            note "Quest: \#{quest}"
+          end
+        end
+        RUNBOOK
+      end
+      let(:output_lines) {
+        [
+          /`quest` cannot be referenced at compile time./,
+        ]
+      }
+
+      it "executes the runbook" do
+        output_lines.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
+      end
+    end
+  end
+
   describe "input specification" do
     context "runbook is passed as an argument" do
       let(:command) { "runbook exec -P #{runbook_file}" }

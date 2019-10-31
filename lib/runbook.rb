@@ -124,4 +124,8 @@ module Runbook
   def self.books
     @books ||= []
   end
+
+  def self.runtime_methods
+    @runtime_methods ||= []
+  end
 end

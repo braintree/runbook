@@ -104,8 +104,23 @@ module Runbook
       unless File.exist?(runbook)
         raise Thor::InvocationError, "#{cmd}: cannot access #{runbook}: No such file or directory"
       end
-      load(runbook)
-      Runbook.books.last || eval(File.read(runbook))
+
+      begin
+        load(runbook)
+        Runbook.books.last || eval(File.read(runbook))
+      rescue NameError => e
+        if Runbook.runtime_methods.include?(e.name)
+          message = (
+            "Runtime method `#{e.name}` cannot be referenced at " \
+            "compile time. Wrap statements referencing it in a " \
+            "`ruby_command` block in order to invoke the code at " \
+            "runtime."
+          )
+          raise e, message, e.backtrace
+        end
+
+        raise e
+      end
     end
   end
 end
