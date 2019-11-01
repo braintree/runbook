@@ -169,11 +169,12 @@ Initialize Runbook in your project:
   * [6.8 Adding to Runbook's Configuration](#adding-to-runbooks-configuration)
 * [7. Testing](#testing)
 * [8. Known Issues](#known-issues)
-* [9. Development](#development)
-* [10. Contributing](#contributing)
-* [11. Feature Requests](#feature-requests)
-* [12. License](#license)
-* [13. Code of Conduct](#code-of-conduct)
+* [9. FAQ](#faq)
+* [10. Development](#development)
+* [11. Contributing](#contributing)
+* [12. Feature Requests](#feature-requests)
+* [13. License](#license)
+* [14. Code of Conduct](#code-of-conduct)
 
 ## Runbook Anatomy
 
@@ -253,7 +254,13 @@ Prompts the user for a string and stores its value on the containing step entity
 
 ```ruby
 ask "What percentage of requests are failing?", into: :failing_request_percentage, default: "100", echo: true
+
+ruby_command do
+  note "Failing request percentage: #{@failing_request_percentage}"
+end
 ```
+
+In the above example, the `note` statement must be wrapped in a `ruby_command` statement. Without wrapping `note` in a `ruby_command`, it would be evaluated at compile time but the user will only be asked for input when the runbook is executed (so `@failing_request_percentage` would not have a value). If you find yourself wrapping many or all runbook statements in ruby commands it may make sense to set these values at compile time using environment variables.
 
 ##### Assert
 
@@ -277,7 +284,7 @@ assert(
 
 ##### Capture
 
-Runs the provided `cmd` and captures its output into `into`. An optional `ssh_config` can be specified to configure how the capture command gets run. Capture commands take an optional `strip` parameter that indicates if the returned output should have leading and trailing whitespace removed. Capture commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
+Runs the provided `cmd` and captures its output into `into`. Once captured, this value can be referenced in later statements such as the `ruby_command` statement. An optional `ssh_config` can be specified to configure how the capture command gets run. Capture commands take an optional `strip` parameter that indicates if the returned output should have leading and trailing whitespace removed. Capture commands also take an optional `raw` parameter that tells SSHKit whether the command should be executed as is, or to include the auto-wrapping of the ssh_config.
 
 ```ruby
 capture %Q{wc -l file.txt | cut -d " " -f 1}, into: :num_lines, strip: true, ssh_config: {user: "root"}
@@ -983,7 +990,7 @@ Runbook.runs.each do |run|
 end
 ```
 
-Hooks can be defined anywhere prior to runbook execution. If defining a hook for only a single runbook, it makes sense to define the hook immediately prior to the runbook definition. If you  want a hook to apply to all runbooks in your project, it can be defined in a config file such as the `Runbookfile`. If you want to selectively apply the hook to certain runbooks, it may make sense to define it in a file that can be required by runbooks when it is needed.
+Hooks can be defined anywhere prior to runbook execution. If defining a hook for only a single runbook, it makes sense to define the hook immediately prior to the runbook definition. If you want a hook to apply to all runbooks in your project, it can be defined in a config file such as the `Runbookfile`. If you want to selectively apply the hook to certain runbooks, it may make sense to define it in a file that can be required by runbooks when it is needed.
 
 When starting at a certain position in the runbook, hooks for any preceding sections and steps will be skipped. After hooks will be run for a parent when starting at a child entity of a parent.
 
@@ -1096,6 +1103,8 @@ command "echo '\\''I love cheese'\\''"
 
 Alternatively, if you wish to avoid issues with SSHKit command wrapping, you can specify that your commands be executed in raw form, passed directly as written to the specified host.
 
+`tmux_command` wraps the input passed to it in single quotes. Therefore any single quotes passed to the `tmux_command` should be escaped using `'\\''`. This issue can manifest itself as part of the command not being echoed to the tmux pane.
+
 ### Specifying env values
 
 When specifying the `env` for running commands, if you place curly braces `{}` around the env values, it is required to enclose the arguments in parenthesis `()`, otherwise the following syntax error will result:
@@ -1121,6 +1130,57 @@ not as
 ```
 env {rails_env: :production}
 ```
+
+## FAQ
+
+### Are runbooks compiled?
+
+Yes they are. When you define a runbook, a tree data structure is constructed much like an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree). This is important because you do not have to worry about any side-effects such as executing server commands when this data structure is compiled. Once compiled, choosing either the run or view to execute the runbook object determines what behavior is executed at each node.
+
+### Why are runbooks compiled?
+
+Runbook is designed to minimize and mitigate issues that arise when running operations in production enviroments. One way this is accomplished is by compiling all statements in the runbook before execution is started. Validations and assertions can be made to reduce the likelihood that a runbook will encounter an error in the middle of an operation. In other words, Runbook provides some guarantees about proper formatting of a runbook before any commands execute that could affect live systems.
+
+### Why is my variable/method not set?
+
+Because runbooks are compiled, statements that set values such as `ask`, `capture`, and `capture_all` statements (using the `:into` keyword) only expose their values at runtime. This means any references to these methods or variables (specified with `:into`) can only happen within `ruby_command` blocks which are evaluated at runtime. If an argument to a statement references the values set by these statements, then the statement must be wrapped in a `ruby_command` block. See [Passing State](#passing-state) for specific examples.
+
+### How do I define and call methods within a runbook?
+
+When defining and referencing your own functions in a runbook, functions should be wrapped in a module so they can be referenced globally. For example:
+
+```ruby
+module Adder
+  def add(x, y)
+    x + y
+  end
+end
+
+Runbook.book "Add Two Numbers" do
+  step "Add numbers" do
+    ask "X?", into: :x
+    ask "Y?", into: :y
+
+    ruby_command do |rb_cmd, metadata, run|
+      metadata[:toolbox].output("Result: #{Adder.add(x, y)}")
+    end
+  end
+end
+```
+
+### Why does my command work on the command line but not in runbook?
+
+There are a number of reasons why a command may work directly on your command line, but not when executed using the `command` statement. Some possible things to try include:
+
+* Print the command with any variables substituted
+* Ensure the command works outside of runbook
+* Use full paths. The `PATH` environment variable may not be set.
+* Check for aliases. Aliases are usually not set for non-interactive shells.
+* Check for environment variables. Differences between your shell environment variables and those set for the executing shell may modify command behavior.
+* Check for differing behavior between the bourne shell (`sh`) and your shell (usually bash).
+* Check that quotes are properly being escaped.
+* Simplify the command you are executing and then slowly build it back up
+* Check for permissions issues that might cause different execution behavior.
 
 ## Development
 
