@@ -31,6 +31,7 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 ## Features Outline
 
 * [Sudo Raw Command Support](#sudo-raw-command-support): Add support for sudo interaction handler for raw commands
+* [Tmux Command Quote Escaping](#tmux-command-quote-escaping): Eliminate the need to escape single quotes in tmux commands
 * [Always-executed Setup Section](#always-executed-setup-section): Add support for a section that is never skipped
 * [Shortened Tmux Layout Keys](#shortened-tmux-layout-keys): Make tmux layout keys easier
 * [Add Host Aliases for SSH Config](#add-host-aliases-for-ssh-config): Use `host` and `hosts` instead of `server` and `servers`
@@ -39,6 +40,7 @@ Runbook is intended to be a light-weight, minimalistic library. This means every
 * [Runbook Logger](#runbook-logger): A logger for Runbook
 * [Mutation Command Skipping](#mutation-command-skipping): Allow skipping mutation commands
 * [Revert Section](#revert-section): A section that can be triggered which will revert the changes of the runbook
+* [Better Error Formatting](#better-error-formatting): More cleanly format errors to aid in troubleshooting issues
 * [Runbook Versioning](#runbook-versioning): Specify a version in a runbook to allow for supporting backwards incompatible runbook DSL format changes
 * [Replace Thor CLI](#replace-thor-cli): Replace Thor for Runbook's CLI with something that can be more easily extended and customized
 * [Goto Statement](#goto-statement): A statement for jumping to a specific step
@@ -72,6 +74,28 @@ Raw commands remove all the [command wrapping](https://github.com/braintree/runb
 when raw is specified, number (!) above is not executed. Thus pty is not set to true. (2) can be assumed to manually be performed by the user (they will have to type their own sudo command). (3) Is currently toggled by the user setter and the `enable_sudo_prompt` config.
 
 An ideal solution for this would allow the user to set pty true for the command to be executed via ssh_config. Additionally, it would be beneficial to set their own interaction handler. It seems safe to assume that if a user specifies that a command be executed with a pty, then we can set the sudo interaction handler by default if `enable_sudo_prompt` is set, but still allow for the interaction_handler to be overridden.
+
+#### Tmux Command Quote Escaping
+
+**Difficulty: 1**, **Desireability: 1**, **Conceptual Completeness: 1**
+
+Using heredocs and command substitution, it is possible to eliminate the need to escape single quotes passed to tmux_commands. This would go a long way to make this command more intuitive and ensure that the string passed by the user gets executed in the desired pane. This can be accomplished by updating the `send_keys` method to the following:
+
+```ruby
+def send_keys(command, target)
+  `
+  command=$(cat <<'MAGIC_WORD'
+  #{command}
+  MAGIC_WORD
+  )
+  tmux send-keys -t #{target} #{_pager_escape_sequence} "$command" C-m
+  `
+end
+```
+
+The two main concerns for this change are (1) is this implementation as widely supported as the current implementation (in terms of shells and their versions) and (2) This would technically be a backwards incompatible change where we would want to provide a deprecation path.
+
+Additionally, is it worth pursuing a similar pattern for SSHKit?
 
 #### Always-executed Setup Section
 
@@ -140,6 +164,12 @@ It is a best practice to have a plan for reverting any system changes you make. 
 This functionality could be achieved by adding a new revert entity which responds to a revert flag passed by the user (environment variable, command line config, runner/viewer option). Instead of a separate entity, this could be accomplished with a tagging solution, where a section has a revert tag that designates it should be skipped unless the revert flag is present (and vis-versa for non-revert sections). The skipping logic could be implemented using Runbook hooks.
 
 A workaround for this is to simply have a separate revert runbook to execute in the event a rollbock is needed.
+
+#### Better Error Formatting
+
+**Difficulty: 2**, **Desireability: 1**, **Conceptual Completeness: 3**
+
+Right now interpretting errors and stacktraces is difficult for people new to Runbook or Ruby. Rspec does a very good job of presenting cleanly formatted errors and helpful error messages for common problems. See their [exception presenter](https://github.com/rspec/rspec-core/blob/6c5628fc0ea83ecf51f1a4d5e0eb2036819a0dab/lib/rspec/core/formatters/exception_presenter.rb) as an example. It would be helpful to examine Rspec's practices around error formatting and providing more helpful error messages to see what can be emulated for Runbook.
 
 #### Runbook Versioning
 
