@@ -323,7 +323,7 @@ DESC
 Downloads the specified file to `to`. An optional `ssh_config` can be specified to configure how the download command gets run, for example specifying the remote host and remote directory to download from. Optional `options` can be specified that get passed down to the underlying sshkit implementation
 
 ```ruby
-download /home/pblesi/rad_file.txt, to: my_rad_file.txt, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
+download '/home/pblesi/rad_file.txt', to: my_rad_file.txt, ssh_config: {servers: ["host1.prod"]}, options: {log_percent: 10}
 ```
 
 ##### Layout
