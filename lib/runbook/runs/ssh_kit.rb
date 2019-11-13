@@ -9,6 +9,12 @@ module Runbook::Runs
     module ClassMethods
       include Runbook::Helpers::SSHKitHelper
 
+      def runbook__entities__step(object, metadata)
+        airbrussh_context = Runbook.configuration._airbrussh_context
+        airbrussh_context.set_current_task_name(object.title)
+        super
+      end
+
       def runbook__statements__assert(object, metadata)
         cmd_ssh_config = find_ssh_config(object, :cmd_ssh_config)
 

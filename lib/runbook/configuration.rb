@@ -19,6 +19,7 @@ module Runbook
   end
 
   class Configuration
+    attr_accessor :_airbrussh_context
     attr_accessor :ssh_kit
     attr_accessor :enable_sudo_prompt
     attr_reader :use_same_sudo_password
@@ -89,11 +90,16 @@ module Runbook
 
     def initialize
       self.ssh_kit = SSHKit.config
-      ssh_kit.output = Airbrussh::Formatter.new(
+      formatter = Airbrussh::Formatter.new(
         $stdout,
         banner: nil,
         command_output: true,
+        context: AirbrusshContext,
       )
+      ssh_kit.output = formatter
+      self._airbrussh_context = formatter.formatters.find do |fmt|
+        fmt.is_a?(Airbrussh::ConsoleFormatter)
+      end.context
       self.enable_sudo_prompt = true
       self.use_same_sudo_password = true
     end

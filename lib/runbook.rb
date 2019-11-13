@@ -12,6 +12,8 @@ require "tty-progressbar"
 require "tty-prompt"
 require "thor/group"
 
+require "runbook/airbrussh_context"
+
 require "runbook/configuration"
 
 require "hacks/ssh_kit"
