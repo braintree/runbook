@@ -822,7 +822,7 @@ step "Inspect plate" do
     when "carrots"
       add carrots_book
     when "peas"
-      system("runbook exec samples/print_peas.rb")
+      system("runbook exec examples/print_peas.rb")
     else
       metadata[:toolbox].warn("Found #{veggie}!")
     end
@@ -1214,7 +1214,7 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
-To execute runbook using this repo, run `bundle exec exe/runbook exec samples/layout_runbook.rb`.
+To execute runbook using this repo, run `bundle exec exe/runbook exec examples/layout_runbook.rb`.
 
 To release a new version:
 
