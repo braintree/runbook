@@ -1,0 +1,19 @@
+FROM ruby:2.5
+RUN apt-get update -qq && apt-get install -y build-essential tmux
+
+RUN mkdir /runbook
+WORKDIR /runbook
+
+RUN mkdir /runbook/bin
+ADD bin/setup /runbook/bin/setup
+
+ADD runbook.gemspec /runbook/runbook.gemspec
+ADD Gemfile /runbook/Gemfile
+ADD Gemfile.lock /runbook/Gemfile.lock
+
+RUN mkdir -p /runbook/lib/runbook
+ADD lib/runbook/version.rb /runbook/lib/runbook/version.rb
+
+RUN bin/setup
+
+ADD . /runbook
