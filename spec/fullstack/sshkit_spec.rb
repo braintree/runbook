@@ -18,15 +18,29 @@ RSpec.describe "runbook sshkit integration", type: :aruba do
   let(:stored_pose_file) {
     Runbook::Util::StoredPose._file(book_title)
   }
+  let(:user) { ENV["USER"] }
+  let(:key_dir) do
+    File.join(
+      aruba.root_directory,
+      aruba.current_directory,
+      "ssh_keys"
+    )
+  end
 
   around(:all) do |example|
     ports = "-p 10022:22"
-    mount = "-v ~/.ssh/id_rsa.pub:/etc/authorized_keys/$USER"
+    mount = "-v #{key_dir}/id_rsa.pub:/etc/authorized_keys/$USER"
     users = %Q{-e SSH_USERS="$USER:500:500"}
     image = "docker.io/panubo/sshd:1.0.3"
+
     begin
-      @cid = `docker run -d #{ports} #{mount} #{users} #{image}`.strip
+      FileUtils.mkdir_p(key_dir)
+      key_gen_cmd = "[ -f #{key_dir}/id_rsa ] || ssh-keygen -t rsa -N '' -f #{key_dir}/id_rsa"
+      `#{key_gen_cmd}`
+      run_cmd = "docker run -d #{ports} #{mount} #{users} #{image} 2>/dev/null"
+      @cid = `#{run_cmd}`.strip
       sleep 1
+      `docker exec #{@cid} chown root:root /etc/authorized_keys/$USER`
       example.run
     ensure
       `docker stop -t 0 #{@cid}`
@@ -51,12 +65,13 @@ RSpec.describe "runbook sshkit integration", type: :aruba do
       SSHKit::Backend::Netssh.configure do |ssh|
         ssh.ssh_options = {
           verify_host_key: :never,
+          keys: ["#{key_dir}/id_rsa"],
         }
       end
 
       Runbook.book "#{book_title}" do
         step do
-          server "admin@127.0.0.1:10022"
+          server "#{user}@127.0.0.1:10022"
 
           command "cat /etc/hostname"
         end

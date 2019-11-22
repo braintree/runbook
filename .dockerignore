@@ -1,6 +1,7 @@
 **/.git
 /.bundle/
 /.yardoc
+/Gemfile.lock
 /_yardoc/
 /coverage/
 /doc/

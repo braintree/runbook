@@ -1,9 +1,8 @@
-dist: bionic
+dist: xenial
 language: ruby
 services:
   - docker
 rvm:
-  - 2.2.3
   - 2.2.10
   - 2.3.8
   - 2.4.6

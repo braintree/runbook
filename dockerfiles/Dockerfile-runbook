@@ -9,7 +9,6 @@ ADD bin/setup /runbook/bin/setup
 
 ADD runbook.gemspec /runbook/runbook.gemspec
 ADD Gemfile /runbook/Gemfile
-ADD Gemfile.lock /runbook/Gemfile.lock
 
 RUN mkdir -p /runbook/lib/runbook
 ADD lib/runbook/version.rb /runbook/lib/runbook/version.rb
