@@ -4,6 +4,20 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.16.0` (2019-11-22)
+
+### Fixes:
+
+* Add better error messages for runtime values accessed at compile time
+
+### New Features
+
+* Add entity tags and labels
+* Add `setup` entity for initial runbook setup code
+* Add `Runbook.views` method for accessing an array of all defined views
+* Add airbrussh context for better ssh_kit output
+* Backtick "into" targets in markdown view output (Thanks fwolfst!)
+
 ## `v0.15.0` (2019-09-29)
 
 ### Fixes:
@@ -11,7 +25,7 @@ This log maintains a list of all substantive changes to Runbook. The log include
 * Halt the project generator if gem generation fails
 * Replace timeout_statement with abort_statement for assert statements
 * Make runbook state files only readable by the current user
-* Allow / characters in the title of a runbook (Thanks brafales)
+* Allow / characters in the title of a runbook (Thanks brafales!)
 
 ### New Features
 
