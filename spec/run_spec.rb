@@ -132,10 +132,22 @@ RSpec.describe "Runbook::Run" do
       end
 
       context "when :skip" do
-        it "skips the step" do
-          expect(toolbox).to receive(:expand).and_return(:skip)
-          subject.execute(object, metadata)
-          expect(metadata[:start_at]).to eq("1.2")
+        context "when step is top level" do
+          let(:metadata_override) { {position: "1", paranoid: true} }
+          it "skips the step" do
+            expect(toolbox).to receive(:expand).and_return(:skip)
+            subject.execute(object, metadata)
+            expect(metadata[:start_at]).to eq("2")
+          end
+        end
+
+        context "when step is nested" do
+          let(:metadata_override) { {position: "1.2.1.2", paranoid: true} }
+          it "skips the step" do
+            expect(toolbox).to receive(:expand).and_return(:skip)
+            subject.execute(object, metadata)
+            expect(metadata[:start_at]).to eq("1.2.1.3")
+          end
         end
       end
 

@@ -233,9 +233,9 @@ module Runbook
           return
         when :skip
           position = metadata[:position]
-          current_step = position.split(".")[-1].to_i
-          new_step = current_step + 1
-          start_at = position.gsub(/\.#{current_step}$/, ".#{new_step}")
+          split_position = position.split(".")
+          new_step = (split_position.pop.to_i + 1).to_s
+          start_at = (split_position <<  new_step).join(".")
           metadata[:start_at] = start_at
         when :jump
           result = toolbox.ask("What position would you like to jump to?")
