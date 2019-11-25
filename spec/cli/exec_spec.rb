@@ -101,7 +101,7 @@ RSpec.describe "runbook run", type: :aruba do
         it "re-prompts" do
           type("YY\ny")
 
-            expected_output = /.*Unknown input: Please type 'y' or 'n'\..*/
+          expected_output = /.*Invalid input\..*/
           expect(last_command_started).to have_output(expected_output)
         end
       end

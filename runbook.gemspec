@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "airbrussh", "~> 1.4"
   spec.add_runtime_dependency "thor", "~> 0.20"
   spec.add_runtime_dependency "tty-progressbar", "~> 0.14"
-  spec.add_runtime_dependency "tty-prompt", "~> 0.16"
+  spec.add_runtime_dependency "tty-prompt", "~> 0.20"
 
   spec.add_development_dependency "appraisal", "~> 2.2"
   spec.add_development_dependency "aruba", "~> 0.14"
