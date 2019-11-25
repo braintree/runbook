@@ -15,15 +15,7 @@ module Runbook
     end
 
     def yes?(msg)
-      begin
-        prompt.yes?(msg)
-      rescue TTY::Prompt::ConversionError
-        # Versions of tty-prompt after v0.19.0 do not generate this
-        # error
-        err_msg = "Unknown input: Please type 'y' or 'n'."
-        warn(err_msg)
-        retry
-      end
+      prompt.yes?(msg)
     end
 
     def output(msg)
