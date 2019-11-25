@@ -4,6 +4,12 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v0.16.1` (2019-11-25)
+
+### Fixes:
+
+* Fix bug preventing skipping of steps not nested in sections (Thanks celeen!)
+
 ## `v0.16.0` (2019-11-22)
 
 ### Fixes:
