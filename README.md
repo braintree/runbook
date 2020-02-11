@@ -2,6 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/runbook.svg)](https://badge.fury.io/rb/runbook)
 [![Build Status](https://travis-ci.org/braintree/runbook.svg?branch=master)](https://travis-ci.org/braintree/runbook)
+[![Gitter](https://badges.gitter.im/braintree/runbook.svg)](https://gitter.im/braintree/runbook?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 _See our [blog post](https://medium.com/braintree-product-technology/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
 
