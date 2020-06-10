@@ -43,7 +43,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
 
     context "when layout_file exists" do
       before(:each) do
-        expect(File).to receive(:exists?).with(layout_file).and_return(true)
+        expect(File).to receive(:exist?).with(layout_file).and_return(true)
       end
 
       context "when all panes exist" do
@@ -61,7 +61,7 @@ RSpec.describe Runbook::Helpers::TmuxHelper do
 
     context "when layout file does not exist" do
       before(:each) do
-        expect(File).to receive(:exists?).with(layout_file).and_return(false)
+        expect(File).to receive(:exist?).with(layout_file).and_return(false)
       end
 
       it "invokes _setup_layout" do
