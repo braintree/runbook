@@ -5,7 +5,7 @@ module Runbook::Helpers
     def setup_layout(structure, runbook_title:)
       _remove_stale_layouts
       layout_file = _layout_file(_slug(runbook_title))
-      if File.exists?(layout_file)
+      if File.exist?(layout_file)
         stored_layout = ::YAML::load_file(layout_file)
         if _all_panes_exist?(stored_layout)
           return stored_layout

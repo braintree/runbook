@@ -6,7 +6,7 @@ module Runbook::Util
     def self.load(metadata)
       title = metadata[:book_title]
       file = _file(title)
-      if File.exists?(file)
+      if File.exist?(file)
         ::YAML::load_file(file)
       end
     end
