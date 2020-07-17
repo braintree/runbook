@@ -2,8 +2,6 @@ module Runbook
   class Statement < Node
     include Runbook::Hooks::Invoker
 
-    attr_accessor :parent
-
     def render(view, output, metadata)
       invoke_with_hooks(view, self, output, metadata) do
         view.render(self, output, metadata)

@@ -7,7 +7,6 @@ module Runbook
       child_class.const_set(:DSL, Runbook::DSL.class)
     end
 
-    attr_accessor :parent
     attr_reader :title, :tags, :labels, :dsl
 
     def initialize(title, tags: [], labels: {}, parent: nil)
