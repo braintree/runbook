@@ -4,6 +4,25 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v1.0.0` (2020-07-24)
+
+### Breaking Changes:
+
+* Commands and tmux commands that previously escaped single quotes will now require un-escaped single quotes
+
+### Features:
+
+* Add Node#parent_entity to find the containinng entity for a node
+
+### Fixes:
+
+* Fix bugs requiring escaping single quotes in commands and tmux_commands (BACKWARDS INCOMPATIBLE CHANGE)
+* Fix `File.exists?` deprecation warning (Thanks onk!)
+
+### Documentation:
+
+* Add suppress_capture_output.rb runbook example
+
 ## `v0.16.1` (2019-11-25)
 
 ### Fixes:
