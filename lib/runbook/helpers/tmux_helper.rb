@@ -20,7 +20,7 @@ module Runbook::Helpers
     end
 
     def send_keys(command, target)
-      `tmux send-keys -t #{target} #{_pager_escape_sequence} '#{command}' C-m`
+      `tmux send-keys -t #{target} #{_pager_escape_sequence} #{Shellwords.escape(command)} C-m`
     end
 
     def kill_all_panes(layout_panes)

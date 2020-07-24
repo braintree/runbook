@@ -68,8 +68,34 @@ RSpec.describe "runbook tmux integration", type: :aruba do
         expect(last_command_started).to have_output(line)
       end
 
-      run_command( "docker exec #{@cid} ls #{sentinel_dir}")
+      run_command("docker exec #{@cid} ls #{sentinel_dir}")
       expect(last_command_started).to have_output(sentinel_file)
+    end
+
+    context "when single quotes are not escaped" do
+      let(:sentinel_file) { "#{SecureRandom.hex}$love" }
+      let(:content) do
+        <<-RUNBOOK
+        Runbook.book "#{book_title}" do
+          layout [:runbook, :commands]
+
+          step "Print stuff" do
+            tmux_command "mkdir -p #{sentinel_dir}", :commands
+            tmux_command "touch '#{sentinel_dir}/#{sentinel_file}'", :commands
+            note "file touched"
+          end
+        end
+        RUNBOOK
+      end
+
+      it "does not break tmux_command" do
+        output_lines.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
+
+        run_command("docker exec #{@cid} ls #{sentinel_dir}")
+        expect(last_command_started).to have_output(sentinel_file)
+      end
     end
   end
 end

@@ -1142,7 +1142,7 @@ Additionally, runbooks should contain their own assertions, sanity checks, monit
 
 ## Known Issues
 
-### Command Quoting
+### Command Quoting (Prior to v1.0)
 
 Because ssh_config declarations such as `user`, `group`, `path`, `env`, and `umask` are implemented as wrappers around your provided commands, you must be aware that issues can arise if your commands contain characters such as single quotes that are not properly escaped.
 

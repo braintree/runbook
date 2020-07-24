@@ -31,16 +31,18 @@ RSpec.describe "runbook sshkit integration", type: :aruba do
     ports = "-p 10022:22"
     mount = "-v #{key_dir}/id_rsa.pub:/etc/authorized_keys/$USER"
     users = %Q{-e SSH_USERS="$USER:500:500"}
-    image = "docker.io/panubo/sshd:1.0.3"
 
     begin
       FileUtils.mkdir_p(key_dir)
       key_gen_cmd = "[ -f #{key_dir}/id_rsa ] || ssh-keygen -t rsa -N '' -f #{key_dir}/id_rsa"
       `#{key_gen_cmd}`
-      run_cmd = "docker run -d #{ports} #{mount} #{users} #{image} 2>/dev/null"
+      `docker build --rm -t sshd:latest -f dockerfiles/Dockerfile-sshd .`
+      run_cmd = "docker run -d #{ports} #{mount} #{users} sshd:latest 2>/dev/null"
       @cid = `#{run_cmd}`.strip
       sleep 1
       `docker exec #{@cid} chown root:root /etc/authorized_keys/$USER`
+      `docker exec #{@cid} sed -ie 's/# \\(%wheel ALL=(ALL) NOPASSWD: ALL\\)/\\1/' /etc/sudoers`
+      `docker exec #{@cid} sed -ie 's/^wheel:\\(.*\\)/wheel:\\1,#{user}/' /etc/group`
       example.run
     ensure
       `docker stop -t 0 #{@cid}`
@@ -87,6 +89,41 @@ RSpec.describe "runbook sshkit integration", type: :aruba do
     it "executes remote commands" do
       output_lines.each do |line|
         expect(last_command_started).to have_output(line)
+      end
+    end
+
+    context "when single quotes are not escaped and user is specified" do
+      let(:echo_output) { "I \\$love you" }
+      let(:content) do
+        <<-RUNBOOK
+        SSHKit::Backend::Netssh.configure do |ssh|
+          ssh.ssh_options = {
+            verify_host_key: :never,
+            keys: ["#{key_dir}/id_rsa"],
+          }
+        end
+
+        Runbook.book "#{book_title}" do
+          step do
+            server "#{user}@127.0.0.1:10022"
+            user "root"
+
+            command "echo '#{echo_output}'"
+          end
+        end
+        RUNBOOK
+      end
+      let(:output_lines) {
+        [
+          / #{echo_output}$/,
+        ]
+      }
+
+
+      it "does not break the command" do
+        output_lines.each do |line|
+          expect(last_command_started).to have_output(line)
+        end
       end
     end
   end
