@@ -1208,7 +1208,7 @@ When defining and referencing your own functions in a runbook, functions should 
 
 ```ruby
 module Adder
-  def add(x, y)
+  def self.add(x, y)
     x + y
   end
 end
