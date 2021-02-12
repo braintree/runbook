@@ -2,6 +2,7 @@ require "tmpdir"
 require "yaml"
 require "thread"
 
+require "active_support/deprecation"
 require "active_support/inflector"
 require "method_source"
 require "pastel"

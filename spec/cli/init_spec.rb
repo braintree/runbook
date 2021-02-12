@@ -52,7 +52,6 @@ RSpec.describe "runbook install", type: :aruba do
   let(:command) { "runbook install" }
   let(:installation_output) {
     [
-      "DEPRECATION WARNING: install is deprecated and will be removed from Runbook 1.0 \\(use init instead\\) \\(called from",
       "create  Runbookfile",
       "create  runbooks",
       "create  lib/runbook",
