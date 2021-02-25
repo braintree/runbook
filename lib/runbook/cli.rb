@@ -82,17 +82,6 @@ module Runbook
       invoke(Runbook::Initializer)
     end
 
-    desc "install", "Install Runbook in an existing project", hide: true
-    Runbook::Initializer.class_options.values.each do |co|
-      method_option co.name, desc: co.description, required: co.required,
-        default: co.default, aliases: co.aliases, type: co.type,
-        banner: co.banner, hide: co.hide
-    end
-    def install
-      Runbook.deprecator.deprecation_warning(:install, :init)
-      invoke(Runbook::Initializer)
-    end
-
     desc "--version", "Print runbook's version"
     def __print_version
       puts "Runbook v#{Runbook::VERSION}"
