@@ -4,12 +4,6 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
-## `v1.0.1`
-
-### Breaking Changes:
-
-* `runbook install` has been removed per deprecation warnings
-
 ## `v1.0.0` (2020-07-24)
 
 ### Breaking Changes:
@@ -18,7 +12,7 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ### Features:
 
-* Add Node#parent_entity to find the containing entity for a node
+* Add Node#parent_entity to find the containinng entity for a node
 
 ### Fixes:
 
