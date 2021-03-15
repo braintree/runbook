@@ -321,7 +321,7 @@ In the above example, the `note` statement must be wrapped in a `ruby_command` s
 
 ##### Assert
 
-Runs the provided `cmd` repeatedly until it returns true. A timeout and maximum number of attempts can be set. Note that at least `1` attempt should be set in order to have at least one retry. When either the attempt or timeout limit is hit, a command can be specified that will be run. If no command is specified, the process will fail. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
+Runs the provided `cmd` repeatedly until it returns true. A timeout and maximum number of attempts can be set. When either the attempt or timeout limit is hit, a command can be specified that will be run. If no command is specified, the process will fail. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
 
 ```ruby
 assert(
