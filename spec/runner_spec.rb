@@ -488,6 +488,22 @@ Note: Run me last
           and_return(layout_panes)
         end
 
+        context "with keep_panes: true" do
+
+          it "does not kill all panes" do
+            expect(
+              Runbook::Runs::SSHKit
+            ).to_not receive(:kill_all_panes)
+
+            runner.run(
+              run: run,
+              auto: false,
+              paranoid: false,
+              keep_panes: true
+            )
+          end
+        end
+
         context "with auto: true" do
           it "kills all panes without prompting" do
             expect_any_instance_of(

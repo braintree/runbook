@@ -443,6 +443,7 @@ Metadata at execution time is structured as follows:
   noop: false, # A boolean indicating if you are running in noop mode. ruby_command blocks are never evaluated in noop mode
   auto: false, # A boolean indicating if you are running in auto mode
   paranoid: true, # A boolean indicating if you are running in paranoid mode (prompting before each step)
+  keep_panes: false, # A boolean indicating whether panes should be kept open after completion
   start_at: 0, # A string representing the step where nodes should start being processed
   toolbox: Runbook::Toolbox.new, # A collection of methods to invoke side-effects such as printing and collecting input
   layout_panes: {}, # A map of pane names to pane ids. `layout_panes` is used by the `tmux_command` to identify which tmux pane to send the command to

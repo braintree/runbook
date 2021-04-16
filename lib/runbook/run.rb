@@ -258,7 +258,7 @@ module Runbook
         :after,
         Runbook::Entities::Book,
       ) do |object, metadata|
-        next if metadata[:noop] || metadata[:layout_panes].none?
+        next if metadata[:noop] || metadata[:layout_panes].none? || metadata[:keep_panes]
         if metadata[:auto]
           metadata[:toolbox].output("Killing all opened tmux panes...")
           kill_all_panes(metadata[:layout_panes])

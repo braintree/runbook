@@ -11,6 +11,7 @@ module Runbook
       noop: false,
       auto: false,
       paranoid: true,
+      keep_panes: false,
       start_at: "0"
     )
       run = "Runbook::Runs::#{run.to_s.camelize}".constantize
@@ -21,6 +22,7 @@ module Runbook
         paranoid: Util::Glue.new(paranoid),
         start_at: Util::Glue.new(start_at || "0"),
         toolbox: Util::Glue.new(toolbox),
+        keep_panes: keep_panes,
         book_title: book.title,
       }).
       merge(Runbook::Entities::Book.initial_run_metadata).
