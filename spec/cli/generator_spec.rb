@@ -372,13 +372,18 @@ RSpec.describe "runbook generate", type: :aruba do
         let(:root_opt) { "--root #{root}" }
         let(:test) { "rspec" }
         let(:test_opt) { "--test #{test}" }
+        let(:ci) { "github" }
+        let(:ci_opt) { "--ci #{ci}" }
         let(:shared_lib_dir) { "lib/my_runbooks" }
         let(:shared_lib_dir_opt) { "--shared-lib-dir #{shared_lib_dir}" }
-        let(:command) { "runbook generate project #{name} #{test_opt} #{shared_lib_dir_opt} #{root_opt}" }
+        let(:opts) { [test_opt, ci_opt, shared_lib_dir_opt, root_opt].join(" ") }
+        let(:command) { "runbook generate project #{opts} #{name} " }
 
         it "generates a project" do
           last_cmd = last_command_started
-          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --no-coc --no-mit from "."}
+          bundler_version = Gem::Version.new(Bundler::VERSION)
+          changelog = "--no-changelog" if bundler_version >= Gem::Version.new("2.2.8")
+          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --ci #{ci} --rubocop #{changelog} --no-coc --no-mit from "."}
           gem_successfully_created = %Q{Gem 'my_runbooks' was successfully created.}
           project_generation_output = [
             "remove  my_runbooks/my_runbooks.gemspec",
@@ -412,9 +417,10 @@ RSpec.describe "runbook generate", type: :aruba do
 
           gemfile = "#{root}/#{name}/Gemfile"
           expect(file?(gemfile)).to be_truthy
-          expect(gemfile).to have_file_content(/gem "bundler"/)
+          expect(gemfile).to have_file_content(/gem "runbook"/)
           expect(gemfile).to have_file_content(/gem "rake"/)
           expect(gemfile).to have_file_content(/gem "rspec"/)
+          expect(gemfile).to have_file_content(/gem "rubocop"/)
         end
       end
 
@@ -424,13 +430,18 @@ RSpec.describe "runbook generate", type: :aruba do
         let(:root_opt) { "--root #{root}" }
         let(:test) { "rspec" }
         let(:test_opt) { "--test #{test}" }
+        let(:ci) { "github" }
+        let(:ci_opt) { "--ci #{ci}" }
         let(:shared_lib_dir) { "lib/my_runbooks" }
         let(:shared_lib_dir_opt) { "--shared-lib-dir #{shared_lib_dir}" }
-        let(:command) { "runbook generate project #{name} #{test_opt} #{shared_lib_dir_opt} #{root_opt} -p" }
+        let(:opts) { [test_opt, ci_opt, shared_lib_dir_opt, root_opt].join(" ") }
+        let(:command) { "runbook generate project #{opts} #{name} -p" }
 
         it "does not generate a project" do
           last_cmd = last_command_started
-          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --no-coc --no-mit from "."}
+          bundler_version = Gem::Version.new(Bundler::VERSION)
+          changelog = "--no-changelog" if bundler_version >= Gem::Version.new("2.2.8")
+          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --ci #{ci} --rubocop #{changelog} --no-coc --no-mit from "."}
           gem_successfully_created = %Q{Gem 'my_runbooks' was successfully created.}
           project_generation_output = [
             "remove  my_runbooks/my_runbooks.gemspec",
@@ -473,13 +484,18 @@ RSpec.describe "runbook generate", type: :aruba do
         let(:root_opt) { "--root #{root}" }
         let(:test) { "rspec" }
         let(:test_opt) { "--test #{test}" }
+        let(:ci) { "github" }
+        let(:ci_opt) { "--ci #{ci}" }
         let(:shared_lib_dir) { "lib/my_runbooks" }
         let(:shared_lib_dir_opt) { "--shared-lib-dir #{shared_lib_dir}" }
-        let(:command) { "runbook generate project #{name} #{test_opt} #{shared_lib_dir_opt} #{root_opt}" }
+        let(:opts) { [test_opt, ci_opt, shared_lib_dir_opt, root_opt].join(" ") }
+        let(:command) { "runbook generate project #{opts} #{name} " }
 
         it "does not generate a project" do
           last_cmd = last_command_started
-          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --no-coc --no-mit from "."}
+          bundler_version = Gem::Version.new(Bundler::VERSION)
+          changelog = "--no-changelog" if bundler_version >= Gem::Version.new("2.2.8")
+          bundle_gem_output = %Q{run  bundle gem #{name} --test #{test} --ci #{ci} --rubocop #{changelog} --no-coc --no-mit from "."}
           invalid_gem_name = %Q{Invalid gem name 7l Please give a name which does not start with numbers.}
           project_generation_output = [
             "remove  my_runbooks/my_runbooks.gemspec",
@@ -513,9 +529,10 @@ RSpec.describe "runbook generate", type: :aruba do
 
           gemfile = "#{root}/#{name}/Gemfile"
           expect(file?(gemfile)).to be_falsey
-          expect(gemfile).to_not have_file_content(/gem "bundler"/)
+          expect(gemfile).to_not have_file_content(/gem "runbook"/)
           expect(gemfile).to_not have_file_content(/gem "rake"/)
           expect(gemfile).to_not have_file_content(/gem "rspec"/)
+          expect(gemfile).to_not have_file_content(/gem "rubocop"/)
           expect(last_command_stopped.exit_status).to_not eq(0)
         end
       end

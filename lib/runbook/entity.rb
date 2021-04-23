@@ -26,7 +26,7 @@ module Runbook
       @items ||= []
     end
 
-    def method_missing(method, *args, &block)
+    ruby2_keywords def method_missing(method, *args, &block)
       if dsl.respond_to?(method)
         dsl.send(method, *args, &block)
       else
