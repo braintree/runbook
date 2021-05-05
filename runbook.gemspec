@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "activesupport", ">= 5.0.1.x", "< 7.0"
-  spec.add_runtime_dependency "method_source", "~> 0.9"
+  spec.add_runtime_dependency "method_source", "~> 1.0"
   spec.add_runtime_dependency "sshkit", "1.21.0"
   spec.add_runtime_dependency "sshkit-sudo", "~> 0.1"
   spec.add_runtime_dependency "airbrussh", "~> 1.4"
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "bcrypt_pbkdf", ">= 1.0", "< 2.0"
   spec.add_development_dependency "ed25519", ">= 1.2", "< 2.0"
-  spec.add_development_dependency "pry", "~> 0.11"
+  spec.add_development_dependency "pry", "~> 0.13"
   spec.add_development_dependency "pry-byebug", "~> 3.6"
   spec.add_development_dependency "rake", "~> 12.3"
   spec.add_development_dependency "rspec", "~> 3.0"
