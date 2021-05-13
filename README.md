@@ -321,16 +321,16 @@ In the above example, the `note` statement must be wrapped in a `ruby_command` s
 
 ##### Assert
 
-Runs the provided `cmd` repeatedly until it returns true. A timeout and maximum number of attempts can be set. You can specify a command to be run if a timeout occurs or the maximum number of attempts is hit. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
+Runs the provided `cmd` repeatedly until it returns true. A timeout and maximum number of attempts can be set. When either the attempt or timeout limit is hit, a command can be specified that will be run. If no command is specified, the process will fail. Commands can optionally be specified as `raw`. This tells SSHKit to not perform auto-wrapping of the commands, but execute the exact string on the remote server. See SSHKit's documentation for more details.
 
 ```ruby
 assert(
   'service nginx status | grep "is running"',
   cmd_ssh_config: {servers: ["host1.prod"], parallelization: {strategy: :parallel}},
   cmd_raw: false,
-  interval: 3, # seconds
-  timeout: 300, # seconds
-  attempts: 3,
+  interval: 3,   # How often, in seconds, to wait between tries
+  timeout: 300,  # Total time, in seconds, to keep trying command, after which it will fail
+  attempts: 3,   # Total number of attempts after which the process will fail
   abort_statement: Runbook::Statements::Command.new(
     "echo 'help' | mail -s 'need help' page-me@page-me.com",
     ssh_config: {servers: [:local], parallelization: {strategy: :parallel}},
