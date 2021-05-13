@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "bcrypt_pbkdf", ">= 1.0", "< 2.0"
   spec.add_development_dependency "ed25519", ">= 1.2", "< 2.0"
-  spec.add_development_dependency "pry", "~> 0.11"
+  spec.add_development_dependency "pry", "~> 0.13"
   spec.add_development_dependency "pry-byebug", "~> 3.6"
   spec.add_development_dependency "rake", "~> 12.3"
   spec.add_development_dependency "rspec", "~> 3.0"
