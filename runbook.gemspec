@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "appraisal", "~> 2.2"
   spec.add_development_dependency "aruba", "~> 0.14"
-  spec.add_development_dependency "bundler", "~> 1.15"
+  spec.add_development_dependency "bundler", ">= 2.1.0"
   spec.add_development_dependency "bcrypt_pbkdf", ">= 1.0", "< 2.0"
   spec.add_development_dependency "ed25519", ">= 1.2", "< 2.0"
   spec.add_development_dependency "pry", "~> 0.13"
