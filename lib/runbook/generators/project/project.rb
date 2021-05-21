@@ -22,15 +22,20 @@ module Runbook::Generators
       desc: "Target directory for shared runbook code"
     class_option :test, type: :string, enum: ["rspec", "minitest"],
       default: "rspec", desc: %Q{Test-suite, "rspec" or "minitest"}
+    class_option :ci, type: :string, enum: ["github", "travis", "gitlab", "circle"],
+      default: "github", desc: %Q{CI Service, "github", "travis", "gitlab", or "circle"}
 
     def init_gem
       bundle_exists = "which bundle 2>&1 1>/dev/null"
       raise "Please ensure bundle is installed" unless system(bundle_exists)
+      bundler_version = Gem::Version.new(Bundler::VERSION)
 
       inside(parent_options[:root]) do
         test = "--test #{options[:test]}"
+        ci = "--ci #{options[:ci]}"
+        changelog = "--no-changelog" if bundler_version >= Gem::Version.new("2.2.8")
         continue = (
-          run("bundle gem #{_name} #{test} --no-coc --no-mit") ||
+          run("bundle gem #{_name} #{test} #{ci} --rubocop #{changelog} --no-coc --no-mit") ||
           options[:pretend]
         )
         exit 1 unless continue
@@ -53,6 +58,9 @@ module Runbook::Generators
       remove_file(readme)
 
       gemfile = File.join(*dirs, "Gemfile")
+      if File.exist?(gemfile)
+        @gemfile_file_contents = File.readlines(gemfile)
+      end
       remove_file(gemfile)
 
       base_file = File.join(*dirs, "lib", "#{_name}.rb")
@@ -102,14 +110,25 @@ module Runbook::Generators
       template("templates/Gemfile.tt", target)
 
       # Add development dependencies from gemspec
-      return unless @gemspec_file_contents
-      gems = @gemspec_file_contents.select do |line|
-        line =~ /  spec.add_development_dependency/
-      end.map do |line|
-        line.gsub(/  spec.add_development_dependency/, "gem")
-      end.join
+      if @gemspec_file_contents
+        gems = @gemspec_file_contents.select do |line|
+          line =~ /  spec.add_development_dependency/
+        end.map do |line|
+          line.gsub(/  spec.add_development_dependency/, "gem")
+        end.join
 
-      append_to_file(target, "\n#{gems}", verbose: false)
+        append_to_file(target, "\n#{gems}", verbose: false)
+      end
+
+      # Add gemfile gems
+      if @gemfile_file_contents
+        gems = @gemfile_file_contents.select do |line|
+          line =~ /^gem /
+        end.join
+
+        append_to_file(target, "\n#{gems}", verbose: false)
+      end
+
     end
 
     def create_base_file
