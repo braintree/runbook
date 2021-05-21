@@ -4,6 +4,23 @@ This log maintains a list of all substantive changes to Runbook. The log include
 
 ## master
 
+## `v1.1.0` (2021-05-21)
+
+### Breaking Changes:
+
+* Removes `runbook install` (should have happened in v1.0.0)
+* Drops support for Ruby 2.2 and bundler < 2.2
+
+### Features:
+
+* Add support for Ruby 3.0.0 (thanks @pblesi!)
+* Add metadata argument that saves TMUX panes: keep_panes (thanks @ClashTheBunny)
+
+### Documentation:
+
+* Update assert parameters description
+* Update example for module class method (thanks @voodoologic!)
+
 ## `v1.0.0` (2020-07-24)
 
 ### Breaking Changes:
