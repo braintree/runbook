@@ -25,10 +25,11 @@ jobs:
         ruby-version:
           - 2.3.8
           - 2.4.10
-          - 2.5.8
-          - 2.6.6
-          - 2.7.2
-          - '3.0.0' # Due to https://github.com/actions/runner/issues/849, we have to use quotes for '3.0'
+          - 2.5
+          - 2.6
+          - 2.7
+          - '3.0'  # Due to https://github.com/actions/runner/issues/849, we have to use quotes for '3.0'
+          - 3.1
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
