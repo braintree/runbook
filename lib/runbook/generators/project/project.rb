@@ -1,3 +1,5 @@
+require "bundler"
+
 module Runbook::Generators
   class Project < Thor::Group
     include ::Runbook::Generators::Base
