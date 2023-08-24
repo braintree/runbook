@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/runbook.svg)](https://badge.fury.io/rb/runbook)
 [![Build Status](https://github.com/braintree/runbook/actions/workflows/ruby.yml/badge.svg?branch=master&event=push)](https://github.com/braintree/runbook/actions?query=branch%3Amaster+event%3Apush)
 
-_See our [blog post](https://medium.com/@patrick.blesi/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
+_See [this blog post](https://medium.com/@patrick.blesi/https-medium-com-braintree-product-technology-runbook-be6f072cfc0d) for the philosophy behind Runbook and an overview of its features._
 
 Runbook provides a DSL for specifying a series of steps to execute an operation. Once your runbook is specified, you can use it to generate a formatted representation of the book or to execute the runbook interactively. For example, you can export your runbook to markdown or use the same runbook to execute commands on remote servers.
 
